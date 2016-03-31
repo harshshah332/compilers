@@ -1,0 +1,7 @@
+lex.yy.c
+lex.yy.o
+errors.o
+glc
+main.o
+utility.o
+sftp-config.json
