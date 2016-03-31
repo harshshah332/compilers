@@ -14,7 +14,7 @@
 #include <string.h>
 #include "scanner.h"
 #include "utility.h" // for PrintDebug()
-#include "errors.h"
+#include "errors.h" 
 
 /* Global variable: yylval
  * -----------------------
