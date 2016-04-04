@@ -77,7 +77,6 @@ FIELDSELECTION     ({IDENTIFIER}"."{IDENTIFIER})
 
 
 
-
 %x ML_COMMENT
 %%             /* BEGIN RULES SECTION */
  /* All patterns and actions should be placed between the start and stop
