@@ -129,34 +129,32 @@ struct                 { return T_Struct; }
 /* Check for single and multi character operators and return appropriate operator token */
 
 
-+                     { return T_Plus; }
-/* what is the thing for minus sign */
--                     { return T_Dash; }
+"++"                    { return T_Inc; }
+"--"                    { return T_Dec; }
+"<="                    { return T_LessEqual; }
+">="                    { return T_GreaterEqual; }
+"=="                    { return T_EQ; }
+"!="                    { return T_NE; }
+"&&"                    { return T_And; }
+"||"                    { return T_Or; }
 
-:                     { return T_Colon; }
-;                     { return T_Semicolon; }
-.                     { return T_Dot; }
-[                     { return T_LeftBracket; }
-]                     { return T_RightBracket; }
-(                     { return T_LeftParen; }
-)                     { return T_RightParen; }
-{                     { return T_LeftBrace; }
-}                     { return T_RightBrace; }
-=                     { return T_Equal; }
-
-
-<=                    { return T_LessEqual; }
->=                    { return T_GreaterEqual; }
-==                    { return T_EQ; }
-!=                    { return T_NE; }
-&&                    { return T_And; }
-||                    { return T_Or; }
-++                    { return T_Inc; }
---                    { return T_Dec; }
-
-
-
-
+"["                     { return T_LeftBracket; }
+"]"                     { return T_RightBracket; }
+"("                     { return T_LeftParen; }
+")"                     { return T_RightParen; }
+"{"                     { return T_LeftBrace; }
+"}"                     { return T_RightBrace; }
+"."                     { return T_Dot; }
+":"                     { return T_Colon; }
+"="                     { return T_Equal; }
+";"                     { return T_Semicolon; }
+"-"                     { return T_Dash; }
+"+"                     { return T_Plus; }
+"*"                     { return T_Star; }
+"/"                     { return T_Slash; }
+"<"                     { return T_LeftAngle; }
+">"                     { return T_RightAngle; }
+"?"                     { return T_Question; }
 
 
 /* Boolean check for true or false and return that value */
