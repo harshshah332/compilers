@@ -66,7 +66,8 @@ int currentLineNum, currentColNum;
 BOOLEAN   (true|false)
 
 INTEGER   ([0-9]+)
-FLOAT              ({INTEGER}"."{INTEGER}) 
+CHARS              (\"[^\"\n]*\")
+FLOAT              ({INTEGER}\.{INTEGER}{CHARS}?) 
 IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
