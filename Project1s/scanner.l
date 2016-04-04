@@ -190,7 +190,7 @@ struct                 { return T_Struct; }
 
 
 {FLOAT}                  {
-                           yylval.floatConstant = strtol(yytext, NULL, 10);
+                           yylval.floatConstant = atof(yytext); 
                            return T_Float; 
 
 
