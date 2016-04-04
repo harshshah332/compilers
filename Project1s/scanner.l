@@ -68,12 +68,12 @@ NUMBER             ([0-9])
 INTEGER            ({NUMBER}+)
 CHARS              (\"[^\"\n]*\")
 EXPONENT           ([Ee][+-]?{INTEGER})
-FLOAT              ({INTEGER}\.{NUMBER}+{EXPONENT}?[a-zA-Z]?) 
+FLOAT              ( ({INTEGER}\.{NUMBER}+{EXPONENT}?[a-zA-Z]?) | ({INTEGER}{EXPONENT}?[a-zA-Z]?)) 
 IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 STARTCOMMENT       ("/*")
 ENDCOMMENT         ("*/")
 SINGLECOMMENT      ("//"[^\n]*)
-
+FIELDSELECTION     ({IDENTIFIER}"."{IDENTIFIER})
 
 
 
@@ -179,15 +179,12 @@ struct                 { return T_Struct; }
 {IDENTIFIER}            { 
                           if (yyleng > MaxIdentLen) {
 
-                            //do some error here
+                            ReportError::LongIdentifier(&yylloc, yytext);
                           }
                             strncpy(yylval.identifier, yytext, MaxIdentLen);
                             yylval.identifier[MaxIdentLen] = '\0';
                             return T_Identifier;
 
-
-                          
-              
                         }
 
 
