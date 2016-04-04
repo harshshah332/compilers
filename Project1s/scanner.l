@@ -126,7 +126,7 @@ return                 { return T_Return; }
 struct                 { return T_Struct; }
 
 
-// Check for single and multi character operators and return appropriate operator token 
+
 
 
 "++"                    { return T_Inc; }
@@ -157,7 +157,7 @@ struct                 { return T_Struct; }
 "?"                     { return T_Question; }
 
 
-// Boolean check for true or false and return that value 
+
 {BOOLEAN}                { 
                            if (strcmp("true", yytext) == 0) {
                             yylval.boolConstant = true;
@@ -169,7 +169,6 @@ struct                 { return T_Struct; }
                            return T_BoolConstant;
                          }
 
-// check for identifier, if length is greater than MaxIdentLen, then truncate and set to yylval 
 
 
 {IDENTIFIER}            { 
