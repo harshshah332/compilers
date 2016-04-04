@@ -67,7 +67,7 @@ BOOLEAN            (true|false)
 NUMBER             ([0-9]+)
 INTEGER            ((\+|\-)?{NUMBER})
 CHARS              (\"[^\"\n]*\")
-FLOAT              ({INTEGER}\.{NUMBER}{CHARS}?) 
+FLOAT              ({INTEGER}\.{NUMBER}[a-zA-Z]?) 
 IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
