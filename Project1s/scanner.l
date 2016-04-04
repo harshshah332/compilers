@@ -77,6 +77,14 @@ bool                   { return T_Bool; }
 
 void 		{return T_Void;}
 
+{BOOLEAN}                { 
+                           if (strcmp("true", yytext) == 0)
+                               yylval.boolConstant = true;
+                           else
+             yylval.boolConstant = false;
+                           return T_BoolConstant;
+                         }
+
 %%
 
 /* The closing %% above marks the end of the Rules section and the beginning
