@@ -89,7 +89,7 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
  /* check for keyworda and return that token from the scanner.h */
 
 uniform                { return T_Uniform; }
-const                  { return T_const; }
+const                  { return T_Const; }
 break                  { return T_Break; }
 continue               { return T_Continue; }
 do                     { return T_Do; }
