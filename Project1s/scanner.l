@@ -173,19 +173,31 @@ struct                 { return T_Struct; }
 
 {IDENTIFIER}            { 
                           if (yyleng > MaxIdentLen) {
+
+                            //do some error here
+                          }
                             strncpy(yylval.identifier, yytext, MaxIdentLen);
                             yylval.identifier[MaxIdentLen] = '\0';
                             return T_Identifier;
 
 
-                          }
+                          
               
                         }
 
 
 
 
+{FLOAT}                  {
+                           yylval.doubleConstant = atof(yytext); return T_DoubleConstant; 
 
+
+                          } 
+                        
+{INTEGER}               { 
+                          yylval.integerConstant = strtol(yytext, NULL, 10);
+                          return T_IntConstant; 
+                        }                        
 
 
 
