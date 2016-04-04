@@ -64,6 +64,7 @@ int currentLineNum, currentColNum;
   */
 
 BOOLEAN   (true|false)
+FLOAT              ({DECIMAL}\.{DECIMAL}?((E|e)(\+|\-)?{DECIMAL})?)
 
 %x ML_COMMENT
 %%             /* BEGIN RULES SECTION */
@@ -72,6 +73,7 @@ BOOLEAN   (true|false)
   */ 
 
 [\n]		{currentLineNum++; currentColNum = 1;}
+bool                   { return T_Bool; }
 
 void 		{return T_Void;}
 
