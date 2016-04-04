@@ -71,8 +71,6 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 STARTCOMMENT       ("/*")
 ENDCOMMENT         ("*/")
 SINGLECOMMENT      ("//"[^\n]*)
-FIELDSELECTION     ({IDENTIFIER}"."{IDENTIFIER})
-
 
 
 
@@ -189,8 +187,8 @@ struct                 { return T_Struct; }
 
 
 {FLOAT}                  {
-                           yylval.floatConstant = strtol(yytext, NULL, 10);
-                           return T_Float; 
+                           yylval.floatConstant = atof(yytext); 
+                           return T_FloatConstant; 
 
 
                           } 
