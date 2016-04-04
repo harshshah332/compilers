@@ -73,7 +73,6 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 STARTCOMMENT       ("/*")
 ENDCOMMENT         ("*/")
 SINGLECOMMENT      ("//"[^\n]*)
-FIELDSELECTION     ({IDENTIFIER}"."{IDENTIFIER})
 
 
 
