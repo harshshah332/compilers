@@ -14,7 +14,13 @@
 #include <string.h>
 #include "scanner.h"
 #include "utility.h" // for PrintDebug()
-#include "errors.h"
+#include "errors.h" 
+
+
+
+
+
+
 
 /* Global variable: yylval
  * -----------------------
@@ -57,7 +63,20 @@ int currentLineNum, currentColNum;
   * entries in the Rules section later. 
   */
 
-BOOLEAN   (true|false)
+BOOLEAN            (true|false)
+NUMBER             ([0-9])
+INTEGER            ({NUMBER}+)
+CHARS              (\"[^\"\n]*\")
+EXPONENT           ([Ee][+-]?{INTEGER})
+FLOAT              ( ({INTEGER}\.{NUMBER}+{EXPONENT}?[a-zA-Z]?) | ({INTEGER}{EXPONENT}?[a-zA-Z]?)) 
+IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
+STARTCOMMENT       ("/*")
+ENDCOMMENT         ("*/")
+SINGLECOMMENT      ("//"[^\n]*)
+FIELDSELECTION     ({IDENTIFIER}"."{IDENTIFIER})
+
+
+
 
 %x ML_COMMENT
 %%             /* BEGIN RULES SECTION */
@@ -65,9 +84,137 @@ BOOLEAN   (true|false)
   * %% markers which delimit the Rules section. 
   */ 
 
-[\n]		{currentLineNum++; currentColNum = 1;}
+"\n"		{currentLineNum++; currentColNum = 1;}
+{STARTCOMMENT}                { }
+{ENDCOMMENT}                  { }
+{SINGLECOMMENT}               { }
 
-void 		{return T_Void;}
+
+
+
+ /* check for keyworda and return that token from the scanner.h */
+
+uniform                { return T_Uniform; }
+const                  { return T_Const; }
+break                  { return T_Break; }
+continue               { return T_Continue; }
+do                     { return T_Do; }
+for                    { return T_For; }
+while                  { return T_While; }
+switch                 { return T_Switch; }
+case                   { return T_Case; }
+default                { return T_Default; }
+if                     { return T_If; }
+else                   { return T_Else; }
+in                     { return T_In; }
+out                    { return T_Out; }
+float                  { return T_Float; }
+int                    { return T_Int; }
+void                   { return T_Void; }
+bool                   { return T_Bool; }
+mat2                   { return T_Mat2; }
+mat3                   { return T_Mat3; }
+mat4                   { return T_Mat4; }
+vec2                   { return T_Vec2; }
+vec3                   { return T_Vec3; }
+vec4                   { return T_Vec4; }
+ivec2                  { return T_Ivec2; }
+ivec3                  { return T_Ivec3; }
+ivec4                  { return T_Ivec4; }
+bvec2                  { return T_Bvec2; }
+bvec3                  { return T_Bvec3; }
+bvec4                  { return T_Bvec4; }
+uint                   { return T_Uint; }
+uvec2                  { return T_Uvec2; }
+uvec3                  { return T_Uvec3; }
+uvec4                  { return T_Uvec4; }
+return                 { return T_Return; }
+struct                 { return T_Struct; }
+
+
+
+
+
+"++"                    { return T_Inc; }
+"--"                    { return T_Dec; }
+"<="                    { return T_LessEqual; }
+">="                    { return T_GreaterEqual; }
+"=="                    { return T_EQ; }
+"!="                    { return T_NE; }
+"&&"                    { return T_And; }
+"||"                    { return T_Or; }
+
+"["                     { return T_LeftBracket; }
+"]"                     { return T_RightBracket; }
+"("                     { return T_LeftParen; }
+")"                     { return T_RightParen; }
+"{"                     { return T_LeftBrace; }
+"}"                     { return T_RightBrace; }
+"."                     { return T_Dot; }
+":"                     { return T_Colon; }
+"="                     { return T_Equal; }
+";"                     { return T_Semicolon; }
+"-"                     { return T_Dash; }
+"+"                     { return T_Plus; }
+"*"                     { return T_Star; }
+"/"                     { return T_Slash; }
+"<"                     { return T_LeftAngle; }
+">"                     { return T_RightAngle; }
+"?"                     { return T_Question; }
+
+
+
+{BOOLEAN}                { 
+                           if (strcmp("true", yytext) == 0) {
+                            yylval.boolConstant = true;
+                           }
+                           else {
+                            yylval.boolConstant = false;
+                           }
+                           return T_BoolConstant;
+                         }
+
+
+
+{IDENTIFIER}            { 
+                          if (yyleng > MaxIdentLen) {
+
+                            ReportError::LongIdentifier(&yylloc, yytext);
+                          }
+                            strncpy(yylval.identifier, yytext, MaxIdentLen);
+                            yylval.identifier[MaxIdentLen] = '\0';
+                            return T_Identifier;
+
+                        }
+
+
+
+
+{FLOAT}                  {
+                           yylval.floatConstant = strtol(yytext, NULL, 10);
+                           return T_Float; 
+
+
+                          } 
+                        
+{INTEGER}               { 
+                          yylval.integerConstant = strtol(yytext, NULL, 10);
+                          return T_IntConstant; 
+                        }                        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 %%
 
