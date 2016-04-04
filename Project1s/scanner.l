@@ -66,7 +66,7 @@ int currentLineNum, currentColNum;
 BOOLEAN   (true|false)
 
 INTEGER   ([0-9]+)
-FLOAT              ({INTEGER}\.{INTEGER}) 
+FLOAT              ({INTEGER}"."{INTEGER}) 
 IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
@@ -165,7 +165,6 @@ struct                 { return T_Struct; }
                            else {
                             yylval.boolConstant = false;
                            }
-                           yylval.boolConstant = false;
                            return T_BoolConstant;
                          }
 
