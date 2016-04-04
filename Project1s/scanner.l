@@ -66,7 +66,7 @@ int currentLineNum, currentColNum;
 BOOLEAN   (true|false)
 
 INTEGER   ([0-9]+)
-FLOAT              ({INTEGER}\.{INTEGER})
+FLOAT              ({INTEGER}\.{INTEGER}) 
 IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
@@ -128,14 +128,6 @@ struct                 { return T_Struct; }
 
 /* Check for single and multi character operators and return appropriate operator token */
 
-<=                    { return T_LessEqual; }
->=                    { return T_GreaterEqual; }
-==                    { return T_EQ; }
-!=                    { return T_NE; }
-&&                    { return T_And; }
-||                    { return T_Or; }
-++                    { return T_Inc; }
---                    { return T_Dec; }
 
 +                     { return T_Plus; }
 /* what is the thing for minus sign */
@@ -151,6 +143,16 @@ struct                 { return T_Struct; }
 {                     { return T_LeftBrace; }
 }                     { return T_RightBrace; }
 =                     { return T_Equal; }
+
+
+<=                    { return T_LessEqual; }
+>=                    { return T_GreaterEqual; }
+==                    { return T_EQ; }
+!=                    { return T_NE; }
+&&                    { return T_And; }
+||                    { return T_Or; }
+++                    { return T_Inc; }
+--                    { return T_Dec; }
 
 
 
