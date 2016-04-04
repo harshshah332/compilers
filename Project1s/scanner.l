@@ -181,15 +181,14 @@ struct                 { return T_Struct; }
                             return T_Identifier;
 
 
-                          
-              
+          
                         }
 
 
 
 
 {FLOAT}                  {
-                           yylval.doubleConstant = atof(yytext); 
+                           yylval.floatConstant = atof(yytext); 
                            return T_Float; 
 
 
