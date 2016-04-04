@@ -63,11 +63,11 @@ int currentLineNum, currentColNum;
   * entries in the Rules section later. 
   */
 
-BOOLEAN   (true|false)
-
-INTEGER   ([0-9]+)
+BOOLEAN            (true|false)
+NUMBER             ([0-9]+)
+INTEGER            ((\+|\-)?{NUMBER})
 CHARS              (\"[^\"\n]*\")
-FLOAT              ({INTEGER}\.{INTEGER}{CHARS}?) 
+FLOAT              ({INTEGER}\.{NUMBER}{CHARS}?) 
 IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
