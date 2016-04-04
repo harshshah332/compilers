@@ -64,7 +64,15 @@ int currentLineNum, currentColNum;
   */
 
 BOOLEAN   (true|false)
-FLOAT              ({DECIMAL}\.{DECIMAL}?((E|e)(\+|\-)?{DECIMAL})?)
+
+INTEGER   ([0-9]+)
+FLOAT              ({INTEGER}\.{INTEGER})
+IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
+
+
+
+
+
 
 %x ML_COMMENT
 %%             /* BEGIN RULES SECTION */
@@ -73,17 +81,126 @@ FLOAT              ({DECIMAL}\.{DECIMAL}?((E|e)(\+|\-)?{DECIMAL})?)
   */ 
 
 [\n]		{currentLineNum++; currentColNum = 1;}
+
+
+
+
+
+ /* check for keyworda and return that token from the scanner.h */
+
+uniform                { return T_Uniform; }
+const                  { return T_const; }
+break                  { return T_Break; }
+continue               { return T_Continue; }
+do                     { return T_Do; }
+for                    { return T_For; }
+while                  { return T_While; }
+switch                 { return T_Switch; }
+case                   { return T_Case; }
+default                { return T_Default; }
+if                     { return T_If; }
+else                   { return T_Else; }
+in                     { return T_In; }
+out                    { return T_Out; }
+float                  { return T_Float; }
+int                    { return T_Int; }
+void                   { return T_Void; }
 bool                   { return T_Bool; }
+mat2                   { return T_Mat2; }
+mat3                   { return T_Mat3; }
+mat4                   { return T_Mat4; }
+vec2                   { return T_Vec2; }
+vec3                   { return T_Vec3; }
+vec4                   { return T_Vec4; }
+ivec2                  { return T_Ivec2; }
+ivec3                  { return T_Ivec3; }
+ivec4                  { return T_Ivec4; }
+bvec2                  { return T_Bvec2; }
+bvec3                  { return T_Bvec3; }
+bvec4                  { return T_Bvec4; }
+uint                   { return T_Uint; }
+uvec2                  { return T_Uvec2; }
+uvec3                  { return T_Uvec3; }
+uvec4                  { return T_Uvec4; }
+return                 { return T_Return; }
+struct                 { return T_Struct; }
 
-void 		{return T_Void;}
 
+/* Check for single and multi character operators and return appropriate operator token */
+
+<=                    { return T_LessEqual; }
+>=                    { return T_GreaterEqual; }
+==                    { return T_EQ; }
+!=                    { return T_NE; }
+&&                    { return T_And; }
+||                    { return T_Or; }
+++                    { return T_Inc; }
+--                    { return T_Dec; }
+
++                     { return T_Plus; }
+/* what is the thing for minus sign */
+-                     { return T_Dash; }
+
+:                     { return T_Colon; }
+;                     { return T_Semicolon; }
+.                     { return T_Dot; }
+[                     { return T_LeftBracket; }
+]                     { return T_RightBracket; }
+(                     { return T_LeftParen; }
+)                     { return T_RightParen; }
+{                     { return T_LeftBrace; }
+}                     { return T_RightBrace; }
+=                     { return T_Equal; }
+
+
+
+
+
+
+/* Boolean check for true or false and return that value */
 {BOOLEAN}                { 
-                           if (strcmp("true", yytext) == 0)
-                               yylval.boolConstant = true;
-                           else
-             yylval.boolConstant = false;
+                           if (strcmp("true", yytext) == 0) {
+                            yylval.boolConstant = true;
+                           }
+                           else {
+                            yylval.boolConstant = false;
+                           }
+                           yylval.boolConstant = false;
                            return T_BoolConstant;
                          }
+
+/* check for identifier, if length is greater than MaxIdentLen, then truncate and set to yylval */
+
+
+{IDENTIFIER}            { 
+                          if (yyleng > MaxIdentLen) {
+                            strncpy(yylval.identifier, yytext, MaxIdentLen);
+                            yylval.identifier[MaxIdentLen] = '\0';
+                            return T_Identifier;
+
+
+                          }
+              
+                        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 %%
 
