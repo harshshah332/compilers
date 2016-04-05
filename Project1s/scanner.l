@@ -61,6 +61,9 @@ int currentLineNum, currentColNum;
   * entries in the Rules section later. 
   */
 
+STARTCOMMENT       ("/*")
+ENDCOMMENT         ("*/")
+SINGLECOMMENT      ("//"[^\n]*)
 BOOLEAN            (true|false)
 NUMBER             ([0-9])
 INTEGER            ({NUMBER}+)
@@ -68,9 +71,6 @@ CHARS              (\"[^\"\n]*\")
 EXPONENT           ([Ee][+-]?{INTEGER})
 FLOAT              ({INTEGER}\.{NUMBER}+{EXPONENT}?[a-zA-Z]?) 
 IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
-STARTCOMMENT       ("/*")
-ENDCOMMENT         ("*/")
-SINGLECOMMENT      ("//"[^\n]*)
 
 
 
