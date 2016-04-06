@@ -83,7 +83,7 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
   */ 
 
 {NEWLINE}                  		{currentLineNum++; currentColNum = 1;}
-{TAB}                         { currentColNum += 8 - currentColNum % 8;} 
+{TAB}                         { currentColNum += 8 - currentColNum % 8; return T_Dot;} 
 {STARTCOMMENT}                { return T_Dot;}
 {ENDCOMMENT}                  { }
 {SINGLECOMMENT}               { }
