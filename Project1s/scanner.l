@@ -70,7 +70,6 @@ INTEGER            ({NUMBER}+)
 CHARS              (\"[^\"\n]*\")
 EXPONENT           ([Ee][+-]?{INTEGER})
 FLOAT              ({INTEGER}\.{NUMBER}+{EXPONENT}?[a-zA-Z]?) 
-NEWLINE            ("\n")
 IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
@@ -81,7 +80,7 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
   * %% markers which delimit the Rules section. 
   */ 
 
-{NEWLINE}                      		{currentLineNum++; currentColNum = 1;}
+[\n]                      		{currentLineNum++; currentColNum = 1;}
 "\t"                          { currentColNum += 8 - currentColNum % 8; } 
 "/*"                          { return T_Dot;}
 "*/"                          { return T_Dot;}
