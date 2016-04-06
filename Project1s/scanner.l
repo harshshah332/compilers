@@ -81,7 +81,7 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
   */ 
 
 "\n"		{currentLineNum++; currentColNum = 1;}
-{STARTCOMMENT}                { }
+{STARTCOMMENT}                { return t+T_Break;}
 {ENDCOMMENT}                  { }
 {SINGLECOMMENT}               { }
 
