@@ -61,6 +61,7 @@ int currentLineNum, currentColNum;
   * entries in the Rules section later. 
   */
 
+STARTCOMMENT       ("/*")
 ENDCOMMENT         ("*/")
 SINGLECOMMENT      ("//"[^\n]*)
 BOOLEAN            (true|false)
@@ -80,7 +81,7 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
   */ 
 
 "\n"		{currentLineNum++; currentColNum = 1;}
- "/*"               { return T_Dot;}
+{STARTCOMMENT}                { return T_Dot;}
 {ENDCOMMENT}                  { }
 {SINGLECOMMENT}               { }
 
