@@ -67,6 +67,7 @@ SINGLECOMMENT      ("//"[^\n]*)
 BOOLEAN            (true|false)
 NUMBER             ([0-9])
 INTEGER            ({NUMBER}+)
+UINT               ({INTEGER}\u)
 CHARS              (\"[^\"\n]*\")
 EXPONENT           ([Ee][+-]?{INTEGER})
 FLOAT              ({INTEGER}\.{NUMBER}+{EXPONENT}?[a-zA-Z]?) 
@@ -193,7 +194,13 @@ struct                 { return T_Struct; }
 
 
                           } 
-                        
+          
+
+{UINT}               { 
+                          yylval.integerConstant = strtol(yytext, NULL, 10);
+                          return T_IntConstant; 
+                        }                        
+              
 {INTEGER}               { 
                           yylval.integerConstant = strtol(yytext, NULL, 10);
                           return T_IntConstant; 
