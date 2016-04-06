@@ -64,6 +64,7 @@ int currentLineNum, currentColNum;
 
 ENDCOMMENT         ("*/")
 SINGLECOMMENT      ("//"[^\n]*)
+TAB                ("\t")
 BOOLEAN            (true|false)
 NUMBER             ([0-9])
 INTEGER            ({NUMBER}+)
@@ -83,7 +84,7 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 \n                      		{currentLineNum++; currentColNum = 1;}
 " "                           {};
-"\t"                          { currentColNum += 8 - currentColNum % 8; } 
+{TAB}                         { currentColNum += 8 - currentColNum % 8; } 
 "/*"                          { }
 "*/"                          { }
 {SINGLECOMMENT}               { }
