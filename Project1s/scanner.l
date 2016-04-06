@@ -198,7 +198,7 @@ struct                 { return T_Struct; }
 
 {UINT}               { 
                           yylval.integerConstant = strtol(yytext, NULL, 10);
-                          return T_IntConstant; 
+                          return T_UintConstant; 
                         }                        
               
 {INTEGER}               { 
