@@ -209,7 +209,9 @@ struct                 { return T_Struct; }
 
 
 
-
+.                       { 
+                          ReportError::UnrecogChar(&yylloc, yytext[0]);     
+                        }
 
 
 
