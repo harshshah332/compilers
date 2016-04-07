@@ -85,7 +85,6 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 \n                      		{currentLineNum++; currentColNum = 1;}
 [ ]+                           {};
 {TAB}                         {currentColNum += 8 - ((currentColNum) % 8) + 1};
-{ curColNum += TAB_SIZE - curColNum%TAB_SIZE + 1; }
 
 "/*"                          { }
 "*/"                          { }
