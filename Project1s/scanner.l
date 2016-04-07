@@ -76,44 +76,26 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
 
-%x COMMENT
+%x ML_COMMENT
 %%             /* BEGIN RULES SECTION */
  /* All patterns and actions should be placed between the start and stop
   * %% markers which delimit the Rules section. 
   */ 
 
-[\n]                          {currentLineNum++; currentColNum = 1;}
-[ ]+                           {};
+[\n]                      		{currentLineNum++; currentColNum = 1;}
+[ ]                           {}
 [\t]                          {currentColNum += 8 - ((currentColNum) % 8) + 1 ;}
 
 
 
+{STARTCOMMENT} { BEGIN(ML_COMMENT); }
 
- /* consume single-line comment */
-\/\/.*\n                { 
-                          currentLineNum++; 
-        currentColNum = 1;
-      }
-\/\*.*\*\/              ;
+<ML_COMMENT>{ENDCOMMENT} { BEGIN(INITIAL); }
 
- /* consume multi-line comments 
-  * report unterminated comment
-  */
+<ML_COMMENT><<EOF>>          { ReportError::UntermComment(); }
+<ML_COMMENT>(.|\n) ;
 
-\/\*                    { BEGIN COMMENT; }
-<COMMENT>.              ;
-<COMMENT>[\r\n]         { 
-                          currentLineNum++; 
-                          currentColNum = 1;
-      }
-<COMMENT>\*\/           { BEGIN INITIAL; }
-<COMMENT><<EOF>>        { 
-        ReportError::UntermComment();
-        BEGIN INITIAL;
-      }
-
-
-
+{SINGLECOMMENT}       { }
 
 
  /* check for keyworda and return that token from the scanner.h */
