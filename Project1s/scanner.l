@@ -72,7 +72,7 @@ UINT               ({INTEGER}\u|{INTEGER}\U)
 CHARS              (\"[^\"\n]*\")
 EXPONENT           ([Ee][+-]?{INTEGER})
 FLOAT              (({INTEGER}\.{INTEGER}?({EXPONENT})?[a-zA-Z]?)|({INTEGER}{EXPONENT}[a-zA-Z]?)) 
-IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
+IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
 
 
 
@@ -82,7 +82,7 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
   * %% markers which delimit the Rules section. 
   */ 
 
-[\n]                      		{currentLineNum++; currentColNum = 1;}
+[\n]                          {currentLineNum++; currentColNum = 1;}
 [ ]+                           {}
 [\t]                          {currentColNum += 8 - ((currentColNum) - 1) % 8 ;}
 
@@ -187,7 +187,7 @@ struct                 { return T_Struct; }
 
 
 {IDENTIFIER}            { 
-                          if (yyleng) > MaxIdentLen) {
+                          if (yyleng > MaxIdentLen) {
 
                             ReportError::LongIdentifier(&yylloc, yytext);
                           }
