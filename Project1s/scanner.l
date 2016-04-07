@@ -103,8 +103,8 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 \/\*                    { BEGIN COMMENT; }
 <COMMENT>.              ;
 <COMMENT>[\r\n]         { 
-                          lineno++; 
-                          colno = 1;
+                          currentLineNum++; 
+                          currentColNum = 1;
       }
 <COMMENT>\*\/           { BEGIN INITIAL; }
 <COMMENT><<EOF>>        { 
