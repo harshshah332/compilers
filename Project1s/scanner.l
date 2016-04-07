@@ -94,7 +94,7 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 <COMMENT><<EOF>>          { ReportError::UntermComment();
                            BEGIN INITIAL; }
-<COMMENT>(.|\n|\t) ;
+<COMMENT>(.|\n) ;
 
 {SINGLECOMMENT}       { }
 
@@ -187,7 +187,7 @@ struct                 { return T_Struct; }
 
 
 {IDENTIFIER}            { 
-                          if ((strlen(yytext)) > MaxIdentLen) {
+                          if (yyleng) > MaxIdentLen) {
 
                             ReportError::LongIdentifier(&yylloc, yytext);
                           }
