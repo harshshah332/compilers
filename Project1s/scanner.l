@@ -76,7 +76,7 @@ IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
 
 
 
-%x COMMENT
+%x ML_COMMENT
 %%             /* BEGIN RULES SECTION */
  /* All patterns and actions should be placed between the start and stop
   * %% markers which delimit the Rules section. 
@@ -88,16 +88,16 @@ IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
 
 
 
-{STARTCOMMENT} { BEGIN(COMMENT); }
+{STARTCOMMENT} { BEGIN(ML_COMMENT); }
 
-<COMMENT>{ENDCOMMENT} { BEGIN(INITIAL); }
+<ML_COMMENT>{ENDCOMMENT} { BEGIN(INITIAL); }
 
-<COMMENT><<EOF>>          { ReportError::UntermComment();
+<ML_COMMENT><<EOF>>          { ReportError::UntermComment();
                            BEGIN INITIAL; }
 
-<COMMENT>(\t)         {currentColNum += 8 - ((currentColNum) - 1) % 8 ;}
-<COMMENT>(\n)        {currentLineNum++; currentColNum = 1;}
-<COMMENT>(.) ;
+<ML_COMMENT>(\t)         {currentColNum += 8 - ((currentColNum) - 1) % 8 ;}
+<ML_COMMENT>(\n)        {currentLineNum++; currentColNum = 1;}
+<ML_COMMENT>(.) ;
 
 {SINGLECOMMENT}       { }
 
