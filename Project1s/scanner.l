@@ -94,6 +94,8 @@ IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
 
 <COMMENT><<EOF>>          { ReportError::UntermComment();
                            BEGIN INITIAL; }
+                           
+<COMMENT>(\t)         {currentColNum += 8 - ((currentColNum) - 1) % 8 ;}
 <COMMENT>(.|\n) ;
 
 {SINGLECOMMENT}       { }
