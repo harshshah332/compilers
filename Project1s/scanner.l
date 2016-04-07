@@ -62,7 +62,9 @@ int currentLineNum, currentColNum;
   * entries in the Rules section later. 
   */
 
-
+STARTCOMMENT       ("/*")
+ENDCOMMENT         ("*/")
+SINGLECOMMENT      ("//"[^\n]*)
 BOOLEAN            (true|false)
 NUMBER             ([0-9])
 INTEGER            ({NUMBER}+)
@@ -86,31 +88,12 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
 
-
- /* consume single-line comment */
-\/\/.*\n                { 
-                          currentLineNum++; 
-        currentColNum = 1;
-      }
-\/\*.*\*\/              ;
-
- /* consume multi-line comments 
-  * report unterminated comment
-  */
-
-\/\*                    { BEGIN COMMENT; }
-<COMMENT>.              ;
-<COMMENT>[\r\n]         { 
-                          currentLineNum++; 
-                          currentColNum = 1;
-      }
-<COMMENT>\*\/           { BEGIN INITIAL; }
-<COMMENT><<EOF>>        { 
-        ReportError::UntermComment();
-      }
-
-
-
+{STARTCOMMENT}          { BEGIN(COMM); }
+<COMM>{ENDCOMMENT}    { ; }
+<COMM><<EOF>>          { ReportError::UntermComment();
+                        }
+<COMM>.                { /* ignore everything else that doesn't match */ }
+{SINGLE_COMMENT}       { /* skip to end of line for // comment */ }
 
 
  /* check for keyworda and return that token from the scanner.h */
