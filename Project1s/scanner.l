@@ -71,7 +71,7 @@ INTEGER            ({NUMBER}+)
 UINT               ({INTEGER}\u|{INTEGER}\U)
 CHARS              (\"[^\"\n]*\")
 EXPONENT           ([Ee][+-]?{INTEGER})
-FLOAT              ({INTEGER}((\.{NUMBER}+{EXPONENT}?[a-zA-Z]?)|({EXPONENT}?[a-zA-Z]?))) 
+FLOAT              ({INTEGER}\.{NUMBER}?({EXPONENT}[a-zA-Z]?)?) 
 IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
