@@ -20,8 +20,6 @@
 
 
 
-
-
 /* Global variable: yylval
  * -----------------------
  * This global variable is how we get attribute information about the token
@@ -56,6 +54,7 @@ int currentLineNum, currentColNum;
 
 %}
 
+
  /* The section before the first %% is the Definitions section of the lex
   * input file. Here is where you set options for the scanner, define lex
   * states, and can set up definitions to give names to regular expressions
@@ -63,16 +62,17 @@ int currentLineNum, currentColNum;
   * entries in the Rules section later. 
   */
 
-BOOLEAN            (true|false)
-NUMBER             ([0-9])
-INTEGER            ({NUMBER}+)
-CHARS              (\"[^\"\n]*\")
-EXPONENT           ([Ee][+-]?{INTEGER})
-FLOAT              ({INTEGER}\.{NUMBER}+{EXPONENT}?[a-zA-Z]?) 
-IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 STARTCOMMENT       ("/*")
 ENDCOMMENT         ("*/")
 SINGLECOMMENT      ("//"[^\n]*)
+BOOLEAN            (true|false)
+NUMBER             ([0-9])
+INTEGER            ({NUMBER}+)
+UINT               ({INTEGER}\u|{INTEGER}\U)
+CHARS              (\"[^\"\n]*\")
+EXPONENT           ([Ee][+-]?{INTEGER})
+FLOAT              (({INTEGER}\.{INTEGER}?({EXPONENT})?[a-zA-Z]?)|({INTEGER}{EXPONENT}[a-zA-Z]?)) 
+IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
 
@@ -82,12 +82,20 @@ SINGLECOMMENT      ("//"[^\n]*)
   * %% markers which delimit the Rules section. 
   */ 
 
-"\n"		{currentLineNum++; currentColNum = 1;}
-{STARTCOMMENT}                { }
-{ENDCOMMENT}                  { }
-{SINGLECOMMENT}               { }
+[\n]                      		{currentLineNum++; currentColNum = 1;}
+[ ]                           {}
+[\t]                          {currentColNum += 8 - ((currentColNum) % 8) + 1 ;}
 
 
+
+{STARTCOMMENT} { BEGIN(ML_COMMENT); }
+
+<ML_COMMENT>{ENDCOMMENT} { BEGIN(INITIAL); }
+
+<ML_COMMENT><<EOF>>          { ReportError::UntermComment(); }
+<ML_COMMENT>(.|\n) ;
+
+{SINGLECOMMENT}       { }
 
 
  /* check for keyworda and return that token from the scanner.h */
@@ -141,7 +149,10 @@ struct                 { return T_Struct; }
 "!="                    { return T_NE; }
 "&&"                    { return T_And; }
 "||"                    { return T_Or; }
-
+"*="                    { return T_MulAssign;}
+"/="                    { return T_DivAssign;}
+"+="                    { return T_AddAssign;}
+"-="                    { return T_SubAssign;}
 "["                     { return T_LeftBracket; }
 "]"                     { return T_RightBracket; }
 "("                     { return T_LeftParen; }
@@ -175,7 +186,7 @@ struct                 { return T_Struct; }
 
 
 {IDENTIFIER}            { 
-                          if (yyleng > MaxIdentLen) {
+                          if ((strlen(yytext)) > MaxIdentLen) {
 
                             ReportError::LongIdentifier(&yylloc, yytext);
                           }
@@ -194,7 +205,13 @@ struct                 { return T_Struct; }
 
 
                           } 
-                        
+          
+
+{UINT}               { 
+                          yylval.integerConstant = strtol(yytext, NULL, 10);
+                          return T_UintConstant; 
+                        }                        
+              
 {INTEGER}               { 
                           yylval.integerConstant = strtol(yytext, NULL, 10);
                           return T_IntConstant; 
@@ -203,7 +220,9 @@ struct                 { return T_Struct; }
 
 
 
-
+.                       { 
+                          ReportError::UnrecogChar(&yylloc, yytext[0]);     
+                        }
 
 
 
