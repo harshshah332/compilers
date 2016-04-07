@@ -61,7 +61,7 @@ int currentLineNum, currentColNum;
   * entries in the Rules section later. 
   */
 
-
+STARTCOMMENT       ("/*")
 ENDCOMMENT         ("*/")
 SINGLECOMMENT      ("//"[^\n]*)
 TAB                ("\t")
@@ -86,10 +86,14 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 [ ]+                           {};
 {TAB}                         {currentColNum += 8 - ((currentColNum) % 8) + 1 ;}
 
-"/*"                          { }
-"*/"                          { }
-{SINGLECOMMENT}               { }
 
+
+{STARTCOMMENT}         { BEGIN(COMM); }
+<COMM>{ENDCOMMENT}     { BEGIN(N); }
+<COMM><<EOF>>          { ReportError::UntermComment();
+                         return 0; }
+<COMM>.                { /* ignore everything else that doesn't match */ }
+{SINGLECOMMENT}       { /* skip to end of line for // comment */ }
 
 
 
