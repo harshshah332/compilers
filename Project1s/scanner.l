@@ -83,15 +83,18 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
   */ 
 
 [\n]                      		{currentLineNum++; currentColNum = 1;}
-[ ]                           {};
+[ ]                           {}
 [\t]                          {currentColNum += 8 - ((currentColNum) % 8) + 1 ;}
 
 
 
-{STARTCOMMENT}          { BEGIN(COMM); }
-<COMM>{ENDCOMMENT}    {  }
-<COMM><<EOF>>          { ReportError::UntermComment(); }
-<COMM>.                { /* ignore everything else that doesn't match */ }
+{STARTCOMMENT} { BEGIN(COMMENT); }
+
+<COMMENT>"*/" { BEGIN(INITIAL); }
+
+<COMMENT><<EOF>>          { ReportError::UntermComment(); }
+<COMMENT>(.|\n) ;
+
 {SINGLECOMMENT}       { /* skip to end of line for // comment */ }
 
 
