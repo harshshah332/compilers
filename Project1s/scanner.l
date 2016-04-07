@@ -91,8 +91,8 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
  /* consume single-line comment */
 \/\/.*\n                { 
-                          lineno++; 
-        colno = 1;
+                          currentLineNum++; 
+        currentColNum = 1;
       }
 \/\*.*\*\/              ;
 
