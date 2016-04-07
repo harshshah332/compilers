@@ -89,9 +89,8 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
 {STARTCOMMENT}          { BEGIN(COMM); }
-<COMM>{ENDCOMMENT}    { ; }
-<COMM><<EOF>>          { ReportError::UntermComment();
-                        }
+<COMM>{ENDCOMMENT}    {  }
+<COMM><<EOF>>          { ReportError::UntermComment(); }
 <COMM>.                { /* ignore everything else that doesn't match */ }
 {SINGLECOMMENT}       { /* skip to end of line for // comment */ }
 
