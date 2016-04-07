@@ -93,7 +93,7 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 <COMM><<EOF>>          { ReportError::UntermComment();
                         }
 <COMM>.                { /* ignore everything else that doesn't match */ }
-{SINGLE_COMMENT}       { /* skip to end of line for // comment */ }
+{SINGLECOMMENT}       { /* skip to end of line for // comment */ }
 
 
  /* check for keyworda and return that token from the scanner.h */
