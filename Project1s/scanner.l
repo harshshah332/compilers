@@ -76,24 +76,25 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
 
-%x ML_COMMENT
+%x COMMENT
 %%             /* BEGIN RULES SECTION */
  /* All patterns and actions should be placed between the start and stop
   * %% markers which delimit the Rules section. 
   */ 
 
 [\n]                      		{currentLineNum++; currentColNum = 1;}
-[ ]                           {}
-[\t]                          {currentColNum += 8 - ((currentColNum) % 8) + 1 ;}
+[ ]+                           {}
+[\t]                          {currentColNum += 8 - ((currentColNum) - 1) % 8 ;}
 
 
 
-{STARTCOMMENT} { BEGIN(ML_COMMENT); }
+{STARTCOMMENT} { BEGIN(COMMENT); }
 
-<ML_COMMENT>{ENDCOMMENT} { BEGIN(INITIAL); }
+<COMMENT>{ENDCOMMENT} { BEGIN(INITIAL); }
 
-<ML_COMMENT><<EOF>>          { ReportError::UntermComment(); }
-<ML_COMMENT>(.|\n) ;
+<COMMENT><<EOF>>          { ReportError::UntermComment();
+                           BEGIN INITIAL; }
+<COMMENT>(.|\n|\t) ;
 
 {SINGLECOMMENT}       { }
 
