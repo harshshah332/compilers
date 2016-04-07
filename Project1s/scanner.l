@@ -88,14 +88,6 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
 
-{STARTCOMMENT} { BEGIN(ML_COMMENT); }
-
-<ML_COMMENT>{ENDCOMMENT} { BEGIN(INITIAL); }
-
-<ML_COMMENT><<EOF>>          { ReportError::UntermComment(); }
-<ML_COMMENT>(.|\n) ;
-
-{SINGLECOMMENT}       { }
 
 
  /* check for keyworda and return that token from the scanner.h */
