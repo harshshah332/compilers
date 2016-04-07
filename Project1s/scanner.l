@@ -62,9 +62,7 @@ int currentLineNum, currentColNum;
   * entries in the Rules section later. 
   */
 
-STARTCOMMENT       ("/*")
-ENDCOMMENT         ("*/")
-SINGLECOMMENT      ("//"[^\n]*)
+
 BOOLEAN            (true|false)
 NUMBER             ([0-9])
 INTEGER            ({NUMBER}+)
@@ -109,7 +107,6 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 <COMMENT>\*\/           { BEGIN INITIAL; }
 <COMMENT><<EOF>>        { 
         ReportError::UntermComment();
-        BEGIN INITIAL;
       }
 
 
