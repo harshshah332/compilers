@@ -54,6 +54,8 @@ int currentLineNum, currentColNum;
 
 %}
 
+%x COPY COMM
+
  /* The section before the first %% is the Definitions section of the lex
   * input file. Here is where you set options for the scanner, define lex
   * states, and can set up definitions to give names to regular expressions
