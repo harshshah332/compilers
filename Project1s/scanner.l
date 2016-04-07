@@ -54,7 +54,6 @@ int currentLineNum, currentColNum;
 
 %}
 
-%x COPY COMM
 
  /* The section before the first %% is the Definitions section of the lex
   * input file. Here is where you set options for the scanner, define lex
@@ -66,7 +65,6 @@ int currentLineNum, currentColNum;
 STARTCOMMENT       ("/*")
 ENDCOMMENT         ("*/")
 SINGLECOMMENT      ("//"[^\n]*)
-TAB                ("\t")
 BOOLEAN            (true|false)
 NUMBER             ([0-9])
 INTEGER            ({NUMBER}+)
@@ -78,25 +76,43 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 
 
-%x ML_COMMENT
+%x COMMENT
 %%             /* BEGIN RULES SECTION */
  /* All patterns and actions should be placed between the start and stop
   * %% markers which delimit the Rules section. 
   */ 
 
-\n                      		{currentLineNum++; currentColNum = 1;}
+[\n]                      		{currentLineNum++; currentColNum = 1;}
 [ ]+                           {};
-{TAB}                         {currentColNum += 8 - ((currentColNum) % 8) + 1 ;}
+[\t]                          {currentColNum += 8 - ((currentColNum) % 8) + 1 ;}
 
 
 
-{STARTCOMMENT}         { BEGIN(COMM); }
-<COMM>{ENDCOMMENT}     { BEGIN(N); }
-<N>                     { }
-<COMM><<EOF>>          { ReportError::UntermComment();
-                         return 0; }
-<COMM>.                { /* ignore everything else that doesn't match */ }
-{SINGLECOMMENT}       { /* skip to end of line for // comment */ }
+
+ /* consume single-line comment */
+\/\/.*\n                { 
+                          lineno++; 
+        colno = 1;
+      }
+\/\*.*\*\/              ;
+
+ /* consume multi-line comments 
+  * report unterminated comment
+  */
+
+\/\*                    { BEGIN COMMENT; }
+<COMMENT>.              ;
+<COMMENT>[\r\n]         { 
+                          lineno++; 
+                          colno = 1;
+      }
+<COMMENT>\*\/           { BEGIN INITIAL; }
+<COMMENT><<EOF>>        { 
+        ReportError::UntermComment();
+        BEGIN INITIAL;
+      }
+
+
 
 
 
