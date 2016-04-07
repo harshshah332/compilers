@@ -187,7 +187,7 @@ struct                 { return T_Struct; }
 
 
 {IDENTIFIER}            { 
-                          if (yyleng > MaxIdentLen) {
+                          if (yyleng > 1023) {
 
                             ReportError::LongIdentifier(&yylloc, yytext);
                           }
