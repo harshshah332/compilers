@@ -92,6 +92,7 @@ IDENTIFIER         ([a-zA-Z][a-zA-Z0-9_]*)
 
 {STARTCOMMENT}         { BEGIN(COMM); }
 <COMM>{ENDCOMMENT}     { BEGIN(N); }
+<N>                     { }
 <COMM><<EOF>>          { ReportError::UntermComment();
                          return 0; }
 <COMM>.                { /* ignore everything else that doesn't match */ }
