@@ -167,7 +167,10 @@ struct                 { return T_Struct; }
 "!="                    { return T_NE; }
 "&&"                    { return T_And; }
 "||"                    { return T_Or; }
-
+"*="                    { return T_MulAssign;}
+"/="                    { return T_DivAssign;}
+"+="                    { return T_AddAssign;}
+"-="                    { return T_SubAssign;}
 "["                     { return T_LeftBracket; }
 "]"                     { return T_RightBracket; }
 "("                     { return T_LeftParen; }
