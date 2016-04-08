@@ -76,19 +76,17 @@ IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
 
 
 
-
 %x ML_COMMENT
-%x FIELD
+%s FIELD
 %%             /* BEGIN RULES SECTION */
  /* All patterns and actions should be placed between the start and stop
   * %% markers which delimit the Rules section. 
   */ 
 
 [\n]                          {currentLineNum++; currentColNum = 1;}
-[ ]+                           {}
+
 [\t]                { if((currentColNum-1) %8 ==0){ currentColNum = currentColNum;}
                       else currentColNum += 8 - ((currentColNum) - 1) % 8 ;}
-
 
 
 {STARTCOMMENT} { BEGIN(ML_COMMENT); }
@@ -105,6 +103,15 @@ IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
 <ML_COMMENT>(.) ;
 
 {SINGLECOMMENT}       { }
+
+
+"."     {BEGIN(FIELD); return T_Dot;}
+
+<FIELD>(" ") { BEGIN(INITIAL); }
+<FIELD>([a-zA-Z_][a-zA-Z0-9_]*)     {return T_FieldSelection;}
+
+<FIELD>(\n)   {currentLineNum++; currentColNum = 1;}
+[ ]+                           {}
 
 
  /* check for keyworda and return that token from the scanner.h */
@@ -193,7 +200,6 @@ struct                 { return T_Struct; }
                          }
 
 
-
 {IDENTIFIER}            { 
                           if (yyleng > 1023) {
 
@@ -204,7 +210,6 @@ struct                 { return T_Struct; }
                             return T_Identifier;
 
                         }
-
 
 
 
