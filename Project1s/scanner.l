@@ -89,12 +89,6 @@ IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
 [\t]                          {currentColNum += 8 - ((currentColNum) - 1) % 8 ;}
 
 
-{IDENTIFIER}                  {BEGIN(FIELD);
-                              return T_Identifier;}
-
-<FIELD>"."                        { return T_Dot; }
-<FIELD>(.)                         {return T_FieldSelection; }
-
 
 {STARTCOMMENT} { BEGIN(ML_COMMENT); }
 
