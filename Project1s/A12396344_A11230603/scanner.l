@@ -108,21 +108,7 @@ IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
 "."     {BEGIN(FIELD); return T_Dot;}
 
 <FIELD>(" ") { BEGIN(INITIAL); }
-<FIELD>([a-zA-Z_][a-zA-Z0-9_]*)          { 
-                                          if (yyleng > 1023) {
-
-                                          ReportError::LongIdentifier(&yylloc, yytext);
-                                            }
-                                              strncpy(yylval.identifier, yytext, MaxIdentLen);
-                                              yylval.identifier[MaxIdentLen] = '\0';
-                                              return T_FieldSelection;
-
-                                          }
-
-
-
-
-
+<FIELD>([a-zA-Z_][a-zA-Z0-9_]*)     {return T_FieldSelection;}
 
 <FIELD>(\n)   {currentLineNum++; currentColNum = 1;}
 [ ]+                           {}
