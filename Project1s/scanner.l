@@ -73,6 +73,7 @@ CHARS              (\"[^\"\n]*\")
 EXPONENT           ([Ee][+-]?{INTEGER})
 FLOAT              (({INTEGER}\.{INTEGER}?({EXPONENT})?[a-zA-Z]?)|({INTEGER}{EXPONENT}[a-zA-Z]?)) 
 IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
+FIELD              ({IDENTIFIER}\.)
 
 
 
@@ -86,6 +87,7 @@ IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
 [ ]+                           {}
 [\t]                          {currentColNum += 8 - ((currentColNum) - 1) % 8 ;}
 
+{FIELD}                       {return T_FieldSelection;}
 
 
 {STARTCOMMENT} { BEGIN(ML_COMMENT); }
