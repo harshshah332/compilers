@@ -69,15 +69,16 @@ BOOLEAN            (true|false)
 NUMBER             ([0-9])
 INTEGER            ({NUMBER}+)
 UINT               ({INTEGER}\u|{INTEGER}\U)
-CHARS              (\"[^\"\n]*\")
 EXPONENT           ([Ee][+-]?{INTEGER})
 FLOAT              (({INTEGER}\.{INTEGER}?({EXPONENT})?[a-zA-Z]?)|({INTEGER}{EXPONENT}[a-zA-Z]?)) 
 IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
-FIELD              ({IDENTIFIER}\.)
+
+
 
 
 
 %x ML_COMMENT
+%x FIELD
 %%             /* BEGIN RULES SECTION */
  /* All patterns and actions should be placed between the start and stop
   * %% markers which delimit the Rules section. 
@@ -87,7 +88,12 @@ FIELD              ({IDENTIFIER}\.)
 [ ]+                           {}
 [\t]                          {currentColNum += 8 - ((currentColNum) - 1) % 8 ;}
 
-{FIELD}                       {return T_FieldSelection;}
+
+{IDENTIFIER}                  {BEGIN(FIELD);
+                              return T_Identifier;}
+
+<FIELD>"."                        { return T_Dot; }
+<FIELD>(.)                         {return T_FieldSelection; }
 
 
 {STARTCOMMENT} { BEGIN(ML_COMMENT); }
