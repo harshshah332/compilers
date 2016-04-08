@@ -84,7 +84,6 @@ IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
 
 [\n]                          {currentLineNum++; currentColNum = 1;}
 [ ]+                           {}
-//[\t]                          {currentColNum += 8 - ((currentColNum) - 1) % 8 ;}
 
 [\t]                      {--currentColNum;        
                           currentColNum = (currentColNum + 7)/8 * 8 +1; 
