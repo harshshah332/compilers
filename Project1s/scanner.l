@@ -86,7 +86,7 @@ IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
 
 [\n]                          {currentLineNum++; currentColNum = 1;}
 [ ]+                           {}
-[\t]                { if(currentColNum %8 ==0){ currentColNum = currentColNum;}
+[\t]                { if((currentColNum-1) %8 ==0){ currentColNum = currentColNum;}
                       else currentColNum += 8 - ((currentColNum) - 1) % 8 ;}
 
 
@@ -98,7 +98,9 @@ IDENTIFIER         ([a-zA-Z_][a-zA-Z0-9_]*)
 <ML_COMMENT><<EOF>>          { ReportError::UntermComment();
                            BEGIN INITIAL; }
 
-<ML_COMMENT>(\t)         {currentColNum += 8 - ((currentColNum) - 1) % 8 ;}
+<ML_COMMENT>(\t)          { if((currentColNum-1) %8 ==0){ currentColNum = currentColNum;}
+                      else currentColNum += 8 - ((currentColNum) - 1) % 8 ;}
+
 <ML_COMMENT>(\n)        {currentLineNum++; currentColNum = 1;}
 <ML_COMMENT>(.) ;
 
