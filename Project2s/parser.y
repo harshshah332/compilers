@@ -27,7 +27,7 @@ void yyerror(const char *msg); // standard error-handling routine
 /* The section before the first %% is the Definitions section of the yacc
  * input file. Here is where you declare tokens and types, add precedence
  * and associativity options, and so on.
- */œ
+ */
 
 /* yylval
  * ------
@@ -38,7 +38,16 @@ void yyerror(const char *msg); // standard error-handling routine
  * pp2: You will need to add new fields to this union as you add different
  *      attributes to your non-terminal symbols.
  */
+
+ 
 %union {
+    int integerConstant;
+    bool boolConstant;
+    float floatConstant;
+    char identifier[MaxIdentLen+1]; // +1 for terminating null
+    Decl *decl;
+    List<Decl*> *declList;
+}
 
 
     int integerConstant;
