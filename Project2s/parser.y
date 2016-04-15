@@ -27,7 +27,7 @@ void yyerror(const char *msg); // standard error-handling routine
 /* The section before the first %% is the Definitions section of the yacc
  * input file. Here is where you declare tokens and types, add precedence
  * and associativity options, and so on.
- */
+ */œ
 
 /* yylval
  * ------
@@ -39,12 +39,72 @@ void yyerror(const char *msg); // standard error-handling routine
  *      attributes to your non-terminal symbols.
  */
 %union {
+
+
     int integerConstant;
     bool boolConstant;
     float floatConstant;
     char identifier[MaxIdentLen+1]; // +1 for terminating null
     Decl *decl;
     List<Decl*> *declList;
+
+    VarDecl *vardecl;
+    FnDecl  *fndecl;
+
+
+    Expr *expr;
+    Expr *emptyexpr;
+    Call *call;
+
+    IntConstant *intconstant;
+    FloatConstant *floatconstant;
+    BoolConstant *boolconstant;
+
+    ArithmeticExpr *arithmeticexpr;
+    RelationalExpr *relationalexpr;
+    EqualityExpr   *equalityexpr;
+    LogicalExpr    *logicalexpr;
+    SelectionExpr  *selectionexpr;
+    PostfixExpr    *postfixexpr;
+    AssignExpr     *assignexpr;
+    PostfixExpr    *postfixexpr;
+
+    
+    LValue *lvalue;
+    FieldAccess *fieldaccess;
+    ArrayAccess *arrayaccess;
+
+    Program *program;
+
+    Stmt *stmt;
+    StmtBlock *stmtblock;
+    ConditionalStmt *conditionalstmt;
+    LoopStmt *loopstmt;
+
+    ForStmt *forstmt;
+    WhileStmt *whilestmt;
+    DoWhileStmt *dowhilestmt;
+    IfStmt *ifstmt;
+    BreakStmt *breakstmt;
+    ReturnStmt *returnstmt;
+    SwitchStmt *switchstmt;
+    SwitchLabel *switchlabel;
+    Case *case;
+    Default *default;
+
+    Type *type;
+    NamedType *namedtype;
+    ArrayType *arraytype;
+
+
+    PrintStmt *pntstmt;
+    List<Stmt*> *stmts;
+
+
+
+
+
+
 }
 
 
@@ -85,9 +145,40 @@ void yyerror(const char *msg); // standard error-handling routine
  * of the union named "declList" which is of type List<Decl*>.
  * pp2: You'll need to add many of these of your own.
  */
-%type <declList>  DeclList
-%type <decl>      Decl
 
+%type <program>       Program
+%type <declList>      DeclList
+%type <decl>          Decl
+%type <vardecl>       VarDecl
+%type <fndecl>        FnDecl
+%type <type>          Type
+%type <namedtype>     NamedType
+%type <arraytype>     ArrayType
+%type <stmt>          Stmt
+%type <stmtblock>     StmtBlock
+%type <ifstmt>        IfStmt
+%type <whilestmt>     WhileStmt
+%type <forstmt>       ForStmt
+%type <returnstmt>       ReturnStmt
+%type <switchstmt>    SwitchStmt
+%type <case>      Case
+%type <default>   Default
+%type <expr>          Expr
+%type <EmptyExpr>          EmptyExpr
+%type <expr>        Constant
+%type <intconst>      IntConstant 
+%type <boolconst>     BoolConstant
+%type <floatconst>   FloatConstant
+%type <call>          Call
+%type <arithmeticexpr> ArithmeticExpr
+%type <relationalexpr> RelationalExpr
+%type <equalityexpr>   EqualityExpr
+%type <logicalexpr>    LogicalExpr
+%type <assignexpr>     AssignExpr
+%type <postfixexpr>    PostfixExpr
+%type <lvalue>        LValue
+%type <fieldaccess>   FieldAccess
+%type <arrayaccess>   ArrayAccess
 
 
 %%
