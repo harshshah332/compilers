@@ -39,7 +39,7 @@ void yyerror(const char *msg); // standard error-handling routine
  *      attributes to your non-terminal symbols.
  */
 
- 
+
 %union {
     int integerConstant;
     bool boolConstant;
@@ -47,7 +47,6 @@ void yyerror(const char *msg); // standard error-handling routine
     char identifier[MaxIdentLen+1]; // +1 for terminating null
     Decl *decl;
     List<Decl*> *declList;
-}
 
 
     int integerConstant;
