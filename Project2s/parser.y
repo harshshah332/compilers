@@ -38,6 +38,8 @@ void yyerror(const char *msg); // standard error-handling routine
  * pp2: You will need to add new fields to this union as you add different
  *      attributes to your non-terminal symbols.
  */
+
+
 %union {
     int integerConstant;
     bool boolConstant;
@@ -45,6 +47,72 @@ void yyerror(const char *msg); // standard error-handling routine
     char identifier[MaxIdentLen+1]; // +1 for terminating null
     Decl *decl;
     List<Decl*> *declList;
+
+
+    int integerConstant;
+    bool boolConstant;
+    float floatConstant;
+    char identifier[MaxIdentLen+1]; // +1 for terminating null
+    Decl *decl;
+    List<Decl*> *declList;
+
+    VarDecl *vardecl;
+    FnDecl  *fndecl;
+
+
+    Expr *expr;
+    Expr *emptyexpr;
+    Call *call;
+
+    IntConstant *intconstant;
+    FloatConstant *floatconstant;
+    BoolConstant *boolconstant;
+
+    ArithmeticExpr *arithmeticexpr;
+    RelationalExpr *relationalexpr;
+    EqualityExpr   *equalityexpr;
+    LogicalExpr    *logicalexpr;
+    SelectionExpr  *selectionexpr;
+    PostfixExpr    *postfixexpr;
+    AssignExpr     *assignexpr;
+    PostfixExpr    *postfixexpr;
+
+    
+    LValue *lvalue;
+    FieldAccess *fieldaccess;
+    ArrayAccess *arrayaccess;
+
+    Program *program;
+
+    Stmt *stmt;
+    StmtBlock *stmtblock;
+    ConditionalStmt *conditionalstmt;
+    LoopStmt *loopstmt;
+
+    ForStmt *forstmt;
+    WhileStmt *whilestmt;
+    DoWhileStmt *dowhilestmt;
+    IfStmt *ifstmt;
+    BreakStmt *breakstmt;
+    ReturnStmt *returnstmt;
+    SwitchStmt *switchstmt;
+    SwitchLabel *switchlabel;
+    Case *case;
+    Default *default;
+
+    Type *type;
+    NamedType *namedtype;
+    ArrayType *arraytype;
+
+
+    PrintStmt *pntstmt;
+    List<Stmt*> *stmts;
+
+
+
+
+
+
 }
 
 
@@ -85,9 +153,40 @@ void yyerror(const char *msg); // standard error-handling routine
  * of the union named "declList" which is of type List<Decl*>.
  * pp2: You'll need to add many of these of your own.
  */
-%type <declList>  DeclList
-%type <decl>      Decl
 
+%type <program>       Program
+%type <declList>      DeclList
+%type <decl>          Decl
+%type <vardecl>       VarDecl
+%type <fndecl>        FnDecl
+%type <type>          Type
+%type <namedtype>     NamedType
+%type <arraytype>     ArrayType
+%type <stmt>          Stmt
+%type <stmtblock>     StmtBlock
+%type <ifstmt>        IfStmt
+%type <whilestmt>     WhileStmt
+%type <forstmt>       ForStmt
+%type <returnstmt>       ReturnStmt
+%type <switchstmt>    SwitchStmt
+%type <case>      Case
+%type <default>   Default
+%type <expr>          Expr
+%type <EmptyExpr>          EmptyExpr
+%type <expr>        Constant
+%type <intconst>      IntConstant 
+%type <boolconst>     BoolConstant
+%type <floatconst>   FloatConstant
+%type <call>          Call
+%type <arithmeticexpr> ArithmeticExpr
+%type <relationalexpr> RelationalExpr
+%type <equalityexpr>   EqualityExpr
+%type <logicalexpr>    LogicalExpr
+%type <assignexpr>     AssignExpr
+%type <postfixexpr>    PostfixExpr
+%type <lvalue>        LValue
+%type <fieldaccess>   FieldAccess
+%type <arrayaccess>   ArrayAccess
 
 
 %%
@@ -113,12 +212,43 @@ DeclList  :    DeclList Decl        { ($$=$1)->Append($2); }
           |    Decl                 { ($$ = new List<Decl*>)->Append($1); }
           ;
 
-Decl      :    T_Int T_Identifier T_Semicolon {
+Decl      :    VarDecl
+          ;
+
+
+
+VarDecl   :    Type T_Identifier ';'          {
                                                  // replace it with your implementation
                                                  Identifier *id = new Identifier(@2, $2);
-                                                 $$ = new VarDecl(id, Type::intType);
+                                                 $$ = new VarDecl(id, $1);
                                               }
+
+
           ;
+
+        
+Type      :    T_Int                 { $$ = Type::intType; }
+          |    T_Float               { $$ = Type::floatType; }
+          |    T_Bool                { $$ = Type::boolType; }
+          |    T_Void                { $$ = Type::voidType; }
+          |    T_Mat2                { $$ = Type::mat2Type; }
+          |    T_Mat3                { $$ = Type::mat3Type; }
+          |    T_Mat4                { $$ = Type::mat4Type; }
+          |    T_Vec2                { $$ = Type::vec2Type; }
+          |    T_Vec3                { $$ = Type::vec3Type; }
+          |    T_Vec4                { $$ = Type::vec4Type; }
+          |    T_Ivec2               { $$ = Type::ivec2Type; }
+          |    T_Ivec3               { $$ = Type::ivec3Type; }
+          |    T_Ivec4               { $$ = Type::ivec4Type; }
+          |    T_Bvec2               { $$ = Type::bvec2Type; }
+          |    T_Bvec3               { $$ = Type::bvec3Type; }
+          |    T_Bvec4               { $$ = Type::bvec4Type; }
+          |    T_Uint                { $$ = Type::uintType; }
+          |    T_Uvec2               { $$ = Type::uvec2Type; }
+          |    T_Uvec3               { $$ = Type::uvec3Type; }
+          |    T_Uvec4               { $$ = Type::uvec4Type; }
+          |    NamedType
+          |    ArrayType
 
 
 %%
