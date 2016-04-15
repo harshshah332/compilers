@@ -212,12 +212,43 @@ DeclList  :    DeclList Decl        { ($$=$1)->Append($2); }
           |    Decl                 { ($$ = new List<Decl*>)->Append($1); }
           ;
 
-Decl      :    T_Int T_Identifier T_Semicolon {
+Decl      :    VarDecl
+          ;
+
+
+
+VarDecl   :    Type T_Identifier ';'          {
                                                  // replace it with your implementation
                                                  Identifier *id = new Identifier(@2, $2);
-                                                 $$ = new VarDecl(id, Type::intType);
+                                                 $$ = new VarDecl(id, $1);
                                               }
+
+
           ;
+
+        
+Type      :    T_Int                 { $$ = Type::intType; }
+          |    T_Float               { $$ = Type::floatType; }
+          |    T_Bool                { $$ = Type::boolType; }
+          |    T_Void                { $$ = Type::voidType; }
+          |    T_Mat2                { $$ = Type::mat2Type; }
+          |    T_Mat3                { $$ = Type::mat3Type; }
+          |    T_Mat4                { $$ = Type::mat4Type; }
+          |    T_Vec2                { $$ = Type::vec2Type; }
+          |    T_Vec3                { $$ = Type::vec3Type; }
+          |    T_Vec4                { $$ = Type::vec4Type; }
+          |    T_Ivec2               { $$ = Type::ivec2Type; }
+          |    T_Ivec3               { $$ = Type::ivec3Type; }
+          |    T_Ivec4               { $$ = Type::ivec4Type; }
+          |    T_Bvec2               { $$ = Type::bvec2Type; }
+          |    T_Bvec3               { $$ = Type::bvec3Type; }
+          |    T_Bvec4               { $$ = Type::bvec4Type; }
+          |    T_Uint                { $$ = Type::uintType; }
+          |    T_Uvec2               { $$ = Type::uvec2Type; }
+          |    T_Uvec3               { $$ = Type::uvec3Type; }
+          |    T_Uvec4               { $$ = Type::uvec4Type; }
+          |    NamedType
+          |    ArrayType
 
 
 %%
