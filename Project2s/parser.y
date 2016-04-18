@@ -210,15 +210,26 @@ VarDecl   :    Type T_Identifier T_Semicolon          {
                                                  Identifier *id = new Identifier(@2, $2);
                                                  $$ = new VarDecl(id, $1);
                                               }
-          |    Type T_Identifier T_Equal T_Identifier T_Semicolon    
+
+
+       /*   |    Type T_Identifier T_Equal T_Identifier T_Semicolon    
                                             {
 
                                             Identifier *id = new Identifier(@2, $2);
-                                            Expr *ex = new AssignExpr($2, new Operator(@2, "="), $4);
+                                            AssignExpr *ex = new AssignExpr($2, new Operator(@2, "="), $4);
                                             $$ = new VarDecl(id, $1, ex);
 
 
-                                            } 
+                                            }  
+
+                                  */
+            |     Type T_Identifier T_LeftBracket Constant T_RightBracket 
+                                            {
+                                               ArrayType *ar = new ArrayType(elemType=intType); 
+                                               $$ = new VarDecl(id, ar);
+
+
+                                            }
 
 
           ;
