@@ -164,7 +164,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <vardecls>      Variables
 
 
-%type <namedtype>     NamedType
+//%type <namedtype>     NamedType
 //%type <arraytype>     ArrayType
 %type <stmt>          Stmt
 %type <stmtblock>     StmtBlock
@@ -173,9 +173,9 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <whilestmt>     WhileStmt
 %type <forstmt>       ForStmt
 %type <returnstmt>       ReturnStmt
-%type <switchstmt>    SwitchStmt
-%type <case>      Case
-%type <default>   Default
+//%type <switchstmt>    SwitchStmt
+//%type <case>      Case
+//%type <default>   Default
 %type <expr>          Expr
 %type <exprs>         Exprs
 %type <exprs>       Actuals
@@ -393,7 +393,7 @@ BoolConstant   : T_BoolConstant      { $$ = new BoolConstant(@1, $1); }
 
 
 
-Stmt       : emptyexpr T_Semicolon  
+Stmt       : EmptyExpr T_Semicolon  
            | IfStmt
            | WhileStmt
            | ForStmt
