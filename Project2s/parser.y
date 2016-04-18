@@ -315,8 +315,8 @@ ArithmeticExpr : Expr T_Plus Expr       { $$ = new ArithmeticExpr($1, new Operat
                                      { $$ = new ArithmeticExpr(new Operator(@1, "-"), $2); } */
                ;
 
-PostfixExpr    : LValue T_Inc  { $$ = new PostfixExpr(Join(@1, @2), $1, new Operator(@2, "++")); }
-               | LValue T_Dec  { $$ = new PostfixExpr(Join(@1, @2), $1, new Operator(@2, "--")); }
+PostfixExpr    : LValue T_Inc  { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
+               | LValue T_Dec  { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
                ;
                
 EqualityExpr   : Expr T_EQ Expr   
