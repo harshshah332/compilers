@@ -262,7 +262,7 @@ Variables :    Variables T_Comma Type T_Identifier     { ($$ = $1)->Append(new V
 
            
 Expr       : LValue                     { $$ =  $1;}
-           | Call                        { $$ =  $1;} 
+         //  | Call                        { $$ =  $1;} 
            | Constant
            | LValue T_Equal Expr         { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
            | Expr T_Plus Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); } 
