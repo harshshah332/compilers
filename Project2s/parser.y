@@ -49,12 +49,6 @@ void yyerror(const char *msg); // standard error-handling routine
     List<Decl*> *declList;
 
 
-    int integerConstant;
-    bool boolConstant;
-    float floatConstant;
-    char identifier[MaxIdentLen+1]; // +1 for terminating null
-    Decl *decl;
-    List<Decl*> *declList;
 
     VarDecl *vardecl;
     FnDecl  *fndecl;
@@ -75,7 +69,6 @@ void yyerror(const char *msg); // standard error-handling routine
     SelectionExpr  *selectionexpr;
     PostfixExpr    *postfixexpr;
     AssignExpr     *assignexpr;
-    PostfixExpr    *postfixexpr;
 
     
     LValue *lvalue;
@@ -97,15 +90,15 @@ void yyerror(const char *msg); // standard error-handling routine
     ReturnStmt *returnstmt;
     SwitchStmt *switchstmt;
     SwitchLabel *switchlabel;
-    Case *case;
-    Default *default;
+ //   Case *case;
+ //   Default *default;
 
     Type *type;
     NamedType *namedtype;
     ArrayType *arraytype;
 
 
-    PrintStmt *pntstmt;
+ //   PrintStmt *pntstmt;
     List<Stmt*> *stmts;
 
 
@@ -249,7 +242,7 @@ Type      :    T_Int                 { $$ = Type::intType; }
           |    T_Uvec4               { $$ = Type::uvec4Type; }
           |    NamedType
           |    ArrayType
-
+          ;
 
 %%
 
