@@ -12,7 +12,6 @@
 
 #ifndef _H_ast_stmt
 #define _H_ast_stmt
-c
 #include "list.h"
 #include "ast.h"
 
