@@ -282,17 +282,17 @@ Variables :    Variables T_Comma Type T_Identifier
 
 
            
-Expr       :  AssignExpr          
+Expr       :  AssignExpr           {$$ =  $1;}
            |  Constant
-           |  LValue
+           |  LValue                 {$$ =  $1;}
       //    |  T_This                 { $$ = new This(@1); }
            |  Call
            |  T_LeftParen Expr T_RightParen           { $$ = $2; }
-           |  ArithmeticExpr
-           |  EqualityExpr
-           |  RelationalExpr
-           |  LogicalExpr
-           |  PostfixExpr
+           |  ArithmeticExpr                       {$$ =  $1;}
+           |  EqualityExpr               {$$ =  $1;}
+           |  RelationalExpr               {$$ =  $1;}
+           |  LogicalExpr                 {$$ =  $1;}
+           |  PostfixExpr                  {$$ =  $1;}
          //  |  T_ReadInteger T_LeftParen T_RightParen  { $$ = new ReadIntegerExpr(Join(@1, @3)); }
          //  |  T_ReadLine T_LeftParen T_RightParen     { $$ = new ReadLineExpr(Join(@1, @3)); }
          //  |  T_New T_Identifier     { $$ = new NewExpr(Join(@1, @2), new NamedType(new Identifier(@2, $2))); }
@@ -347,13 +347,13 @@ Exprs      : Exprs T_Comma Expr          { ($$ = $1)->Append($3); }
            | Expr                    { ($$ = new List<Expr*>)->Append($1); }
            ; 
 
-EmptyExpr  : Expr
+EmptyExpr  : Expr                      {$$ =  $1;}
            |                         { $$ = new EmptyExpr(); }
            ;
  
             
-LValue     : FieldAccess             
-           | ArrayAccess 
+LValue     : FieldAccess        {$$ =  $1;}         
+           | ArrayAccess         {$$ =  $1;}
            ; 
 
 FieldAccess : T_Identifier           { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }
@@ -374,9 +374,9 @@ Actuals    : Exprs
            |                         { $$ = new List<Expr*>; }
            ;
            
-Constant   : IntConstant            
-           | FloatConstant
-           | BoolConstant
+Constant   : IntConstant    {$$ =  $1;}         
+           | FloatConstant  {$$ =  $1;}
+           | BoolConstant  {$$ =  $1;}
           
            ;
 
@@ -396,14 +396,14 @@ BoolConstant   : T_BoolConstant      { $$ = new BoolConstant(@1, $1); }
 
 
 Stmt       : EmptyExpr T_Semicolon  
-           | IfStmt
-           | WhileStmt
-           | ForStmt
+           | IfStmt  {$$ =  $1;}
+           | WhileStmt  {$$ =  $1;}
+           | ForStmt  {$$ =  $1;}
         //   | BreakStmt
-           | ReturnStmt
+           | ReturnStmt  {$$ =  $1;}
         //   | SwitchStmt
         //   | PrintStmt
-           | StmtBlock
+           | StmtBlock  {$$ =  $1;}
            ;
 
 IfStmt     : T_If T_LeftParen Expr T_RightParen Stmt  %prec LOWER_THAN_ELSE
