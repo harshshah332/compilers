@@ -210,6 +210,15 @@ VarDecl   :    Type T_Identifier T_Semicolon          {
                                                  Identifier *id = new Identifier(@2, $2);
                                                  $$ = new VarDecl(id, $1);
                                               }
+          |    Type T_Identifier T_Equal T_Identifier T_Semicolon    
+                                            {
+
+                                            Identifier *id = new Identifier(@2, $2);
+                                            Expr *ex = new AssignExpr($2, new Operator(@2, "="), $4);
+                                            $$ = new VarDecl(id, $1, ex);
+
+
+                                            } 
 
 
           ;
