@@ -85,9 +85,10 @@ void yyerror(const char *msg); // standard error-handling routine
     ReturnStmt *returnstmt;
    
     SwitchStmt *switchstmt;
-    Case *case;
+    SwitchLabel *switchlabel;
+    //Case *case;
     List<Case*> *caselist;
-    Default *default;
+    //Default *default;
 
     Type *type;
     NamedType *namedtype;
@@ -166,9 +167,11 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <returnstmt>       ReturnStmt
 
 %type <switchstmt>    SwitchStmt
-%type <case>      Case
+%type <switchlabel>   CaseStmt DefaultStmt
+//%type <case>      Case
+//%type <default>   Default
 %type <caselist>  CaseList
-%type <default>   Default
+
 
 
 %type <expr>          Expr Actuals Constant
@@ -376,22 +379,22 @@ ReturnStmt : T_Return EmptyExpr T_Semicolon    { $$ = new ReturnStmt(@2, $2); }
            ;
        
         
-SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace CaseList Default T_RightBrace
+SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace CaseList DefaultStmt T_RightBrace
                                      { $$ = new SwitchStmt($3, $6, $7); } 
            ;
 
 
-CaseList   : CaseList Case           { ($$ = $1)->Append($2); }
-           | Case                    { ($$ = new List<CaseStmt*>)->Append($1); }
+CaseList   : CaseList CaseStmt           { ($$ = $1)->Append($2); }
+           | CaseStmt                    { ($$ = new List<Case*>)->Append($1); }
            ;
 
-Case       : T_Case Expr T_Semicolon Stmts        { $$ = new Case($2, $4); }
+CaseStmt   : T_Case Expr T_Semicolon Stmts        { $$ = new Case($2, $4); }
                                               
            | T_Case Expr T_Semicolon              { $$ = new Case($2, new List<Stmt*>); }
            ;
            
-Default    : T_Default T_Semicolon Stmts     { $$ = new Default($3); }
-           |                                 { $$ = NULL; }
+DefaultStmt    : T_Default T_Semicolon Stmts     { $$ = new Default($3); }
+           |                                     { $$ = NULL; }
            ;
 
 /*
