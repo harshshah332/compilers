@@ -306,33 +306,33 @@ AssignExpr     : LValue T_Equal Expr
                                      { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
                ;
    
-ArithmeticExpr : Expr T_Plus Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, T_Plus), $3); }
-               | Expr T_Dash Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, T_Dash), $3); } 
-               | Expr T_Star Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, T_Star), $3); }
-               | Expr T_Slash Expr      { $$ = new ArithmeticExpr($1, new Operator(@2, T_Slash), $3); }
+ArithmeticExpr : Expr T_Plus Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); }
+               | Expr T_Dash Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
+               | Expr T_Star Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); }
+               | Expr T_Slash Expr      { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
     //           | Expr '%' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
            /*    | '-' Expr %prec UMINUS
                                      { $$ = new ArithmeticExpr(new Operator(@1, "-"), $2); } */
                ;
 
-PostfixExpr    : LValue T_Inc  { $$ = new PostfixExpr(Join(@1, @2), $1, new Operator(@2, T_Inc)); }
-               | LValue T_Dec  { $$ = new PostfixExpr(Join(@1, @2), $1, new Operator(@2, T_Dec)); }
+PostfixExpr    : LValue T_Inc  { $$ = new PostfixExpr(Join(@1, @2), $1, new Operator(@2, "++")); }
+               | LValue T_Dec  { $$ = new PostfixExpr(Join(@1, @2), $1, new Operator(@2, "--")); }
                ;
                
 EqualityExpr   : Expr T_EQ Expr   
-                                     { $$ = new EqualityExpr($1, new Operator(@2, T_EQ), $3); }
+                                     { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
                | Expr T_NE Expr
-                                     { $$ = new EqualityExpr($1, new Operator(@2, T_NE), $3); }                        
+                                     { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); }                        
                ;
                                             
 RelationalExpr : Expr T_LeftAngle Expr
-                                     { $$ = new RelationalExpr($1, new Operator(@2, T_LeftAngle), $3); }
+                                     { $$ = new RelationalExpr($1, new Operator(@2, "<"), $3); }
                | Expr T_RightAngle Expr
-                                     { $$ = new RelationalExpr($1, new Operator(@2, T_RightAngle), $3); } 
+                                     { $$ = new RelationalExpr($1, new Operator(@2, ">"), $3); } 
                | Expr T_LessEqual Expr 
-                                     { $$ = new RelationalExpr($1, new Operator(@2, T_LessEqual), $3); }                     
+                                     { $$ = new RelationalExpr($1, new Operator(@2, "<="), $3); }                     
                | Expr T_GreaterEqual Expr 
-                                     { $$ = new RelationalExpr($1, new Operator(@2, T_GreaterEqual), $3); } 
+                                     { $$ = new RelationalExpr($1, new Operator(@2, ">="), $3); } 
                ;
 
 LogicalExpr    : Expr T_And Expr 
