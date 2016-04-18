@@ -291,7 +291,7 @@ Variables :    Variables T_Comma Type T_Identifier     { ($$ = $1)->Append(new V
 Expr       : LValue                     { $$ =  $1;}
          //  | Call                        { $$ =  $1;} 
            | Constant
-         //  | LValue T_Equal Expr         { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+           | Expr T_Equal Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
            | Expr T_Plus Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); } 
            | Expr T_Dash Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
            | Expr T_Star Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); } 
@@ -326,8 +326,7 @@ EmptyExpr  : Expr                    {$$ =  $1;}
            ;
  
             
-LValue     : Expr T_Equal Expr                           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
-           | T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
+LValue     : T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
            | Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
            | Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
            ; 
