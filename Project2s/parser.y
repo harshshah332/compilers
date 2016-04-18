@@ -286,7 +286,7 @@ Expr       :  AssignExpr           {$$ =  $1;}
            |  Constant
            |  LValue                 {$$ =  $1;}
       //    |  T_This                 { $$ = new This(@1); }
-           |  Call
+           |  Call     {$$ =  $1;}
            |  T_LeftParen Expr T_RightParen           { $$ = $2; }
            |  ArithmeticExpr                       {$$ =  $1;}
            |  EqualityExpr               {$$ =  $1;}
