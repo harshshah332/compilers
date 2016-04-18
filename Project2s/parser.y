@@ -247,7 +247,7 @@ Formals   :    Variables
           |                          { $$ = new List<VarDecl*>; }
           ;
 
-Variables :    Variables ',' Type T_Identifier
+Variables :    Variables T_Comma Type T_Identifier
                                      { ($$ = $1)->Append(new VarDecl(new Identifier(@4, $4), $3)); }
           |     Type T_Identifier    { ($$ = new List<VarDecl*>)->Append(new VarDecl(new Identifier(@2, $2), $1)); }
           ;
