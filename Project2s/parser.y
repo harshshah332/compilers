@@ -288,10 +288,11 @@ Variables :    Variables T_Comma Type T_Identifier     { ($$ = $1)->Append(new V
 
 
            
-Expr       : LValue                     { $$ =  $1;}
+Expr       : 
          //  | Call                        { $$ =  $1;} 
-           | Constant
+            Constant
            | Expr T_Equal Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+           | LValue                     { $$ =  $1;}
            | Expr T_Plus Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); } 
            | Expr T_Dash Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
            | Expr T_Star Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); } 
