@@ -86,6 +86,7 @@ void yyerror(const char *msg); // standard error-handling routine
    
     SwitchStmt *switchstmt;
     Case *case;
+    List<Case*> *caselist;
     Default *default;
 
     Type *type;
@@ -165,8 +166,10 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <returnstmt>       ReturnStmt
 
 %type <switchstmt>    SwitchStmt
-%type <case>      CaseStmt
-%type <default>   DefaultStmt
+%type <case>      Case
+%type <caselist>  CaseList
+%type <default>   Default
+
 
 %type <expr>          Expr Actuals Constant
 %type <exprlist>    Exprlist
@@ -382,12 +385,12 @@ CaseList   : CaseList Case           { ($$ = $1)->Append($2); }
            | Case                    { ($$ = new List<CaseStmt*>)->Append($1); }
            ;
 
-Case       : T_Case Expr T_SemiColon Stmts        { $$ = new CaseStmt($2, $4); }
+Case       : T_Case Expr T_SemiColon Stmts        { $$ = new Case($2, $4); }
                                               
-           | T_Case Expr T_SemiColon              { $$ = new CaseStmt($2, new List<Stmt*>); }
+           | T_Case Expr T_SemiColon              { $$ = new Case($2, new List<Stmt*>); }
            ;
            
-Default    : T_Default T_SemiColon Stmts     { $$ = new DefaultStmt($3); }
+Default    : T_Default T_SemiColon Stmts     { $$ = new Default($3); }
            |                                 { $$ = NULL; }
            ;
 
