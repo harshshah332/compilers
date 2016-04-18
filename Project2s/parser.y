@@ -169,7 +169,7 @@ void yyerror(const char *msg); // standard error-handling routine
 //%type <arraytype>     ArrayType
 %type <stmt>          Stmt
 %type <stmtblock>     StmtBlock
-//%type <stmts>         Stmts
+%type <stmts>         Stmts
 %type <ifstmt>        IfStmt
 %type <whilestmt>     WhileStmt
 %type <forstmt>       ForStmt
@@ -457,6 +457,10 @@ StmtBlock  : T_LeftBrace VarDecls Stmts T_RightBrace  { $$ = new StmtBlock($2, $
 
 VarDecls   : VarDecls VarDecl        { ($$ = $1)->Append($2);    }
            |                         { $$ = new List<VarDecl*>;  }
+           ;
+
+Stmts      : Stmts Stmt              { ($$ = $1)->Append($2); }
+           | Stmt                    { ($$ = new List<Stmt*>)->Append($1);  }
            ;
 
 
