@@ -194,6 +194,10 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <fieldaccess>   FieldAccess
 %type <arrayaccess>   ArrayAccess 
 
+%type <integerConstant>      IntConstant 
+%type <boolConstant>     BoolConstant
+%type <doubleConstant>   FloatConstant
+
 
 %%
 /* Rules
