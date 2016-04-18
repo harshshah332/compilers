@@ -51,11 +51,14 @@ void yyerror(const char *msg); // standard error-handling routine
 
 
     VarDecl *vardecl;
+    List<VarDecl*> *vardecls;
+    
     FnDecl  *fndecl;
 
 
     Expr *expr;
     Expr *emptyexpr;
+    List<Expr*> *exprs;
     Call *call;
 
     IntConstant *intconstant;
@@ -78,6 +81,7 @@ void yyerror(const char *msg); // standard error-handling routine
     Program *program;
 
     Stmt *stmt;
+    List<Stmt*> *stmts;
     StmtBlock *stmtblock;
     ConditionalStmt *conditionalstmt;
     LoopStmt *loopstmt;
@@ -99,7 +103,9 @@ void yyerror(const char *msg); // standard error-handling routine
 
 
  //   PrintStmt *pntstmt;
-    List<Stmt*> *stmts;
+
+
+   
 
 
 
@@ -151,8 +157,13 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <declList>      DeclList
 %type <decl>          Decl
 %type <vardecl>       VarDecl
-%type <fndecl>        FnDecl
 %type <type>          Type
+%type <fndecl>        FnDecl
+
+%type <vardecls>      Formals
+%type <vardecls>      Variables
+
+
 %type <namedtype>     NamedType
 %type <arraytype>     ArrayType
 %type <stmt>          Stmt
@@ -165,6 +176,9 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <case>      Case
 %type <default>   Default
 %type <expr>          Expr
+%type <exprs>         Exprs
+%type <exprs>       Actuals
+%type <expr>        Constant
 %type <EmptyExpr>          EmptyExpr
 %type <expr>        Constant
 %type <intconst>      IntConstant 
@@ -179,7 +193,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <postfixexpr>    PostfixExpr
 %type <lvalue>        LValue
 %type <fieldaccess>   FieldAccess
-%type <arrayaccess>   ArrayAccess
+%type <arrayaccess>   ArrayAccess 
 
 
 %%
@@ -210,7 +224,7 @@ Decl      :    VarDecl
 
 
 
-VarDecl   :    Type T_Identifier ';'          {
+VarDecl   :    Type T_Identifier T_Semicolon          {
                                                  // replace it with your implementation
                                                  Identifier *id = new Identifier(@2, $2);
                                                  $$ = new VarDecl(id, $1);
@@ -218,6 +232,25 @@ VarDecl   :    Type T_Identifier ';'          {
 
 
           ;
+
+
+FnDecl    :    Type T_Identifier T_LeftParen Formals T_LeftParen StmtBlock
+                                     { $$ = new FnDecl(new Identifier(@2, $2), $1, $4); 
+                                       $$->SetFunctionBody($6); }
+          |    T_Void T_Identifier T_LeftParen Formals T_LeftParen StmtBlock
+                                     { $$ = new FnDecl(new Identifier(@2, $2), Type::voidType, $4); 
+                                       $$->SetFunctionBody($6); }
+          ;
+
+Formals   :    Variables  
+          |                          { $$ = new List<VarDecl*>; }
+          ;
+
+Variables :    Variables ',' Type T_Identifier
+                                     { ($$ = $1)->Append(new VarDecl(new Identifier(@4, $4), $3)); }
+          |     Type T_Identifier    { ($$ = new List<VarDecl*>)->Append(new VarDecl(new Identifier(@2, $2), $1)); }
+          ;
+
 
         
 Type      :    T_Int                 { $$ = Type::intType; }
@@ -243,6 +276,177 @@ Type      :    T_Int                 { $$ = Type::intType; }
           |    NamedType
           |    ArrayType
           ;
+
+
+
+           
+Expr       :  AssignExpr          
+           |  Constant
+           |  LValue
+      //    |  T_This                 { $$ = new This(@1); }
+           |  Call
+           |  T_LeftParen Expr T_RightParen           { $$ = $2; }
+           |  ArithmeticExpr
+           |  EqualityExpr
+           |  RelationalExpr
+           |  LogicalExpr
+           |  PostfixExpr
+         //  |  T_ReadInteger T_LeftParen T_RightParen  { $$ = new ReadIntegerExpr(Join(@1, @3)); }
+         //  |  T_ReadLine T_LeftParen T_RightParen     { $$ = new ReadLineExpr(Join(@1, @3)); }
+         //  |  T_New T_Identifier     { $$ = new NewExpr(Join(@1, @2), new NamedType(new Identifier(@2, $2))); }
+         //  |  T_NewArray T_LeftParen Expr T_Comma Type T_RightParen
+          //                           { $$ = new NewArrayExpr(Join(@1, @6), $3, $5); }
+           ;
+
+
+
+AssignExpr     : LValue T_Equal Expr     
+                                     { $$ = new AssignExpr($1, new Operator(@2, T_Equal), $3); } 
+               ;
+   
+ArithmeticExpr : Expr T_Plus Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, T_Plus), $3); }
+               | Expr T_Dash Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, T_Dash), $3); } 
+               | Expr T_Star Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, T_Star), $3); }
+               | Expr T_Slash Expr      { $$ = new ArithmeticExpr($1, new Operator(@2, T_Slash), $3); }
+    //           | Expr '%' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
+           /*    | '-' Expr %prec UMINUS
+                                     { $$ = new ArithmeticExpr(new Operator(@1, "-"), $2); } */
+               ;
+
+PostfixExpr    : LValue T_Inc  { $$ = new PostfixExpr(Join(@1, @2), $1, new Operator(@2, T_Inc)); }
+               | LValue T_Dec  { $$ = new PostfixExpr(Join(@1, @2), $1, new Operator(@2, T_Dec)); }
+               ;
+               
+EqualityExpr   : Expr T_EQ Expr   
+                                     { $$ = new EqualityExpr($1, new Operator(@2, T_EQ), $3); }
+               | Expr T_NE Expr
+                                     { $$ = new EqualityExpr($1, new Operator(@2, T_NE), $3); }                        
+               ;
+                                            
+RelationalExpr : Expr T_LeftAngle Expr
+                                     { $$ = new RelationalExpr($1, new Operator(@2, T_LeftAngle), $3); }
+               | Expr T_RightAngle Expr
+                                     { $$ = new RelationalExpr($1, new Operator(@2, T_RightAngle), $3); } 
+               | Expr T_LessEqual Expr 
+                                     { $$ = new RelationalExpr($1, new Operator(@2, T_LessEqual), $3); }                     
+               | Expr T_GreaterEqual Expr 
+                                     { $$ = new RelationalExpr($1, new Operator(@2, T_GreaterEqual), $3); } 
+               ;
+
+LogicalExpr    : Expr T_And Expr 
+                                     { $$ = new LogicalExpr($1, new Operator(@2, "&&"), $3); }
+               | Expr T_Or Expr 
+                                     { $$ = new LogicalExpr($1, new Operator(@2, "||"), $3); }
+             //  | '!' Expr            { $$ = new LogicalExpr(new Operator(@1, "!"), $2); }
+               ;               
+
+
+Exprs      : Exprs T_Comma Expr          { ($$ = $1)->Append($3); }
+           | Expr                    { ($$ = new List<Expr*>)->Append($1); }
+           ; 
+
+EmptyExpr  : Expr
+           |                         { $$ = new EmptyExpr(); }
+           ;
+ 
+            
+LValue     : FieldAccess             
+           | ArrayAccess 
+           ; 
+
+FieldAccess : T_Identifier           { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }
+            | Expr T_Dot T_Identifier
+                                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
+            ;
+
+Call       : T_Identifier T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, $1), $3); }  
+           | Expr T_Dot T_Identifier T_LeftParen Actuals T_RightParen
+                                     { $$ = new Call(Join(@1, @6), $1, new Identifier(@3, $3), $5); }
+           ;
+
+ArrayAccess : Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
+            ;
+           
+Actuals    : Exprs 
+           |                         { $$ = new List<Expr*>; }
+           ;
+           
+Constant   : IntConstant            
+           | DoubleConstant
+           | BoolConstant
+           | StringConstant
+           | NullConstant
+           ;
+
+IntConstant    : T_IntConstant       { $$ = new IntConstant(@1, $1); }
+               ;
+            
+DoubleConstant : T_DoubleConstant    { $$ = new DoubleConstant(@1, $1); }
+               ;
+               
+BoolConstant   : T_BoolConstant      { $$ = new BoolConstant(@1, $1); }
+               ;
+               
+StringConstant : T_StringConstant    { $$ = new StringConstant(@1, $1); }
+               ;
+               
+NullConstant   : T_Null              { $$ = new NullConstant(@1); }
+               ;
+
+
+
+
+
+
+Stmt       : emptyexpr T_Semicolon  
+           | IfStmt
+           | WhileStmt
+           | ForStmt
+           | BreakStmt
+           | ReturnStmt
+           | SwitchStmt
+           | PrintStmt
+           | StmtBlock
+           ;
+
+IfStmt     : T_If T_LeftParen Expr T_RightParen Stmt  %prec LOWER_THAN_ELSE
+                                     { $$ = new IfStmt($3, $5, NULL); }
+           | T_If T_LeftParen Expr T_RightParen Stmt T_Else Stmt
+                                     { $$ = new IfStmt($3, $5, $7); }
+           ;
+                                     
+           
+WhileStmt  : T_While '(' Expr T_RightParen Stmt
+                                     { $$ = new WhileStmt($3, $5); }
+           ;
+           
+ForStmt    : T_For T_LeftParen EmptyExpr T_Semicolon Expr T_Semicolon EmptyExpr T_RightParen Stmt
+                                     { $$ = new ForStmt($3, $5, $7, $9); }
+           ;
+           
+ReturnStmt : T_Return EmptyExpr T_Semicolon    { $$ = new ReturnStmt(@2, $2); }
+           ;
+        
+BreakStmt  : T_Break T_Semicolon             { $$ = new BreakStmt(@1); }                            
+           ;
+           
+SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace Cases Default T_RightBrace
+                                     { $$ = new SwitchStmt($3, $6, $7); }
+           ;
+
+// PrintStmt  : T_Print T_LeftParen Exprs T_RightParen T_Semicolon 
+  
+
+           
+StmtBlock  : T_LeftBrace VarDecls Stmts T_RightBrace  { $$ = new StmtBlock($2, $3); }
+           | T_LeftBrace VarDecls T_RightBrace         { $$ = new StmtBlock($2, new List<Stmt*>); }
+           ;
+
+VarDecls   : VarDecls VarDecl        { ($$ = $1)->Append($2);    }
+           |                         { $$ = new List<VarDecl*>;  }
+           ;
+
 
 %%
 
