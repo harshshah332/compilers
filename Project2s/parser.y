@@ -167,7 +167,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <returnstmt>       ReturnStmt
 
 %type <switchstmt>    SwitchStmt
-%type <switchlabel>   CaseStmt DefaultStmt
+%type <switchlabel>   SwitchLabel
 //%type <case>      Case
 //%type <default>   Default
 %type <caselist>  CaseList
@@ -379,12 +379,25 @@ ReturnStmt : T_Return EmptyExpr T_Semicolon    { $$ = new ReturnStmt(@2, $2); }
            ;
        
         
-SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace CaseList DefaultStmt T_RightBrace
+SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace CaseList SwitchLabel T_RightBrace
                                      { $$ = new SwitchStmt($3, $6, $7); } 
            ;
 
 
 
+CaseList   : CaseList SwitchLabel           { ($$ = $1)->Append($2); }
+           | SwitchLabel                    { ($$ = new List<Case*>)->Append($1); }
+           ;
+
+SwitchLabel : T_Case Expr T_Semicolon Stmts       { $$ = new Case($2, $4); }
+                                              
+            | T_Case Expr T_Semicolon             { $$ = new Case($2, new List<Stmt*>); }
+            | T_Default T_Semicolon Stmts         { $$ = new Default($3); }
+            |                                     { $$ = NULL; }
+            ;
+
+
+/*
 CaseList   : CaseList CaseStmt           { ($$ = $1)->Append($2); }
            | CaseStmt                    { ($$ = new List<Case*>)->Append($1); }
            ;
@@ -397,6 +410,9 @@ CaseStmt   : T_Case Expr T_Semicolon Stmts        { $$ = new Case($2, $4); }
 DefaultStmt    : T_Default T_Semicolon Stmts     { $$ = new Default($3); }
            |                                     { $$ = NULL; }
            ;
+
+
+*/
 
 /*
  PrintStmt  : T_Print T_LeftParen Exprlist T_RightParen T_Semicolon 
