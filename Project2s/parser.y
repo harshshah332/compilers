@@ -168,6 +168,7 @@ void yyerror(const char *msg); // standard error-handling routine
 //%type <arraytype>     ArrayType
 %type <stmt>          Stmt
 %type <stmtblock>     StmtBlock
+%type <stmts>         Stmts
 %type <ifstmt>        IfStmt
 %type <whilestmt>     WhileStmt
 %type <forstmt>       ForStmt
@@ -193,10 +194,6 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <lvalue>        LValue
 %type <fieldaccess>   FieldAccess
 %type <arrayaccess>   ArrayAccess 
-
-%type <integerConstant>      IntConstant 
-%type <boolConstant>     BoolConstant
-%type <doubleConstant>   FloatConstant
 
 
 %%
@@ -276,8 +273,8 @@ Type      :    T_Int                 { $$ = Type::intType; }
           |    T_Uvec2               { $$ = Type::uvec2Type; }
           |    T_Uvec3               { $$ = Type::uvec3Type; }
           |    T_Uvec4               { $$ = Type::uvec4Type; }
-          |    NamedType
-          |    ArrayType
+   //       |    NamedType
+   //       |    ArrayType
           ;
 
 
