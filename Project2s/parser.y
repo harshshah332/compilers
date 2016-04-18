@@ -157,6 +157,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <declList>      DeclList
 %type <decl>          Decl
 %type <vardecl>       VarDecl
+%type <vardecls>      VarDecls
 %type <type>          Type
 %type <fndecl>        FnDecl
 
