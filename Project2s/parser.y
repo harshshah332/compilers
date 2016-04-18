@@ -88,7 +88,7 @@ void yyerror(const char *msg); // standard error-handling routine
     SwitchLabel *switchlabel;
     Case *case;
     List<Case*> *caselist;
-    Default *defaultstmt;
+    Default *defaultcase;
 
     Type *type;
     NamedType *namedtype;
@@ -170,7 +170,7 @@ void yyerror(const char *msg); // standard error-handling routine
 //%type <switchlabel>   SwitchLabel
 %type <case>      CaseStmt
 %type <caselist>  CaseList
-%type <default>   DefaultCase
+%type <defaultcase>   DefaultCase
 
 
 
