@@ -170,7 +170,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <exprlist>    Exprlist
 %type <emptyexpr>     EmptyExpr
 
-%type <call>          Call
+//%type <call>          Call
 
 %type <lvalue>        LValue
 %type <fieldaccess>   FieldAccess
@@ -312,16 +312,7 @@ FieldAccess : T_Identifier           { $$ = new FieldAccess(NULL, new Identifier
 ArrayAccess : Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
             ;
 
-
-
-Call       : T_Identifier T_LeftParen Actuals T_RightParen 
-                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, $1), $3); }  
-           | Expr T_Dot T_Identifier T_LeftParen Actuals T_RightParen
-                                     { $$ = new Call(Join(@1, @6), $1, new Identifier(@3, $3), $5); }
-           ;
-
-
-           
+        
 Actuals    : Exprlist                { $$ = $1; }
            |                         { $$ = new List<Expr*>; }
            ;
@@ -396,6 +387,17 @@ VarDecls   : VarDecls VarDecl        { ($$ = $1)->Append($2);    }
 Stmts      : Stmts Stmt              { ($$ = $1)->Append($2); }
            | Stmt                    { ($$ = new List<Stmt*>)->Append($1);  }
            ;
+
+
+/*
+Call       : T_Identifier T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, $1), $3); }  
+           | Expr T_Dot T_Identifier T_LeftParen Actuals T_RightParen
+                                     { $$ = new Call(Join(@1, @6), $1, new Identifier(@3, $3), $5); }
+           ;
+
+*/
+   
 
 
 %%
