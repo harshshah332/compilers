@@ -303,7 +303,7 @@ Expr       :  AssignExpr
 
 
 AssignExpr     : LValue T_Equal Expr     
-                                     { $$ = new AssignExpr($1, new Operator(@2, T_Equal), $3); } 
+                                     { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
                ;
    
 ArithmeticExpr : Expr T_Plus Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, T_Plus), $3); }
