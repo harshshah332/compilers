@@ -165,7 +165,7 @@ void yyerror(const char *msg); // standard error-handling routine
 
 
 %type <namedtype>     NamedType
-%type <arraytype>     ArrayType
+//%type <arraytype>     ArrayType
 %type <stmt>          Stmt
 %type <stmtblock>     StmtBlock
 %type <ifstmt>        IfStmt
@@ -179,8 +179,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <exprs>         Exprs
 %type <exprs>       Actuals
 %type <expr>        Constant
-%type <EmptyExpr>          EmptyExpr
-%type <expr>        Constant
+%type <emptyexpr>     EmptyExpr
 %type <intconst>      IntConstant 
 %type <boolconst>     BoolConstant
 %type <floatconst>   FloatConstant
@@ -373,27 +372,21 @@ Actuals    : Exprs
            ;
            
 Constant   : IntConstant            
-           | DoubleConstant
+           | FloatConstant
            | BoolConstant
-           | StringConstant
-           | NullConstant
+          
            ;
 
 IntConstant    : T_IntConstant       { $$ = new IntConstant(@1, $1); }
                ;
             
-DoubleConstant : T_DoubleConstant    { $$ = new DoubleConstant(@1, $1); }
+FloatConstant : T_FloatConstant    { $$ = new FloatConstant(@1, $1); }
                ;
                
 BoolConstant   : T_BoolConstant      { $$ = new BoolConstant(@1, $1); }
                ;
+              
                
-StringConstant : T_StringConstant    { $$ = new StringConstant(@1, $1); }
-               ;
-               
-NullConstant   : T_Null              { $$ = new NullConstant(@1); }
-               ;
-
 
 
 
@@ -403,10 +396,10 @@ Stmt       : emptyexpr T_Semicolon
            | IfStmt
            | WhileStmt
            | ForStmt
-           | BreakStmt
+        //   | BreakStmt
            | ReturnStmt
-           | SwitchStmt
-           | PrintStmt
+        //   | SwitchStmt
+        //   | PrintStmt
            | StmtBlock
            ;
 
@@ -427,16 +420,33 @@ ForStmt    : T_For T_LeftParen EmptyExpr T_Semicolon Expr T_Semicolon EmptyExpr 
            
 ReturnStmt : T_Return EmptyExpr T_Semicolon    { $$ = new ReturnStmt(@2, $2); }
            ;
-        
+ /*       
 BreakStmt  : T_Break T_Semicolon             { $$ = new BreakStmt(@1); }                            
            ;
            
 SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace Cases Default T_RightBrace
-                                     { $$ = new SwitchStmt($3, $6, $7); }
+                                     { $$ = new SwitchStmt($3, $6, $7); } 
            ;
 
-// PrintStmt  : T_Print T_LeftParen Exprs T_RightParen T_Semicolon 
-  
+
+Cases      : Cases Case              { ($$ = $1)->Append($2); }
+           | Case                    { ($$ = new List<CaseStmt*>)->Append($1); }
+           ;
+
+Case       : T_Case IntConstant ':' Stmts        
+                                     { $$ = new CaseStmt($2, $4); }
+           | T_Case IntConstant ':'  { $$ = new CaseStmt($2, new List<Stmt*>); }
+           ;
+           
+Default    : T_Default ':' Stmts     { $$ = new DefaultStmt($3); }
+           |                         { $$ = NULL; }
+           ;
+
+
+ PrintStmt  : T_Print T_LeftParen Exprs T_RightParen T_Semicolon 
+            ;
+
+            */
 
            
 StmtBlock  : T_LeftBrace VarDecls Stmts T_RightBrace  { $$ = new StmtBlock($2, $3); }
