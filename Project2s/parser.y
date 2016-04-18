@@ -58,20 +58,12 @@ void yyerror(const char *msg); // standard error-handling routine
 
     Expr *expr;
     Expr *emptyexpr;
-    List<Expr*> *exprs;
+    List<Expr*> *exprlist;
     Call *call;
 
-    IntConstant *intconstant;
-    FloatConstant *floatconstant;
-    BoolConstant *boolconstant;
-
-    ArithmeticExpr *arithmeticexpr;
-    RelationalExpr *relationalexpr;
-    EqualityExpr   *equalityexpr;
-    LogicalExpr    *logicalexpr;
+  
     SelectionExpr  *selectionexpr;
-    PostfixExpr    *postfixexpr;
-    AssignExpr     *assignexpr;
+
 
     
     LValue *lvalue;
@@ -90,7 +82,6 @@ void yyerror(const char *msg); // standard error-handling routine
     WhileStmt *whilestmt;
     DoWhileStmt *dowhilestmt;
     IfStmt *ifstmt;
-    BreakStmt *breakstmt;
     ReturnStmt *returnstmt;
     SwitchStmt *switchstmt;
     SwitchLabel *switchlabel;
@@ -157,12 +148,10 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <declList>      DeclList
 %type <decl>          Decl
 %type <vardecl>       VarDecl
-%type <vardecls>      VarDecls
+%type <vardecls>      VarDecls Formals Variables
 %type <type>          Type
 %type <fndecl>        FnDecl
 
-%type <vardecls>      Formals
-%type <vardecls>      Variables
 
 
 //%type <namedtype>     NamedType
@@ -177,21 +166,12 @@ void yyerror(const char *msg); // standard error-handling routine
 //%type <switchstmt>    SwitchStmt
 //%type <case>      Case
 //%type <default>   Default
-%type <expr>          Expr
-%type <exprs>         Exprs
-%type <exprs>       Actuals
-%type <expr>        Constant
+%type <expr>          Expr Actuals Constant
+%type <exprlist>    Exprlist
 %type <emptyexpr>     EmptyExpr
-%type <intconstant>      IntConstant 
-%type <boolconstant>     BoolConstant
-%type <floatconstant>   FloatConstant
+
 %type <call>          Call
-%type <arithmeticexpr> ArithmeticExpr
-%type <relationalexpr> RelationalExpr
-%type <equalityexpr>   EqualityExpr
-%type <logicalexpr>    LogicalExpr
-%type <assignexpr>     AssignExpr
-%type <postfixexpr>    PostfixExpr
+
 %type <lvalue>        LValue
 %type <fieldaccess>   FieldAccess
 %type <arrayaccess>   ArrayAccess 
@@ -268,13 +248,12 @@ FnDecl    :    Type T_Identifier T_LeftParen Formals T_RightParen StmtBlock
                                        $$->SetFunctionBody($6); }
           ;
 
-Formals   :    Variables  
+Formals   :    Variables             { $$ = $1; }
           |                          { $$ = new List<VarDecl*>; }
           ;
 
-Variables :    Variables T_Comma Type T_Identifier
-                                     { ($$ = $1)->Append(new VarDecl(new Identifier(@4, $4), $3)); }
-          |     Type T_Identifier    { ($$ = new List<VarDecl*>)->Append(new VarDecl(new Identifier(@2, $2), $1)); }
+Variables :    Variables T_Comma Type T_Identifier     { ($$ = $1)->Append(new VarDecl(new Identifier(@4, $4), $3)); }
+          |     Type T_Identifier                      { ($$ = new List<VarDecl*>)->Append(new VarDecl(new Identifier(@2, $2), $1)); }
           ;
 
 
@@ -282,72 +261,40 @@ Variables :    Variables T_Comma Type T_Identifier
 
 
            
-Expr       :  AssignExpr           {$$ =  $1;}
-           |  Constant
-           |  LValue                 {$$ =  $1;}
-      //    |  T_This                 { $$ = new This(@1); }
-           |  Call     {$$ =  $1;}
+Expr       : LValue                     { $$ =  $1;}
+           | Call                        { $$ =  $1;} 
+           | Constant
+           | LValue T_Equal Expr         { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+           | Expr T_Plus Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); } 
+           | Expr T_Dash Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
+           | Expr T_Star Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); } 
+           | Expr T_Slash Expr           { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
+           | Expr '%' Expr               { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
+           | LValue T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
+           | LValue T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
+           | Expr T_EQ Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
+           | Expr T_NE Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); }  
+           | Expr T_LeftAngle Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<"), $3); }
+           | Expr T_RightAngle Expr      { $$ = new RelationalExpr($1, new Operator(@2, ">"), $3); } 
+           | Expr T_LessEqual Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<="), $3); }   
+           | Expr T_GreaterEqual Expr    { $$ = new RelationalExpr($1, new Operator(@2, ">="), $3); } 
+           | Expr T_And Expr             { $$ = new LogicalExpr($1, new Operator(@2, "&&"), $3); }
+           | Expr T_Or Expr              { $$ = new LogicalExpr($1, new Operator(@2, "||"), $3); }
            |  T_LeftParen Expr T_RightParen           { $$ = $2; }
-           |  ArithmeticExpr                       {$$ =  $1;}
-           |  EqualityExpr               {$$ =  $1;}
-           |  RelationalExpr               {$$ =  $1;}
-           |  LogicalExpr                 {$$ =  $1;}
-           |  PostfixExpr                  {$$ =  $1;}
-         //  |  T_ReadInteger T_LeftParen T_RightParen  { $$ = new ReadIntegerExpr(Join(@1, @3)); }
-         //  |  T_ReadLine T_LeftParen T_RightParen     { $$ = new ReadLineExpr(Join(@1, @3)); }
-         //  |  T_New T_Identifier     { $$ = new NewExpr(Join(@1, @2), new NamedType(new Identifier(@2, $2))); }
-         //  |  T_NewArray T_LeftParen Expr T_Comma Type T_RightParen
-          //                           { $$ = new NewArrayExpr(Join(@1, @6), $3, $5); }
+        // | '!' Expr             { $$ = new LogicalExpr(new Operator(@1,"!"), $2); }
+       //  |  T_This                 { $$ = new This(@1); } 
+        // |  T_ReadInteger T_LeftParen T_RightParen  { $$ = new ReadIntegerExpr(Join(@1, @3)); }
+       //  |  T_ReadLine T_LeftParen T_RightParen     { $$ = new ReadLineExpr(Join(@1, @3)); }
+       //  |  T_New T_Identifier     { $$ = new NewExpr(Join(@1, @2), new NamedType(new Identifier(@2, $2))); }
+       //  |  T_NewArray T_LeftParen Expr T_Comma Type T_RightParen { $$ = new NewArrayExpr(Join(@1, @6), $3, $5); }
            ;
 
 
-
-AssignExpr     : LValue T_Equal Expr     
-                                     { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
-               ;
-   
-ArithmeticExpr : Expr T_Plus Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); }
-               | Expr T_Dash Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
-               | Expr T_Star Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); }
-               | Expr T_Slash Expr      { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
-    //           | Expr '%' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
-           /*    | '-' Expr %prec UMINUS
-                                     { $$ = new ArithmeticExpr(new Operator(@1, "-"), $2); } */
-               ;
-
-PostfixExpr    : LValue T_Inc  { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
-               | LValue T_Dec  { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
-               ;
-               
-EqualityExpr   : Expr T_EQ Expr   
-                                     { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
-               | Expr T_NE Expr
-                                     { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); }                        
-               ;
-                                            
-RelationalExpr : Expr T_LeftAngle Expr
-                                     { $$ = new RelationalExpr($1, new Operator(@2, "<"), $3); }
-               | Expr T_RightAngle Expr
-                                     { $$ = new RelationalExpr($1, new Operator(@2, ">"), $3); } 
-               | Expr T_LessEqual Expr 
-                                     { $$ = new RelationalExpr($1, new Operator(@2, "<="), $3); }                     
-               | Expr T_GreaterEqual Expr 
-                                     { $$ = new RelationalExpr($1, new Operator(@2, ">="), $3); } 
-               ;
-
-LogicalExpr    : Expr T_And Expr 
-                                     { $$ = new LogicalExpr($1, new Operator(@2, "&&"), $3); }
-               | Expr T_Or Expr 
-                                     { $$ = new LogicalExpr($1, new Operator(@2, "||"), $3); }
-             //  | '!' Expr            { $$ = new LogicalExpr(new Operator(@1, "!"), $2); }
-               ;               
-
-
-Exprs      : Exprs T_Comma Expr          { ($$ = $1)->Append($3); }
+Exprlist   : Exprlist T_Comma Expr          { ($$ = $1)->Append($3); }
            | Expr                    { ($$ = new List<Expr*>)->Append($1); }
            ; 
 
-EmptyExpr  : Expr                      {$$ =  $1;}
+EmptyExpr  : Expr                    {$$ =  $1;}
            |                         { $$ = new EmptyExpr(); }
            ;
  
@@ -361,59 +308,47 @@ FieldAccess : T_Identifier           { $$ = new FieldAccess(NULL, new Identifier
                                      { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
             ;
 
+
+ArrayAccess : Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
+            ;
+
+
+
 Call       : T_Identifier T_LeftParen Actuals T_RightParen 
                                      { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, $1), $3); }  
            | Expr T_Dot T_Identifier T_LeftParen Actuals T_RightParen
                                      { $$ = new Call(Join(@1, @6), $1, new Identifier(@3, $3), $5); }
            ;
 
-ArrayAccess : Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
-            ;
+
            
-Actuals    : Exprs 
+Actuals    : Exprlist                { $$ = $1; }
            |                         { $$ = new List<Expr*>; }
            ;
            
-Constant   : IntConstant    {$$ =  $1;}         
-           | FloatConstant  {$$ =  $1;}
-           | BoolConstant  {$$ =  $1;}
+Constant   : T_IntConstant       { $$ = new IntConstant(@1, $1); }      
+           | FloatConstant       { $$ = new FloatConstant(@1, $1); }
+           | T_BoolConstant      { $$ = new BoolConstant(@1, $1); }
           
            ;
-
-IntConstant    : T_IntConstant       { $$ = new IntConstant(@1, $1); }
-               ;
-            
-FloatConstant : T_FloatConstant    { $$ = new FloatConstant(@1, $1); }
-               ;
-               
-BoolConstant   : T_BoolConstant      { $$ = new BoolConstant(@1, $1); }
-               ;
               
-               
-
-
-
-
-
-Stmt       : EmptyExpr T_Semicolon  
+Stmt       : EmptyExpr T_Semicolon   { $$ = $1; }
            | IfStmt  {$$ =  $1;}
            | WhileStmt  {$$ =  $1;}
            | ForStmt  {$$ =  $1;}
-        //   | BreakStmt
+           | T_Break T_Semicolon             { $$ = new BreakStmt(@1); }     
            | ReturnStmt  {$$ =  $1;}
         //   | SwitchStmt
         //   | PrintStmt
            | StmtBlock  {$$ =  $1;}
            ;
 
-IfStmt     : T_If T_LeftParen Expr T_RightParen Stmt  %prec LOWER_THAN_ELSE
-                                     { $$ = new IfStmt($3, $5, NULL); }
-           | T_If T_LeftParen Expr T_RightParen Stmt T_Else Stmt
-                                     { $$ = new IfStmt($3, $5, $7); }
+IfStmt     : T_If T_LeftParen Expr T_RightParen Stmt              { $$ = new IfStmt($3, $5, NULL); }
+           | T_If T_LeftParen Expr T_RightParen Stmt T_Else Stmt  { $$ = new IfStmt($3, $5, $7); }
            ;
                                      
            
-WhileStmt  : T_While '(' Expr T_RightParen Stmt
+WhileStmt  : T_While T_Left_Paren Expr T_RightParen Stmt
                                      { $$ = new WhileStmt($3, $5); }
            ;
            
@@ -424,9 +359,7 @@ ForStmt    : T_For T_LeftParen EmptyExpr T_Semicolon Expr T_Semicolon EmptyExpr 
 ReturnStmt : T_Return EmptyExpr T_Semicolon    { $$ = new ReturnStmt(@2, $2); }
            ;
  /*       
-BreakStmt  : T_Break T_Semicolon             { $$ = new BreakStmt(@1); }                            
-           ;
-           
+        
 SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace Cases Default T_RightBrace
                                      { $$ = new SwitchStmt($3, $6, $7); } 
            ;
@@ -446,7 +379,7 @@ Default    : T_Default ':' Stmts     { $$ = new DefaultStmt($3); }
            ;
 
 
- PrintStmt  : T_Print T_LeftParen Exprs T_RightParen T_Semicolon 
+ PrintStmt  : T_Print T_LeftParen Exprlist T_RightParen T_Semicolon 
             ;
 
             */
