@@ -182,9 +182,9 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <exprs>       Actuals
 %type <expr>        Constant
 %type <emptyexpr>     EmptyExpr
-%type <intconst>      IntConstant 
-%type <boolconst>     BoolConstant
-%type <floatconst>   FloatConstant
+%type <intconstant>      IntConstant 
+%type <boolconstant>     BoolConstant
+%type <floatconstant>   FloatConstant
 %type <call>          Call
 %type <arithmeticexpr> ArithmeticExpr
 %type <relationalexpr> RelationalExpr
