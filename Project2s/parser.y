@@ -222,7 +222,7 @@ VarDecl   :    Type T_Identifier T_Semicolon          {
 
                                             }  
 
-                                  */
+
             |     Type T_Identifier T_LeftBracket Constant T_RightBracket 
                                             {
                                                ArrayType *ar = new ArrayType(elemType=intType); 
@@ -230,7 +230,7 @@ VarDecl   :    Type T_Identifier T_Semicolon          {
 
 
                                             }
-
+ */
 
           ;
 
