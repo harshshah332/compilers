@@ -384,6 +384,7 @@ SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace CaseList Default
            ;
 
 
+
 CaseList   : CaseList CaseStmt           { ($$ = $1)->Append($2); }
            | CaseStmt                    { ($$ = new List<Case*>)->Append($1); }
            ;
@@ -392,7 +393,7 @@ CaseStmt   : T_Case Expr T_Semicolon Stmts        { $$ = new Case($2, $4); }
                                               
            | T_Case Expr T_Semicolon              { $$ = new Case($2, new List<Stmt*>); }
            ;
-           
+
 DefaultStmt    : T_Default T_Semicolon Stmts     { $$ = new Default($3); }
            |                                     { $$ = NULL; }
            ;
