@@ -166,12 +166,13 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <forstmt>       ForStmt
 %type <returnstmt>       ReturnStmt
 
+/*
 %type <switchstmt>    SwitchStmt
 //%type <switchlabel>   SwitchLabel
 %type <case>      CaseStmt
 %type <caselist>  CaseList
 %type <defaultcase>   DefaultCase
-
+*/
 
 
 %type <expr>          Expr Actuals Constant
@@ -357,7 +358,7 @@ Stmt       : EmptyExpr T_Semicolon   { $$ = $1; }
            | ForStmt  {$$ =  $1;}
            | T_Break T_Semicolon             { $$ = new BreakStmt(@1); }     
            | ReturnStmt  {$$ =  $1;}
-           | SwitchStmt   {$$ =  $1;}
+      //     | SwitchStmt   {$$ =  $1;}
         //   | PrintStmt
            | StmtBlock  {$$ =  $1;}
            ;
@@ -378,7 +379,7 @@ ForStmt    : T_For T_LeftParen EmptyExpr T_Semicolon Expr T_Semicolon EmptyExpr 
 ReturnStmt : T_Return EmptyExpr T_Semicolon    { $$ = new ReturnStmt(@2, $2); }
            ;
        
-        
+ /*       
 SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace CaseList DefaultCase T_RightBrace
                                      { $$ = new SwitchStmt($3, $6, $7); } 
            ;
@@ -398,8 +399,7 @@ CaseStmt   : T_Case Expr T_Semicolon Stmts        { $$ = new Case($2, $4); }
 DefaultCase  : T_Default T_Semicolon Stmts         { $$ = new Default($3); }
              |                                     { $$ = NULL; }
              ;
-
-
+*/
 
 /*
  PrintStmt  : T_Print T_LeftParen Exprlist T_RightParen T_Semicolon 
