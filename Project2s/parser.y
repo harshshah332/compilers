@@ -83,10 +83,10 @@ void yyerror(const char *msg); // standard error-handling routine
     DoWhileStmt *dowhilestmt;
     IfStmt *ifstmt;
     ReturnStmt *returnstmt;
+   
     SwitchStmt *switchstmt;
-    SwitchLabel *switchlabel;
- //   Case *case;
- //   Default *default;
+    Case *case;
+    Default *default;
 
     Type *type;
     NamedType *namedtype;
@@ -163,9 +163,11 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <whilestmt>     WhileStmt
 %type <forstmt>       ForStmt
 %type <returnstmt>       ReturnStmt
-//%type <switchstmt>    SwitchStmt
-//%type <case>      Case
-//%type <default>   Default
+
+%type <switchstmt>    SwitchStmt
+%type <case>      CaseStmt
+%type <default>   DefaultStmt
+
 %type <expr>          Expr Actuals Constant
 %type <exprlist>    Exprlist
 %type <emptyexpr>     EmptyExpr
@@ -349,7 +351,7 @@ Stmt       : EmptyExpr T_Semicolon   { $$ = $1; }
            | ForStmt  {$$ =  $1;}
            | T_Break T_Semicolon             { $$ = new BreakStmt(@1); }     
            | ReturnStmt  {$$ =  $1;}
-        //   | SwitchStmt
+           | SwitchStmt
         //   | PrintStmt
            | StmtBlock  {$$ =  $1;}
            ;
@@ -369,27 +371,27 @@ ForStmt    : T_For T_LeftParen EmptyExpr T_Semicolon Expr T_Semicolon EmptyExpr 
            
 ReturnStmt : T_Return EmptyExpr T_Semicolon    { $$ = new ReturnStmt(@2, $2); }
            ;
- /*       
+       
         
-SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace Cases Default T_RightBrace
+SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace CaseList Default T_RightBrace
                                      { $$ = new SwitchStmt($3, $6, $7); } 
            ;
 
 
-Cases      : Cases Case              { ($$ = $1)->Append($2); }
+CaseList   : CaseList Case           { ($$ = $1)->Append($2); }
            | Case                    { ($$ = new List<CaseStmt*>)->Append($1); }
            ;
 
-Case       : T_Case IntConstant ':' Stmts        
-                                     { $$ = new CaseStmt($2, $4); }
-           | T_Case IntConstant ':'  { $$ = new CaseStmt($2, new List<Stmt*>); }
+Case       : T_Case Expr T_SemiColon Stmts        { $$ = new CaseStmt($2, $4); }
+                                              
+           | T_Case Expr T_SemiColon              { $$ = new CaseStmt($2, new List<Stmt*>); }
            ;
            
-Default    : T_Default ':' Stmts     { $$ = new DefaultStmt($3); }
-           |                         { $$ = NULL; }
+Default    : T_Default T_SemiColon Stmts     { $$ = new DefaultStmt($3); }
+           |                                 { $$ = NULL; }
            ;
 
-
+/*
  PrintStmt  : T_Print T_LeftParen Exprlist T_RightParen T_Semicolon 
             ;
 
