@@ -220,9 +220,9 @@ DeclList  :    DeclList Decl        { ($$=$1)->Append($2); }
           |    Decl                 { ($$ = new List<Decl*>)->Append($1); }
           ;
 
-Decl      :    VarDecl
+Decl      :    VarDecl              
+          |    FnDecl                  
           ;
-
 
 
 VarDecl   :    Type T_Identifier T_Semicolon          {
@@ -234,26 +234,6 @@ VarDecl   :    Type T_Identifier T_Semicolon          {
 
           ;
 
-
-FnDecl    :    Type T_Identifier T_LeftParen Formals T_RightParen StmtBlock
-                                     { $$ = new FnDecl(new Identifier(@2, $2), $1, $4); 
-                                       $$->SetFunctionBody($6); }
-          |    T_Void T_Identifier T_LeftParen Formals T_RightParen StmtBlock
-                                     { $$ = new FnDecl(new Identifier(@2, $2), Type::voidType, $4); 
-                                       $$->SetFunctionBody($6); }
-          ;
-
-Formals   :    Variables  
-          |                          { $$ = new List<VarDecl*>; }
-          ;
-
-Variables :    Variables T_Comma Type T_Identifier
-                                     { ($$ = $1)->Append(new VarDecl(new Identifier(@4, $4), $3)); }
-          |     Type T_Identifier    { ($$ = new List<VarDecl*>)->Append(new VarDecl(new Identifier(@2, $2), $1)); }
-          ;
-
-
-        
 Type      :    T_Int                 { $$ = Type::intType; }
           |    T_Float               { $$ = Type::floatType; }
           |    T_Bool                { $$ = Type::boolType; }
@@ -278,6 +258,27 @@ Type      :    T_Int                 { $$ = Type::intType; }
    //       |    ArrayType
           ;
 
+
+
+FnDecl    :    Type T_Identifier T_LeftParen Formals T_RightParen StmtBlock
+                                     { $$ = new FnDecl(new Identifier(@2, $2), $1, $4); 
+                                       $$->SetFunctionBody($6); }
+          |    T_Void T_Identifier T_LeftParen Formals T_RightParen StmtBlock
+                                     { $$ = new FnDecl(new Identifier(@2, $2), Type::voidType, $4); 
+                                       $$->SetFunctionBody($6); }
+          ;
+
+Formals   :    Variables  
+          |                          { $$ = new List<VarDecl*>; }
+          ;
+
+Variables :    Variables T_Comma Type T_Identifier
+                                     { ($$ = $1)->Append(new VarDecl(new Identifier(@4, $4), $3)); }
+          |     Type T_Identifier    { ($$ = new List<VarDecl*>)->Append(new VarDecl(new Identifier(@2, $2), $1)); }
+          ;
+
+
+        
 
 
            
