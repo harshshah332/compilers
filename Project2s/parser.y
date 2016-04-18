@@ -67,8 +67,7 @@ void yyerror(const char *msg); // standard error-handling routine
 
     
     LValue *lvalue;
-    FieldAccess *fieldaccess;
-    ArrayAccess *arrayaccess;
+
 
     Program *program;
 
@@ -86,9 +85,9 @@ void yyerror(const char *msg); // standard error-handling routine
    
     SwitchStmt *switchstmt;
     SwitchLabel *switchlabel;
-    Case *case;
+    //Case *case;
     List<Case*> *caselist;
-    Default *defaultcase;
+   // Default *defaultcase;
 
     Type *type;
     NamedType *namedtype;
@@ -182,8 +181,7 @@ void yyerror(const char *msg); // standard error-handling routine
 //%type <call>          Call
 
 %type <lvalue>        LValue
-%type <fieldaccess>   FieldAccess
-%type <arrayaccess>   ArrayAccess 
+
 
 
 %%
@@ -293,7 +291,7 @@ Variables :    Variables T_Comma Type T_Identifier     { ($$ = $1)->Append(new V
 Expr       : LValue                     { $$ =  $1;}
          //  | Call                        { $$ =  $1;} 
            | Constant
-           | LValue T_Equal Expr         { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+         //  | LValue T_Equal Expr         { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
            | Expr T_Plus Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); } 
            | Expr T_Dash Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
            | Expr T_Star Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); } 
@@ -328,18 +326,12 @@ EmptyExpr  : Expr                    {$$ =  $1;}
            ;
  
             
-LValue     : FieldAccess        {$$ =  $1;}         
-           | ArrayAccess         {$$ =  $1;}
+LValue     : T_Identifier T_Equal Expr                   { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+           | T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
+           | Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
+           | Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
            ; 
 
-FieldAccess : T_Identifier           { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }
-            | Expr T_Dot T_Identifier
-                                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
-            ;
-
-
-ArrayAccess : Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
-            ;
 
         
 Actuals    : Exprlist                { $$ = $1; }
