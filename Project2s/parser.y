@@ -220,8 +220,8 @@ DeclList  :    DeclList Decl        { ($$=$1)->Append($2); }
           |    Decl                 { ($$ = new List<Decl*>)->Append($1); }
           ;
 
-Decl      :    VarDecl              
-          |    FnDecl                  
+Decl      :    VarDecl               {$$ =  $1;}
+          |    FnDecl                 {$$ =  $1;}
           ;
 
 
