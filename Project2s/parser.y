@@ -354,7 +354,7 @@ Stmt       : EmptyExpr T_Semicolon   { $$ = $1; }
            | ForStmt  {$$ =  $1;}
            | T_Break T_Semicolon             { $$ = new BreakStmt(@1); }     
            | ReturnStmt  {$$ =  $1;}
-           | SwitchStmt
+           | SwitchStmt   {$$ =  $1;}
         //   | PrintStmt
            | StmtBlock  {$$ =  $1;}
            ;
@@ -385,12 +385,12 @@ CaseList   : CaseList Case           { ($$ = $1)->Append($2); }
            | Case                    { ($$ = new List<CaseStmt*>)->Append($1); }
            ;
 
-Case       : T_Case Expr T_SemiColon Stmts        { $$ = new Case($2, $4); }
+Case       : T_Case Expr T_Semicolon Stmts        { $$ = new Case($2, $4); }
                                               
-           | T_Case Expr T_SemiColon              { $$ = new Case($2, new List<Stmt*>); }
+           | T_Case Expr T_Semicolon              { $$ = new Case($2, new List<Stmt*>); }
            ;
            
-Default    : T_Default T_SemiColon Stmts     { $$ = new Default($3); }
+Default    : T_Default T_Semicolon Stmts     { $$ = new Default($3); }
            |                                 { $$ = NULL; }
            ;
 
