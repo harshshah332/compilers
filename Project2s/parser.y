@@ -326,8 +326,8 @@ Actuals    : Exprlist                { $$ = $1; }
            |                         { $$ = new List<Expr*>; }
            ;
            
-Constant   : T_IntConstant       { $$ = new IntConstant(@1, $1); }      
-           | FloatConstant       { $$ = new FloatConstant(@1, $1); }
+Constant   : T_IntConstant        { $$ = new IntConstant(@1,$1); }    
+           | T_FloatConstant       { $$ = new FloatConstant(@1, $1); }
            | T_BoolConstant      { $$ = new BoolConstant(@1, $1); }
           
            ;
@@ -348,7 +348,7 @@ IfStmt     : T_If T_LeftParen Expr T_RightParen Stmt              { $$ = new IfS
            ;
                                      
            
-WhileStmt  : T_While T_Left_Paren Expr T_RightParen Stmt
+WhileStmt  : T_While T_LeftParen Expr T_RightParen Stmt
                                      { $$ = new WhileStmt($3, $5); }
            ;
            
