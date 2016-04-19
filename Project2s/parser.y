@@ -289,18 +289,18 @@ Variables :    Variables T_Comma Type T_Identifier     { ($$ = $1)->Append(new V
 Expr       : 
              Call                        { $$ =  $1;} 
            | Constant                    { $$ =  $1;} 
-           | Expr T_Equal Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
            | VarExpr                     { $$ =  $1;} 
            | LValue                      { $$ =  $1;}
+           | Expr T_Equal Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+           | Expr T_MulAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
+           | Expr T_DivAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
+           | Expr T_AddAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
+           | Expr T_SubAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
            | Expr T_Plus Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); } 
            | Expr T_Dash Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
            | Expr T_Star Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); } 
            | Expr T_Slash Expr           { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
            | Expr '%' Expr               { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
-           | Expr T_MulAssign Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "*="), $3); } 
-           | Expr T_DivAssign Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "/="), $3); } 
-           | Expr T_AddAssign Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "+="), $3); } 
-           | Expr T_SubAssign Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "-="), $3); }
            | LValue T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
            | LValue T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
            | Expr T_EQ Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
