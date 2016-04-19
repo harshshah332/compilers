@@ -180,7 +180,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <emptyexpr>     EmptyExpr
 %type <varexpr> VarExpr
 
-//%type <call>          Call
+%type <call>          Call
 
 %type <lvalue>        LValue
 
