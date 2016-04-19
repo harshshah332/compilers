@@ -236,14 +236,31 @@ VarDecl   : Type T_Identifier T_Semicolon          {
                                                  
                                                  Identifier *id = new Identifier(@3, $3);
                                                  $$ = new VarDecl(id, $2, $1);
-                                              }                                     
+                                              }      
+
+
+
+
+           | TypeQualifier Type T_Identifier T_Equal Expr T_Semicolon          
+                                              {
+                                                 
+                                                 Identifier *id = new Identifier(@3, $3);
+                                                 $$ = new VarDecl(id, $2, $1, $5);
+                                              }  
+
+
            | TypeQualifier T_Identifier T_Semicolon          
                                               {
                                                  
                                                  Identifier *id = new Identifier(@2, $2);
                                                  $$ = new VarDecl(id, $1);
                                               }    
-
+           | TypeQualifier T_Identifier T_Equal Expr T_Semicolon              
+                                              {
+                                                 
+                                                 Identifier *id = new Identifier(@2, $2);
+                                                 $$ = new VarDecl(id, $1, $4);
+                                              }  
 
 
        /*   |    Type T_Identifier T_Equal T_Identifier T_Semicolon    
