@@ -91,6 +91,7 @@ void yyerror(const char *msg); // standard error-handling routine
     Default *defaultcase;
 
     Type *type;
+    TypeQualifier *typequalifier;
     NamedType *namedtype;
     ArrayType *arraytype;
 
@@ -152,6 +153,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <vardecl>       VarDecl
 %type <vardecls>      VarDecls Formals Variables
 %type <type>          Type
+%type <typequalifier> TypeQualifier
 %type <fndecl>        FnDecl
 
 
