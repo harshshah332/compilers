@@ -222,6 +222,15 @@ VarDecl   : Type T_Identifier T_Semicolon          {
                                                  $$ = new VarDecl(id, $1);
                                                  }
 
+
+           | Type T_Identifier T_Semicolon T_Equal Expr        
+                                                {
+                                                 // replace it with your implementation
+                                                 Identifier *id = new Identifier(@2, $2);
+                                                 $$ = new VarDecl(id, $1, $5);
+                                                 }
+
+
            | TypeQualifier Type T_Identifier T_Semicolon          
                                               {
                                                  
