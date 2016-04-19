@@ -96,7 +96,6 @@ void yyerror(const char *msg); // standard error-handling routine
     ArrayType *arraytype;
 
 
- //   PrintStmt *pntstmt;
 
 
    
@@ -166,11 +165,10 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <ifstmt>        IfStmt
 %type <whilestmt>     WhileStmt
 %type <forstmt>       ForStmt
-%type <returnstmt>       ReturnStmt
+%type <returnstmt>    ReturnStmt
 
 
 %type <switchstmt>    SwitchStmt
-//%type <switchlabel>   SwitchLabel
 %type <casestmt>      CaseStmt
 %type <caselist>  CaseList
 %type <defaultcase>   DefaultCase
@@ -406,7 +404,6 @@ Stmt       : EmptyExpr T_Semicolon   { $$ = $1; }
            | T_Break T_Semicolon             { $$ = new BreakStmt(@1); }     
            | ReturnStmt  {$$ =  $1;}
            | SwitchStmt   {$$ =  $1;}
-        //   | PrintStmt
            | StmtBlock  {$$ =  $1;}
            ;
 
@@ -455,12 +452,6 @@ DefaultCase  : T_Default T_Colon Stmts         { $$ = new Default($3); }
              |                                     { $$ = NULL; }
              ;
 
-
-/*
- PrintStmt  : T_Print T_LeftParen Exprlist T_RightParen T_Semicolon 
-            ;
-
-            */
 
            
 
