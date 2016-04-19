@@ -60,6 +60,7 @@ void yyerror(const char *msg); // standard error-handling routine
     Expr *emptyexpr;
     List<Expr*> *exprlist;
     Call *call;
+    VarExpr *varexpr;
 
   
     SelectionExpr  *selectionexpr;
@@ -67,8 +68,7 @@ void yyerror(const char *msg); // standard error-handling routine
 
     
     LValue *lvalue;
-    FieldAccess *fieldaccess;
-    ArrayAccess *arrayaccess;
+
 
     Program *program;
 
@@ -83,17 +83,19 @@ void yyerror(const char *msg); // standard error-handling routine
     DoWhileStmt *dowhilestmt;
     IfStmt *ifstmt;
     ReturnStmt *returnstmt;
+   
     SwitchStmt *switchstmt;
     SwitchLabel *switchlabel;
- //   Case *case;
- //   Default *default;
+    Case *casestmt;
+    List<Case*> *caselist;
+    Default *defaultcase;
 
     Type *type;
+    TypeQualifier *typequalifier;
     NamedType *namedtype;
     ArrayType *arraytype;
 
 
- //   PrintStmt *pntstmt;
 
 
    
@@ -150,6 +152,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <vardecl>       VarDecl
 %type <vardecls>      VarDecls Formals Variables
 %type <type>          Type
+%type <typequalifier> TypeQualifier
 %type <fndecl>        FnDecl
 
 
@@ -162,19 +165,25 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <ifstmt>        IfStmt
 %type <whilestmt>     WhileStmt
 %type <forstmt>       ForStmt
-%type <returnstmt>       ReturnStmt
-//%type <switchstmt>    SwitchStmt
-//%type <case>      Case
-//%type <default>   Default
-%type <expr>          Expr Actuals Constant
-%type <exprlist>    Exprlist
-%type <emptyexpr>     EmptyExpr
+%type <returnstmt>    ReturnStmt
 
-//%type <call>          Call
+
+%type <switchstmt>    SwitchStmt
+%type <casestmt>      CaseStmt
+%type <caselist>  CaseList
+%type <defaultcase>   DefaultCase
+
+
+
+%type <expr>          Expr Constant
+%type <exprlist>    Exprlist Actuals
+%type <emptyexpr>     EmptyExpr
+%type <varexpr> VarExpr
+
+%type <call>          Call
 
 %type <lvalue>        LValue
-%type <fieldaccess>   FieldAccess
-%type <arrayaccess>   ArrayAccess 
+
 
 
 %%
@@ -205,11 +214,51 @@ Decl      :    VarDecl               {$$ =  $1;}
           ;
 
 
-VarDecl   :    Type T_Identifier T_Semicolon          {
+VarDecl   : Type T_Identifier T_Semicolon          {
                                                  // replace it with your implementation
                                                  Identifier *id = new Identifier(@2, $2);
                                                  $$ = new VarDecl(id, $1);
-                                              }
+                                                 }
+
+
+           | Type T_Identifier T_Equal Expr T_Semicolon        
+                                                {
+                                                 // replace it with your implementation
+                                                 Identifier *id = new Identifier(@2, $2);
+                                                 $$ = new VarDecl(id, $1, $4);
+                                                 }
+
+
+           | TypeQualifier Type T_Identifier T_Semicolon          
+                                              {
+                                                 
+                                                 Identifier *id = new Identifier(@3, $3);
+                                                 $$ = new VarDecl(id, $2, $1);
+                                              }      
+
+
+
+
+           | TypeQualifier Type T_Identifier T_Equal Expr T_Semicolon          
+                                              {
+                                                 
+                                                 Identifier *id = new Identifier(@3, $3);
+                                                 $$ = new VarDecl(id, $2, $1, $5);
+                                              }  
+
+
+           | TypeQualifier T_Identifier T_Semicolon          
+                                              {
+                                                 
+                                                 Identifier *id = new Identifier(@2, $2);
+                                                 $$ = new VarDecl(id, $1);
+                                              }    
+           | TypeQualifier T_Identifier T_Equal Expr T_Semicolon              
+                                              {
+                                                 
+                                                 Identifier *id = new Identifier(@2, $2);
+                                                 $$ = new VarDecl(id, $1, $4);
+                                              }  
 
 
        /*   |    Type T_Identifier T_Equal T_Identifier T_Semicolon    
@@ -259,6 +308,13 @@ Type      :    T_Int                 { $$ = Type::intType; }
           ;
 
 
+TypeQualifier   : T_In               { $$ = TypeQualifier::inTypeQualifier; }
+                | T_Out              { $$ = TypeQualifier::outTypeQualifier; }
+                | T_Const            { $$ = TypeQualifier::constTypeQualifier; }
+                | T_Uniform          { $$ = TypeQualifier::uniformTypeQualifier; }
+
+                ;
+
 
 FnDecl    :    Type T_Identifier T_LeftParen Formals T_RightParen StmtBlock
                                      { $$ = new FnDecl(new Identifier(@2, $2), $1, $4); 
@@ -277,14 +333,16 @@ Variables :    Variables T_Comma Type T_Identifier     { ($$ = $1)->Append(new V
           ;
 
 
-        
-
-
-           
-Expr       : LValue                     { $$ =  $1;}
-         //  | Call                        { $$ =  $1;} 
-           | Constant
-           | LValue T_Equal Expr         { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+Expr       : 
+             Call                        { $$ =  $1;} 
+           | Constant                    { $$ =  $1;} 
+           | VarExpr                     { $$ =  $1;} 
+           | LValue                      { $$ =  $1;}
+           | Expr T_Equal Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+           | Expr T_MulAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
+           | Expr T_DivAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
+           | Expr T_AddAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
+           | Expr T_SubAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
            | Expr T_Plus Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); } 
            | Expr T_Dash Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
            | Expr T_Star Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); } 
@@ -309,6 +367,9 @@ Expr       : LValue                     { $$ =  $1;}
        //  |  T_NewArray T_LeftParen Expr T_Comma Type T_RightParen { $$ = new NewArrayExpr(Join(@1, @6), $3, $5); }
            ;
 
+VarExpr    : T_Identifier         {  Identifier *id = new Identifier(@1, $1);
+                                     $$ = new VarExpr(@1, id);
+                                  }
 
 Exprlist   : Exprlist T_Comma Expr          { ($$ = $1)->Append($3); }
            | Expr                    { ($$ = new List<Expr*>)->Append($1); }
@@ -319,18 +380,11 @@ EmptyExpr  : Expr                    {$$ =  $1;}
            ;
  
             
-LValue     : FieldAccess        {$$ =  $1;}         
-           | ArrayAccess         {$$ =  $1;}
+LValue     : T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
+           | Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
+           | Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
            ; 
 
-FieldAccess : T_Identifier           { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }
-            | Expr T_Dot T_Identifier
-                                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
-            ;
-
-
-ArrayAccess : Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
-            ;
 
         
 Actuals    : Exprlist                { $$ = $1; }
@@ -349,9 +403,18 @@ Stmt       : EmptyExpr T_Semicolon   { $$ = $1; }
            | ForStmt  {$$ =  $1;}
            | T_Break T_Semicolon             { $$ = new BreakStmt(@1); }     
            | ReturnStmt  {$$ =  $1;}
-        //   | SwitchStmt
-        //   | PrintStmt
+           | SwitchStmt   {$$ =  $1;}
            | StmtBlock  {$$ =  $1;}
+           ;
+
+
+
+Stmts      : Stmts Stmt              { ($$ = $1)->Append($2); }
+           | Stmt                    { ($$ = new List<Stmt*>)->Append($1);  }
+           ;
+
+StmtBlock  : T_LeftBrace VarDecls Stmts T_RightBrace  { $$ = new StmtBlock($2, $3); }
+           | T_LeftBrace VarDecls T_RightBrace         { $$ = new StmtBlock($2, new List<Stmt*>); }
            ;
 
 IfStmt     : T_If T_LeftParen Expr T_RightParen Stmt              { $$ = new IfStmt($3, $5, NULL); }
@@ -369,54 +432,42 @@ ForStmt    : T_For T_LeftParen EmptyExpr T_Semicolon Expr T_Semicolon EmptyExpr 
            
 ReturnStmt : T_Return EmptyExpr T_Semicolon    { $$ = new ReturnStmt(@2, $2); }
            ;
- /*       
+       
         
-SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace Cases Default T_RightBrace
+SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace CaseList DefaultCase T_RightBrace
                                      { $$ = new SwitchStmt($3, $6, $7); } 
            ;
 
 
-Cases      : Cases Case              { ($$ = $1)->Append($2); }
-           | Case                    { ($$ = new List<CaseStmt*>)->Append($1); }
+CaseList   : CaseList CaseStmt           { ($$ = $1)->Append($2); }
+           | CaseStmt                    { ($$ = new List<Case*>)->Append($1); }
            ;
 
-Case       : T_Case IntConstant ':' Stmts        
-                                     { $$ = new CaseStmt($2, $4); }
-           | T_Case IntConstant ':'  { $$ = new CaseStmt($2, new List<Stmt*>); }
-           ;
-           
-Default    : T_Default ':' Stmts     { $$ = new DefaultStmt($3); }
-           |                         { $$ = NULL; }
+CaseStmt   : T_Case Constant T_Colon Stmts        { $$ = new Case($2, $4); }
+                                              
+           | T_Case Constant T_Colon              { $$ = new Case($2, new List<Stmt*>); }
            ;
 
+DefaultCase  : T_Default T_Colon Stmts         { $$ = new Default($3); }
+             |                                     { $$ = NULL; }
+             ;
 
- PrintStmt  : T_Print T_LeftParen Exprlist T_RightParen T_Semicolon 
-            ;
-
-            */
 
            
-StmtBlock  : T_LeftBrace VarDecls Stmts T_RightBrace  { $$ = new StmtBlock($2, $3); }
-           | T_LeftBrace VarDecls T_RightBrace         { $$ = new StmtBlock($2, new List<Stmt*>); }
-           ;
 
 VarDecls   : VarDecls VarDecl        { ($$ = $1)->Append($2);    }
            |                         { $$ = new List<VarDecl*>;  }
-           ;
-
-Stmts      : Stmts Stmt              { ($$ = $1)->Append($2); }
-           | Stmt                    { ($$ = new List<Stmt*>)->Append($1);  }
-           ;
 
 
-/*
+
+
 Call       : T_Identifier T_LeftParen Actuals T_RightParen 
                                      { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, $1), $3); }  
            | Expr T_Dot T_Identifier T_LeftParen Actuals T_RightParen
                                      { $$ = new Call(Join(@1, @6), $1, new Identifier(@3, $3), $5); }
            ;
 
-*/
+
    
 
 
