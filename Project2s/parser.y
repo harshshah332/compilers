@@ -175,8 +175,8 @@ void yyerror(const char *msg); // standard error-handling routine
 
 
 
-%type <expr>          Expr Actuals Constant
-%type <exprlist>    Exprlist
+%type <expr>          Expr Constant
+%type <exprlist>    Exprlist Actuals
 %type <emptyexpr>     EmptyExpr
 %type <varexpr> VarExpr
 
@@ -286,13 +286,9 @@ Variables :    Variables T_Comma Type T_Identifier     { ($$ = $1)->Append(new V
           ;
 
 
-        
-
-
-           
 Expr       : 
-       //  | Call                        { $$ =  $1;} 
-            Constant                     { $$ =  $1;} 
+             Call                        { $$ =  $1;} 
+           | Constant                    { $$ =  $1;} 
            | Expr T_Equal Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
            | VarExpr                     { $$ =  $1;} 
            | LValue                      { $$ =  $1;}
@@ -301,6 +297,10 @@ Expr       :
            | Expr T_Star Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); } 
            | Expr T_Slash Expr           { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
            | Expr '%' Expr               { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
+           | Expr T_MulAssign Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "*="), $3); } 
+           | Expr T_DivAssign Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "/="), $3); } 
+           | Expr T_AddAssign Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "+="), $3); } 
+           | Expr T_SubAssign Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "-="), $3); }
            | LValue T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
            | LValue T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
            | Expr T_EQ Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
@@ -420,14 +420,14 @@ VarDecls   : VarDecls VarDecl        { ($$ = $1)->Append($2);    }
 
 
 
-/*
+
 Call       : T_Identifier T_LeftParen Actuals T_RightParen 
                                      { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, $1), $3); }  
            | Expr T_Dot T_Identifier T_LeftParen Actuals T_RightParen
                                      { $$ = new Call(Join(@1, @6), $1, new Identifier(@3, $3), $5); }
            ;
 
-*/
+
    
 
 
