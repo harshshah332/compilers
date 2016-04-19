@@ -214,11 +214,25 @@ Decl      :    VarDecl               {$$ =  $1;}
           ;
 
 
-VarDecl   :    Type T_Identifier T_Semicolon          {
+VarDecl   : Type T_Identifier T_Semicolon          {
                                                  // replace it with your implementation
                                                  Identifier *id = new Identifier(@2, $2);
                                                  $$ = new VarDecl(id, $1);
-                                              }
+                                                 }
+
+           | TypeQualifier Type T_Identifier T_Semicolon          
+                                              {
+                                                 
+                                                 Identifier *id = new Identifier(@3, $3);
+                                                 $$ = new VarDecl(id, $2, $1);
+                                              }                                     
+           | TypeQualifier T_Identifier T_Semicolon          
+                                              {
+                                                 
+                                                 Identifier *id = new Identifier(@2, $2);
+                                                 $$ = new VarDecl(id, $1);
+                                              }    
+
 
 
        /*   |    Type T_Identifier T_Equal T_Identifier T_Semicolon    
@@ -267,6 +281,13 @@ Type      :    T_Int                 { $$ = Type::intType; }
    //       |    ArrayType
           ;
 
+
+TypeQualifier   : T_In               { $$ = TypeQualifier::inTypeQualifier; }
+                | T_Out              { $$ = TypeQualifier::outTypeQualifier; }
+                | T_Const            { $$ = TypeQualifier::constTypeQualifier; }
+                | T_Uniform          { $$ = TypeQualifier::uniformTypeQualifier; }
+
+                ;
 
 
 FnDecl    :    Type T_Identifier T_LeftParen Formals T_RightParen StmtBlock
