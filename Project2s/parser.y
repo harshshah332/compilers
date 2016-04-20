@@ -336,8 +336,14 @@ Expr       :
            | Expr T_Star Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); } 
            | Expr T_Slash Expr           { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
            | Expr '%' Expr               { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
+ 
+           | T_Inc LValue                { $$ = new ArithmeticExpr( new Operator(@2, "++"), $1); }
+           | T_Dec LValue                { $$ = new ArithmeticExpr( new Operator(@2, "--"), $1); }
+
            | LValue T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
            | LValue T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
+
+
            | Expr T_EQ Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
            | Expr T_NE Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); }  
            | Expr T_LeftAngle Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<"), $3); }
