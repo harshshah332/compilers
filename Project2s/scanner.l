@@ -121,6 +121,7 @@ SINGLE_COMMENT    ("//"[^\n]*)
 
  /* -------------------- Operators ----------------------------- */
 "<="                { return T_LessEqual;   }
+","                 {return T_Comma; }
 ">="                { return T_GreaterEqual;}
 "=="                { return T_EQ;          }
 "!="                { return T_NE;          }
