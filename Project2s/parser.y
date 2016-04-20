@@ -316,7 +316,7 @@ Formals   :    Variables             { $$ = $1; }
           |                          { $$ = new List<VarDecl*>; }
           ;
 
-Variables :    Variables T_Comma Variable            { ($$ = $1)->Append($3); }
+Variables :    Variables T_Comma Variable            { ($$ = $1)->Append($3 ); }
           |    Variable                      { ($$ = new List<VarDecl*>)->Append($1); }
           ;
 
@@ -451,6 +451,8 @@ VarDecls   : VarDecls VarDecl        { ($$ = $1)->Append($2);    }
 
 Call       : T_Identifier T_LeftParen Actuals T_RightParen 
                                      { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, $1), $3); }  
+           | T_Vec2 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "vec2"), $3); }  
            | Expr T_Dot T_Identifier T_LeftParen Actuals T_RightParen
                                      { $$ = new Call(Join(@1, @6), $1, new Identifier(@3, $3), $5); }
            ;
