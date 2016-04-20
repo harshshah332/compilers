@@ -446,8 +446,25 @@ DefaultCase  : T_Default T_Colon Stmts         { $$ = new Default($3); }
 VarDecls   : VarDecls VarDecl        { ($$ = $1)->Append($2);    }
            |                         { $$ = new List<VarDecl*>;  }
 
+
+
 Call       : T_Identifier T_LeftParen Actuals T_RightParen 
                                      { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, $1), $3); }  
+
+           | Expr T_Dot T_Identifier T_LeftParen Actuals T_RightParen
+                                     { $$ = new Call(Join(@1, @6), $1, new Identifier(@3, $3), $5); }
+
+
+// Do we need these hard coded types for calls. ex) int x = bvec(2.0); 
+// Do we need them for ints/bool/float? Do having them mess up other code in the parse tree?
+
+           | T_Int   T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "int"), $3); }  
+           | T_Float T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "float"), $3); }   
+           | T_Bool  T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "bool"), $3); }   
+
 
 
            | T_Vec2 T_LeftParen Actuals T_RightParen 
@@ -479,10 +496,6 @@ Call       : T_Identifier T_LeftParen Actuals T_RightParen
                                      { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "uvec2"), $3); }    
            | T_Uvec4 T_LeftParen Actuals T_RightParen 
                                      { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "uvec2"), $3); }   
-
-
-           | Expr T_Dot T_Identifier T_LeftParen Actuals T_RightParen
-                                     { $$ = new Call(Join(@1, @6), $1, new Identifier(@3, $3), $5); }
            ;
 
 
