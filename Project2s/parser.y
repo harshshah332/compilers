@@ -316,7 +316,7 @@ Formals   :    Variables             { $$ = $1; }
           |                          { $$ = new List<VarDecl*>; }
           ;
 
-Variables :    Variables Variable            { ($$ = $1)->Append($3); }
+Variables :    Variables T_Comma Variable            { ($$ = $1)->Append($3); }
           |    Variable                      { ($$ = new List<VarDecl*>)->Append($1); }
           ;
 
