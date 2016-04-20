@@ -149,7 +149,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <program>       Program
 %type <declList>      DeclList
 %type <decl>          Decl
-%type <vardecl>       VarDecl
+%type <vardecl>       VarDecl Variable
 %type <vardecls>      VarDecls Formals Variables
 %type <type>          Type
 %type <typequalifier> TypeQualifier
@@ -214,14 +214,21 @@ Decl      :    VarDecl               {$$ =  $1;}
           ;
 
 
-VarDecl   : Type T_Identifier T_Semicolon          {
+VarDecl   : Variable T_Semicolon         
+
+
+          ;
+
+
+
+Variable    : Type T_Identifier       {
                                                  // replace it with your implementation
                                                  Identifier *id = new Identifier(@2, $2);
                                                  $$ = new VarDecl(id, $1);
                                                  }
 
 
-           | Type T_Identifier T_Equal Expr T_Semicolon        
+            | Type T_Identifier T_Equal Expr         
                                                 {
                                                  // replace it with your implementation
                                                  Identifier *id = new Identifier(@2, $2);
@@ -229,7 +236,7 @@ VarDecl   : Type T_Identifier T_Semicolon          {
                                                  }
 
 
-           | TypeQualifier Type T_Identifier T_Semicolon          
+           | TypeQualifier Type T_Identifier           
                                               {
                                                  
                                                  Identifier *id = new Identifier(@3, $3);
@@ -239,7 +246,7 @@ VarDecl   : Type T_Identifier T_Semicolon          {
 
 
 
-           | TypeQualifier Type T_Identifier T_Equal Expr T_Semicolon          
+           | TypeQualifier Type T_Identifier T_Equal Expr           
                                               {
                                                  
                                                  Identifier *id = new Identifier(@3, $3);
@@ -247,41 +254,22 @@ VarDecl   : Type T_Identifier T_Semicolon          {
                                               }  
 
 
-           | TypeQualifier T_Identifier T_Semicolon          
+           | TypeQualifier T_Identifier           
                                               {
                                                  
                                                  Identifier *id = new Identifier(@2, $2);
                                                  $$ = new VarDecl(id, $1);
                                               }    
-           | TypeQualifier T_Identifier T_Equal Expr T_Semicolon              
+           | TypeQualifier T_Identifier T_Equal Expr               
                                               {
                                                  
                                                  Identifier *id = new Identifier(@2, $2);
                                                  $$ = new VarDecl(id, $1, $4);
-                                              }  
-
-
-       /*   |    Type T_Identifier T_Equal T_Identifier T_Semicolon    
-                                            {
-
-                                            Identifier *id = new Identifier(@2, $2);
-                                            AssignExpr *ex = new AssignExpr($2, new Operator(@2, "="), $4);
-                                            $$ = new VarDecl(id, $1, ex);
-
-
-                                            }  
-
-
-            |     Type T_Identifier T_LeftBracket Constant T_RightBracket 
-                                            {
-                                               ArrayType *ar = new ArrayType(elemType=intType); 
-                                               $$ = new VarDecl(id, ar);
-
-
-                                            }
- */
+                                              } 
 
           ;
+
+
 
 Type      :    T_Int                 { $$ = Type::intType; }
           |    T_Float               { $$ = Type::floatType; }
@@ -328,8 +316,8 @@ Formals   :    Variables             { $$ = $1; }
           |                          { $$ = new List<VarDecl*>; }
           ;
 
-Variables :    Variables T_Comma Type T_Identifier     { ($$ = $1)->Append(new VarDecl(new Identifier(@4, $4), $3)); }
-          |     Type T_Identifier                      { ($$ = new List<VarDecl*>)->Append(new VarDecl(new Identifier(@2, $2), $1)); }
+Variables :    Variables Variable            { ($$ = $1)->Append($3); }
+          |    Variable                      { ($$ = new List<VarDecl*>)->Append($1); }
           ;
 
 
