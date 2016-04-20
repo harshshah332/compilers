@@ -178,11 +178,11 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <expr>          Expr Constant
 %type <exprlist>    Exprlist Actuals
 %type <emptyexpr>     EmptyExpr
-//%type <varexpr> VarExpr
+%type <varexpr> VarExpr
 
 %type <call>          Call
 
-%type <lvalue>        LValue VarExpr
+%type <lvalue>        LValue
 
 
 
@@ -340,8 +340,8 @@ Expr       :
            | T_Inc LValue                { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
            | T_Dec LValue                { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
 
-           | LValue T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
-           | LValue T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
+           | VarExpr T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
+           | VarExpr T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
 
 
            | Expr T_EQ Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
@@ -375,10 +375,7 @@ EmptyExpr  : Expr                    {$$ =  $1;}
  
             
 LValue     : 
-           T_Identifier         {  Identifier *id = new Identifier(@1, $1);
-                                     $$ = new VarExpr(@1, id);
-                                  }
-            //T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
+             T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
            | Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
            | Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
            ; 
