@@ -360,12 +360,6 @@ Expr       :
            | Expr T_And Expr             { $$ = new LogicalExpr($1, new Operator(@2, "&&"), $3); }
            | Expr T_Or Expr              { $$ = new LogicalExpr($1, new Operator(@2, "||"), $3); }
            |  T_LeftParen Expr T_RightParen           { $$ = $2; }
-        // | '!' Expr             { $$ = new LogicalExpr(new Operator(@1,"!"), $2); }
-       //  |  T_This                 { $$ = new This(@1); } 
-        // |  T_ReadInteger T_LeftParen T_RightParen  { $$ = new ReadIntegerExpr(Join(@1, @3)); }
-       //  |  T_ReadLine T_LeftParen T_RightParen     { $$ = new ReadLineExpr(Join(@1, @3)); }
-       //  |  T_New T_Identifier     { $$ = new NewExpr(Join(@1, @2), new NamedType(new Identifier(@2, $2))); }
-       //  |  T_NewArray T_LeftParen Expr T_Comma Type T_RightParen { $$ = new NewArrayExpr(Join(@1, @6), $3, $5); }
            ;
 
 VarExpr    : T_Identifier         {  Identifier *id = new Identifier(@1, $1);
