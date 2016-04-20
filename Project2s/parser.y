@@ -446,31 +446,6 @@ DefaultCase  : T_Default T_Colon Stmts         { $$ = new Default($3); }
 VarDecls   : VarDecls VarDecl        { ($$ = $1)->Append($2);    }
            |                         { $$ = new List<VarDecl*>;  }
 
-
-
-Type      :    T_Int                 { $$ = Type::intType; }
-          |    T_Float               { $$ = Type::floatType; }
-          |    T_Bool                { $$ = Type::boolType; }
-          |    T_Void                { $$ = Type::voidType; }
-          |    T_Mat2                { $$ = Type::mat2Type; }
-          |    T_Mat3                { $$ = Type::mat3Type; }
-          |    T_Mat4                { $$ = Type::mat4Type; }
-          |    T_Vec2                { $$ = Type::vec2Type; }
-          |    T_Vec3                { $$ = Type::vec3Type; }
-          |    T_Vec4                { $$ = Type::vec4Type; }
-          |    T_Ivec2               { $$ = Type::ivec2Type; }
-          |    T_Ivec3               { $$ = Type::ivec3Type; }
-          |    T_Ivec4               { $$ = Type::ivec4Type; }
-          |    T_Bvec2               { $$ = Type::bvec2Type; }
-          |    T_Bvec3               { $$ = Type::bvec3Type; }
-          |    T_Bvec4               { $$ = Type::bvec4Type; }
-          |    T_Uint                { $$ = Type::uintType; }
-          |    T_Uvec2               { $$ = Type::uvec2Type; }
-          |    T_Uvec3               { $$ = Type::uvec3Type; }
-          |    T_Uvec4               { $$ = Type::uvec4Type; }
-
-
-
 Call       : T_Identifier T_LeftParen Actuals T_RightParen 
                                      { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, $1), $3); }  
 
