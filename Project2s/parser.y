@@ -182,7 +182,7 @@ void yyerror(const char *msg); // standard error-handling routine
 
 %type <call>          Call
 
-%type <lvalue>        LValue
+%type <lvalue>        LValue VarExpr
 
 
 
