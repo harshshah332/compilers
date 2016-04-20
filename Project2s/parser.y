@@ -178,7 +178,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <expr>          Expr Constant
 %type <exprlist>    Exprlist Actuals
 %type <emptyexpr>     EmptyExpr
-%type <varexpr> VarExpr
+//%type <varexpr> VarExpr
 
 %type <call>          Call
 
