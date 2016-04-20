@@ -158,7 +158,7 @@ void yyerror(const char *msg); // standard error-handling routine
 
 
 //%type <namedtype>     NamedType
-//%type <arraytype>     ArrayType
+%type <arraytype>     ArrayType
 %type <stmt>          Stmt
 %type <stmtblock>     StmtBlock
 %type <stmts>         Stmts
@@ -266,6 +266,11 @@ Variable    : Type T_Identifier       {
                                                  Identifier *id = new Identifier(@2, $2);
                                                  $$ = new VarDecl(id, $1, $4);
                                               } 
+           | Type T_Identifier T_LeftBracket Constant T_RightBracket 
+	   				{
+					   Identifier *id = new Identifier(@2, $2);
+					   ArrayType *t = new ArrayType(@1, $1);
+					   $$ = new VarDecl(id, t);}
 
           ;
 
@@ -291,8 +296,8 @@ Type      :    T_Int                 { $$ = Type::intType; }
           |    T_Uvec2               { $$ = Type::uvec2Type; }
           |    T_Uvec3               { $$ = Type::uvec3Type; }
           |    T_Uvec4               { $$ = Type::uvec4Type; }
-   //       |    NamedType
-   //       |    ArrayType
+    //       |    NamedType
+          |    ArrayType             
           ;
 
 
@@ -320,7 +325,9 @@ Variables :    Variables T_Comma Variable            { ($$ = $1)->Append($3 ); }
           |    Variable                      { ($$ = new List<VarDecl*>)->Append($1); }
           ;
 
-
+ArrayType :    Type T_Identifier T_LeftBracket Constant T_RightBracket   
+                 { $$ = new ArrayType(@1, $1); } 
+		 
 Expr       : 
              Call                        { $$ =  $1;} 
            | Constant                    { $$ =  $1;} 
@@ -432,7 +439,6 @@ ReturnStmt : T_Return EmptyExpr T_Semicolon    { $$ = new ReturnStmt(@2, $2); }
 SwitchStmt : T_Switch T_LeftParen Expr T_RightParen T_LeftBrace CaseList DefaultCase T_RightBrace
                                      { $$ = new SwitchStmt($3, $6, $7); } 
            ;
-
 
 CaseList   : CaseList CaseStmt           { ($$ = $1)->Append($2); }
            | CaseStmt                    { ($$ = new List<Case*>)->Append($1); }
