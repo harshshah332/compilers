@@ -149,7 +149,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <program>       Program
 %type <declList>      DeclList
 %type <decl>          Decl
-%type <vardecl>       VarDecl
+%type <vardecl>       VarDecl Variable
 %type <vardecls>      VarDecls Formals Variables
 %type <type>          Type
 %type <typequalifier> TypeQualifier
@@ -214,14 +214,21 @@ Decl      :    VarDecl               {$$ =  $1;}
           ;
 
 
-VarDecl   : Type T_Identifier T_Semicolon          {
+VarDecl   : Variable T_Semicolon         
+
+
+          ;
+
+
+
+Variable    : Type T_Identifier       {
                                                  // replace it with your implementation
                                                  Identifier *id = new Identifier(@2, $2);
                                                  $$ = new VarDecl(id, $1);
                                                  }
 
 
-           | Type T_Identifier T_Equal Expr T_Semicolon        
+            | Type T_Identifier T_Equal Expr         
                                                 {
                                                  // replace it with your implementation
                                                  Identifier *id = new Identifier(@2, $2);
@@ -229,7 +236,7 @@ VarDecl   : Type T_Identifier T_Semicolon          {
                                                  }
 
 
-           | TypeQualifier Type T_Identifier T_Semicolon          
+           | TypeQualifier Type T_Identifier           
                                               {
                                                  
                                                  Identifier *id = new Identifier(@3, $3);
@@ -239,7 +246,7 @@ VarDecl   : Type T_Identifier T_Semicolon          {
 
 
 
-           | TypeQualifier Type T_Identifier T_Equal Expr T_Semicolon          
+           | TypeQualifier Type T_Identifier T_Equal Expr           
                                               {
                                                  
                                                  Identifier *id = new Identifier(@3, $3);
@@ -247,41 +254,22 @@ VarDecl   : Type T_Identifier T_Semicolon          {
                                               }  
 
 
-           | TypeQualifier T_Identifier T_Semicolon          
+           | TypeQualifier T_Identifier           
                                               {
                                                  
                                                  Identifier *id = new Identifier(@2, $2);
                                                  $$ = new VarDecl(id, $1);
                                               }    
-           | TypeQualifier T_Identifier T_Equal Expr T_Semicolon              
+           | TypeQualifier T_Identifier T_Equal Expr               
                                               {
                                                  
                                                  Identifier *id = new Identifier(@2, $2);
                                                  $$ = new VarDecl(id, $1, $4);
-                                              }  
-
-
-       /*   |    Type T_Identifier T_Equal T_Identifier T_Semicolon    
-                                            {
-
-                                            Identifier *id = new Identifier(@2, $2);
-                                            AssignExpr *ex = new AssignExpr($2, new Operator(@2, "="), $4);
-                                            $$ = new VarDecl(id, $1, ex);
-
-
-                                            }  
-
-
-            |     Type T_Identifier T_LeftBracket Constant T_RightBracket 
-                                            {
-                                               ArrayType *ar = new ArrayType(elemType=intType); 
-                                               $$ = new VarDecl(id, ar);
-
-
-                                            }
- */
+                                              } 
 
           ;
+
+
 
 Type      :    T_Int                 { $$ = Type::intType; }
           |    T_Float               { $$ = Type::floatType; }
@@ -328,8 +316,8 @@ Formals   :    Variables             { $$ = $1; }
           |                          { $$ = new List<VarDecl*>; }
           ;
 
-Variables :    Variables T_Comma Type T_Identifier     { ($$ = $1)->Append(new VarDecl(new Identifier(@4, $4), $3)); }
-          |     Type T_Identifier                      { ($$ = new List<VarDecl*>)->Append(new VarDecl(new Identifier(@2, $2), $1)); }
+Variables :    Variables T_Comma Variable            { ($$ = $1)->Append($3 ); }
+          |    Variable                      { ($$ = new List<VarDecl*>)->Append($1); }
           ;
 
 
@@ -348,8 +336,14 @@ Expr       :
            | Expr T_Star Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); } 
            | Expr T_Slash Expr           { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
            | Expr '%' Expr               { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
-           | LValue T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
-           | LValue T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
+ 
+           | T_Inc VarExpr                { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
+           | T_Dec VarExpr                { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
+
+           | VarExpr T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
+           | VarExpr T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
+
+
            | Expr T_EQ Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
            | Expr T_NE Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); }  
            | Expr T_LeftAngle Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<"), $3); }
@@ -380,7 +374,8 @@ EmptyExpr  : Expr                    {$$ =  $1;}
            ;
  
             
-LValue     : T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
+LValue     : 
+             T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
            | Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
            | Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
            ; 
@@ -460,11 +455,54 @@ VarDecls   : VarDecls VarDecl        { ($$ = $1)->Append($2);    }
 
 
 
-
 Call       : T_Identifier T_LeftParen Actuals T_RightParen 
                                      { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, $1), $3); }  
+
            | Expr T_Dot T_Identifier T_LeftParen Actuals T_RightParen
                                      { $$ = new Call(Join(@1, @6), $1, new Identifier(@3, $3), $5); }
+
+
+// Do we need these hard coded types for calls. ex) int x = bvec(2.0); 
+// Do we need them for ints/bool/float? Do having them mess up other code in the parse tree?
+
+           | T_Int   T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "int"), $3); }  
+           | T_Float T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "float"), $3); }   
+           | T_Bool  T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "bool"), $3); }   
+
+
+
+           | T_Vec2 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "vec2"), $3); }  
+           | T_Vec3 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "vec3"), $3); }   
+           | T_Vec4 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "vec4"), $3); }    
+
+           | T_Ivec2 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "ivec2"), $3); }   
+           | T_Ivec3 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "ivec3"), $3); }    
+           | T_Ivec4 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "ivec4"), $3); }    
+
+           | T_Bvec2 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "bvec2"), $3); }   
+           | T_Bvec3 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "bvec2"), $3); }    
+           | T_Bvec4 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "bvec2"), $3); }   
+
+           | T_Uint  T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "uint"), $3); } 
+           | T_Uvec2 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "uvec2"), $3); }   
+           | T_Uvec3 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "uvec2"), $3); }    
+           | T_Uvec4 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "uvec2"), $3); }   
            ;
 
 
