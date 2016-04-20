@@ -448,11 +448,64 @@ VarDecls   : VarDecls VarDecl        { ($$ = $1)->Append($2);    }
 
 
 
+Type      :    T_Int                 { $$ = Type::intType; }
+          |    T_Float               { $$ = Type::floatType; }
+          |    T_Bool                { $$ = Type::boolType; }
+          |    T_Void                { $$ = Type::voidType; }
+          |    T_Mat2                { $$ = Type::mat2Type; }
+          |    T_Mat3                { $$ = Type::mat3Type; }
+          |    T_Mat4                { $$ = Type::mat4Type; }
+          |    T_Vec2                { $$ = Type::vec2Type; }
+          |    T_Vec3                { $$ = Type::vec3Type; }
+          |    T_Vec4                { $$ = Type::vec4Type; }
+          |    T_Ivec2               { $$ = Type::ivec2Type; }
+          |    T_Ivec3               { $$ = Type::ivec3Type; }
+          |    T_Ivec4               { $$ = Type::ivec4Type; }
+          |    T_Bvec2               { $$ = Type::bvec2Type; }
+          |    T_Bvec3               { $$ = Type::bvec3Type; }
+          |    T_Bvec4               { $$ = Type::bvec4Type; }
+          |    T_Uint                { $$ = Type::uintType; }
+          |    T_Uvec2               { $$ = Type::uvec2Type; }
+          |    T_Uvec3               { $$ = Type::uvec3Type; }
+          |    T_Uvec4               { $$ = Type::uvec4Type; }
+
+
 
 Call       : T_Identifier T_LeftParen Actuals T_RightParen 
                                      { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, $1), $3); }  
+
+
            | T_Vec2 T_LeftParen Actuals T_RightParen 
                                      { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "vec2"), $3); }  
+           | T_Vec3 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "vec3"), $3); }   
+           | T_Vec4 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "vec4"), $3); }    
+
+           | T_Ivec2 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "ivec2"), $3); }   
+           | T_Ivec3 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "ivec3"), $3); }    
+           | T_Ivec4 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "ivec4"), $3); }    
+
+           | T_Bvec2 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "bvec2"), $3); }   
+           | T_Bvec3 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "bvec2"), $3); }    
+           | T_Bvec4 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "bvec2"), $3); }   
+
+           | T_Uint  T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "uint"), $3); } 
+           | T_Uvec2 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "uvec2"), $3); }   
+           | T_Uvec3 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "uvec2"), $3); }    
+           | T_Uvec4 T_LeftParen Actuals T_RightParen 
+                                     { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, "uvec2"), $3); }   
+
+
            | Expr T_Dot T_Identifier T_LeftParen Actuals T_RightParen
                                      { $$ = new Call(Join(@1, @6), $1, new Identifier(@3, $3), $5); }
            ;
