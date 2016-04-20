@@ -337,8 +337,8 @@ Expr       :
            | Expr T_Slash Expr           { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
            | Expr '%' Expr               { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
  
-           | T_Inc LValue                { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
-           | T_Dec LValue                { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
+           | T_Inc VarExpr                { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
+           | T_Dec VarExpr                { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
 
            | VarExpr T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
            | VarExpr T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
