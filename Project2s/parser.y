@@ -375,7 +375,9 @@ EmptyExpr  : Expr                    {$$ =  $1;}
  
             
 LValue     : 
-            VarExpr               {$$ = $1; }
+           T_Identifier         {  Identifier *id = new Identifier(@1, $1);
+                                     $$ = new VarExpr(@1, id);
+                                  }
             //T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
            | Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
            | Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
