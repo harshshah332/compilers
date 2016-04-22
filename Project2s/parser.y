@@ -397,6 +397,59 @@ Expr       :
 */
            ;
 
+AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+               | Expr '*=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
+               | Expr '/=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
+               | Expr '+=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
+               | Expr '-' Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
+
+                ;
+
+
+
+ArithmeticExpr : Expr '+' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); }
+               | Expr '-' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
+               | Expr '*' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); }
+               | Expr '/' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
+               | Expr '%' Expr          { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
+               | '++' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
+               | '--' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
+               ;
+
+
+
+PostfixExpr    : VarExpr T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
+               | VarExpr T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
+
+               ;
+
+
+EqualityExpr   : Expr T_Equal Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
+               | Expr T_NotEqual Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); } 
+
+               ;
+
+
+RelationalExpr : Expr '<' Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<"), $3); }
+               | Expr '>' Expr      { $$ = new RelationalExpr($1, new Operator(@2, ">"), $3); } 
+               | Expr T_LessEqual Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<="), $3); }   
+               | Expr T_GreaterEqual Expr    { $$ = new RelationalExpr($1, new Operator(@2, ">="), $3); }
+
+               ;
+
+LogicalExpr    : Expr T_And Expr             { $$ = new LogicalExpr($1, new Operator(@2, "&&"), $3); }
+               | Expr T_Or Expr              { $$ = new LogicalExpr($1, new Operator(@2, "||"), $3); }
+
+               ;
+
+VarExpr    : T_Identifier         {  Identifier *id = new Identifier(@1, $1);
+                                     $$ = new VarExpr(@1, id);
+                                  }
+           ;
+
+
+/*
+
 AssignExpr     : T_Identifier '=' Expr        { Identifier *id = new Identifier(@1, $1);
                                               $$ = new AssignExpr(new VarExpr(@1, id), new Operator(@2, "="), $3); 
                                               } 
@@ -449,25 +502,8 @@ VarExpr    : T_Identifier         {  Identifier *id = new Identifier(@1, $1);
                                      $$ = new VarExpr(@1, id);
                                   }
 
+*/
 
-
-EqualityExpr   : Expr T_Equal Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
-               | Expr T_NotEqual Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); } 
-
-               ;
-
-
-RelationalExpr : Expr '<' Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<"), $3); }
-               | Expr '>' Expr      { $$ = new RelationalExpr($1, new Operator(@2, ">"), $3); } 
-               | Expr T_LessEqual Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<="), $3); }   
-               | Expr T_GreaterEqual Expr    { $$ = new RelationalExpr($1, new Operator(@2, ">="), $3); }
-
-               ;
-
-LogicalExpr    : Expr T_And Expr             { $$ = new LogicalExpr($1, new Operator(@2, "&&"), $3); }
-               | Expr T_Or Expr              { $$ = new LogicalExpr($1, new Operator(@2, "||"), $3); }
-
-               ;
 
 
 
