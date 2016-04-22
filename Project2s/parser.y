@@ -205,7 +205,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %left     T_Or
 %left     T_And 
 %right T_DivAssign T_MulAssign T_AddAssign T_SubAssign
-//%nonassoc T_Equal T_NotEqual
+//%nonassoc T_Equal T_NE
 %nonassoc '<' T_LessEqual '>' T_GreaterEqual
 %left     '+' '-' 
 %left     '*' '/' '%'
@@ -437,7 +437,7 @@ PostfixExpr    : VarExpr T_Inc                { $$ = new PostfixExpr( $1, new Op
 
 
 EqualityExpr   : Expr T_Equal Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
-               | Expr T_NotEqual Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); } 
+               | Expr T_NE Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); } 
 
                ;
 
