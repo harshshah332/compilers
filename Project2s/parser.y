@@ -398,10 +398,10 @@ Expr       :
            ;
 
 AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
-               | Expr '*=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
-               | Expr '/=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
-               | Expr '+=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
-               | Expr '-' Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
+               | Expr T_MulAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
+               | Expr T_DivAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
+               | Expr T_AddAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
+               | Expr T_SubAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
 
                 ;
 
@@ -424,8 +424,8 @@ PostfixExpr    : VarExpr T_Inc                { $$ = new PostfixExpr( $1, new Op
                ;
 
 
-EqualityExpr   : Expr '==' Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
-               | Expr '!=' Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); } 
+EqualityExpr   : Expr T_Equal Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
+               | Expr T_NotEqual Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); } 
 
                ;
 
