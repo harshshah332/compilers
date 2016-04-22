@@ -205,7 +205,8 @@ void yyerror(const char *msg); // standard error-handling routine
 %nonassoc T_Equal T_NotEqual
 %nonassoc '<' T_LessEqual '>' T_GreaterEqual
 //%left     '+' '-' 
-%left     '*' '/' '%'
+//%left     '*' '/' 
+%left '%'
 %left '*=' '/=' '+=' '-='
 %nonassoc '!'  T_Inc T_Dec
 %nonassoc '[' '.'
