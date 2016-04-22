@@ -158,7 +158,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <typequalifier> TypeQualifier
 %type <fndecl>        FnDecl
 
-%type <op> Relational;
+%type <op> Relational;s
 
 
 //%type <namedtype>     NamedType
@@ -423,7 +423,7 @@ AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(
                 ;
 
 
-Relational : T_MulAssign { $$ = new Operator(@2, "*=");  }
+Relational : T_MulAssign { $$ = new Operator(@1, "*=");  }
 
 
 
