@@ -367,11 +367,11 @@ Expr       :
     */       
 
            | Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
-    /*       | Expr '*=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
+           | Expr '*=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
            | Expr '/=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
            | Expr '+=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
            | Expr '-=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
-*/
+
            | Expr '+' Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); } 
            | Expr '-' Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
            | Expr '*' Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); } 
