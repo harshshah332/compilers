@@ -198,6 +198,20 @@ void yyerror(const char *msg); // standard error-handling routine
 
 
 
+%nonassoc LOWER_ELSE
+%nonassoc T_Else
+
+/*
+%nonassoc '='
+%left     T_Or
+%left     T_And 
+%nonassoc T_Equal T_NotEqual
+%nonassoc '<' T_LessEqual '>' T_GreaterEqual
+%left     '+' '-' 
+%left     '*' '/' '%'
+%nonassoc '!'  T_Inc T_Dec
+%nonassoc '[' '.'
+*/
 
 %%
 /* Rules
