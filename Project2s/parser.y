@@ -417,7 +417,7 @@ ArithmeticExpr : Expr '+' Expr       { $$ = new ArithmeticExpr($1, new Operator(
 
 
 AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
-               | Expr T_MulAssign  Expr       { $$ = new AssignExpr($1, new Operator(@2, "*=", $3); } 
+               | Expr T_MulAssign  Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
                | Expr T_DivAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
                | Expr T_AddAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
                | Expr T_SubAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
