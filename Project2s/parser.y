@@ -47,7 +47,7 @@ void yyerror(const char *msg); // standard error-handling routine
     char identifier[MaxIdentLen+1]; // +1 for terminating null
     Decl *decl;
     List<Decl*> *declList;
-
+   Operator *op;
 
 
     VarDecl *vardecl;
@@ -158,6 +158,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <typequalifier> TypeQualifier
 %type <fndecl>        FnDecl
 
+%type <op> Relational;
 
 
 //%type <namedtype>     NamedType
@@ -412,15 +413,17 @@ ArithmeticExpr : Expr '+' Expr       { $$ = new ArithmeticExpr($1, new Operator(
                | '--' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
                ;
 
-               
+
 AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
-               | Expr T_MulAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
+               | Expr Relational  Expr       { $$ = new AssignExpr($1, $2, $3); } 
                | Expr T_DivAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
                | Expr T_AddAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
                | Expr T_SubAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
 
                 ;
 
+
+Relational : T_MulAssign { $$ = new Operator(@2, "*=");  }
 
 
 
