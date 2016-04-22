@@ -16,7 +16,7 @@ Decl::Decl(Identifier *n) : Node(*n->GetLocation()) {
 VarDecl::VarDecl(Identifier *n, Type *t, Expr *e) : Decl(n) {
     Assert(n != NULL && t != NULL);
     (type=t)->SetParent(this);
-    (typeq)->SetParent(this);
+    typeq = NULL;
     if (e) (assignTo=e)->SetParent(this);
 }
 
@@ -44,7 +44,8 @@ void VarDecl::PrintChildren(int indentLevel) {
 FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
     Assert(n != NULL && r!= NULL && d != NULL);
     (returnType=r)->SetParent(this);
-    (returnTypeq)->SetParent(this);
+    returnTypeQ = NULL; 
+
     (formals=d)->SetParentAll(this);
     body = NULL;
 }
