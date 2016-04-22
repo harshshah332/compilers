@@ -184,7 +184,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <varexpr> VarExpr
 
 
-%type <arithmeticexpr> ArithmeticExpr
+//%type <arithmeticexpr> ArithmeticExpr
 %type <relationalexpr> RelationalExpr
 %type <equalityexpr>   EqualityExpr
 %type <logicalexpr>    LogicalExpr
@@ -402,12 +402,7 @@ AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(
                | Expr '/=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
                | Expr '+=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
                | Expr '-' Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
-
-                ;
-
-
-
-ArithmeticExpr : Expr '+' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); }
+               | Expr '+' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); }
                | Expr '-' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
                | Expr '*' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); }
                | Expr '/' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
