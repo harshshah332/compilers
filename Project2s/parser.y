@@ -424,8 +424,8 @@ PostfixExpr    : VarExpr T_Inc                { $$ = new PostfixExpr( $1, new Op
                ;
 
 
-EqualityExpr   : Expr T_EQ Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
-               | Expr T_NE Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); } 
+EqualityExpr   : Expr '==' Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
+               | Expr '!=' Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); } 
 
                ;
 
@@ -446,7 +446,7 @@ VarExpr    : T_Identifier         {  Identifier *id = new Identifier(@1, $1);
                                      $$ = new VarExpr(@1, id);
                                   }
 
-Exprlist   : Exprlist T_Comma Expr          { ($$ = $1)->Append($3); }
+Exprlist   : Exprlist ',' Expr          { ($$ = $1)->Append($3); }
            | Expr                    { ($$ = new List<Expr*>)->Append($1); }
            ; 
 
@@ -457,8 +457,8 @@ EmptyExpr  : Expr                    {$$ =  $1;}
             
 LValue     : 
           //   T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
-             Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
-           | Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
+             Expr '.' T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
+           | Expr '[' Expr ']'      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
            ; 
 
 
