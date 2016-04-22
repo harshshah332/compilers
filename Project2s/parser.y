@@ -352,18 +352,18 @@ ArrayType :    Type T_Identifier T_LeftBracket Constant T_RightBracket
                  { $$ = new ArrayType(@1, $1); } 
 		 
 Expr       : 
-             Call                        { $$ =  $1;} 
+            AssignExpr                  { $$ =  $1;}
+           |  Call                        { $$ =  $1;} 
            | Constant                    { $$ =  $1;} 
            |  T_LeftParen Expr T_RightParen           { $$ = $2; }
            | VarExpr                     { $$ =  $1;} 
            | LValue                      { $$ =  $1;}
-           | AssignExpr                  { $$ =  $1;}
-           | ArithmeticExpr                      { $$ =  $1;}
-           | PostfixExpr                  { $$ =  $1;}
-           | EqualityExpr                      { $$ =  $1;}
-           | RelationalExpr                  { $$ =  $1;}
-           | LogicalExpr                      { $$ =  $1;}
-           
+
+           |  ArithmeticExpr { $$ =  $1;}
+           |  EqualityExpr { $$ =  $1;}
+           |  RelationalExpr { $$ =  $1;}
+           |  LogicalExpr { $$ =  $1;}
+           |  PostfixExpr { $$ =  $1;}
 /*
            | Expr T_Equal Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
            | Expr T_MulAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
