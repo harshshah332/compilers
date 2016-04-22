@@ -158,7 +158,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <typequalifier> TypeQualifier
 %type <fndecl>        FnDecl
 
-%type <op> Relational
+//%type <op> Relational
 
 
 //%type <namedtype>     NamedType
@@ -204,7 +204,7 @@ void yyerror(const char *msg); // standard error-handling routine
 
 %left     T_Or
 %left     T_And 
-%right T_DivAssign
+%right T_DivAssign T_MulAssign T_AddAssign T_SubAssign
 %nonassoc T_Equal T_NotEqual
 %nonassoc '<' T_LessEqual '>' T_GreaterEqual
 %left     '+' '-' 
@@ -417,7 +417,7 @@ ArithmeticExpr : Expr '+' Expr       { $$ = new ArithmeticExpr($1, new Operator(
 
 
 AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
-               | Expr Relational  Expr       { $$ = new AssignExpr($1, $2, $3); } 
+               | Expr T_MulAssign  Expr       { $$ = new AssignExpr($1, new Operator(@2, "*=", $3); } 
                | Expr T_DivAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
                | Expr T_AddAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
                | Expr T_SubAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
@@ -425,7 +425,7 @@ AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(
                 ;
 
 
-Relational : T_MulAssign { $$ = new Operator(@1, "*=");  }
+//Relational : T_MulAssign { $$ = new Operator(@1, "*=");  }
 
 
 
