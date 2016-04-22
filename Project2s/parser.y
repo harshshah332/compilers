@@ -178,29 +178,10 @@ void yyerror(const char *msg); // standard error-handling routine
 
 
 
-%type <expr>          Expr Constant StartExpr
+%type <expr>          Expr Constant
 %type <exprlist>    Exprlist Actuals
 %type <emptyexpr>     EmptyExpr
 %type <varexpr> VarExpr
-
-/*
-%type <arithmeticexpr> ArithmeticExpr AddExpr UnaryExpr
-%type <relationalexpr> RelationalExpr
-%type <equalityexpr>   EqualityExpr
-%type <logicalexpr>    LogicalExpr
-%type <assignexpr>     AssignExpr
-%type <postfixexpr>    PostfixExpr
-*/
-
-%type <expr> ArithmeticExpr AddExpr UnaryExpr
-%type <relationalexpr> RelationalExpr
-%type <equalityexpr>   EqualityExpr
-%type <logicalexpr>    LogicalExpr
-%type <assignexpr>     AssignExpr
-%type <expr>    PostfixExpr
-
-
-
 
 %type <call>          Call
 
