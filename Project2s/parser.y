@@ -184,13 +184,13 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <varexpr> VarExpr
 
 
-%type <arithmeticexpr> ArithmeticExpr
+%type <arithmeticexpr> ArithmeticExpr AddExpr UnaryExpr
 %type <relationalexpr> RelationalExpr
 %type <equalityexpr>   EqualityExpr
 %type <logicalexpr>    LogicalExpr
 %type <assignexpr>     AssignExpr
 %type <postfixexpr>    PostfixExpr
-
+ 
 //%type <arithmeticexpr>  Mult
 //%type <arithmeticexpr>  Addit
 
@@ -201,9 +201,9 @@ void yyerror(const char *msg); // standard error-handling routine
 
 %type <call>          Call
 
-%type <lvalue>        LValue
+//%type <lvalue>        LValue
 
-
+/*
 %left     '='
 %left      T_Or
 %left      T_And 
@@ -215,6 +215,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %nonassoc  '.' '['
 %nonassoc  T_Lower_Than_Else
 %nonassoc  T_Else
+*/
 
 %%
 /* Rules
@@ -356,7 +357,137 @@ Variables :    Variables T_Comma Variable            { ($$ = $1)->Append($3 ); }
 
 ArrayType :    Type T_Identifier T_LeftBracket Constant T_RightBracket   
                  { $$ = new ArrayType(@1, $1); } 
-     
+
+
+
+Expr       : 
+             Call                        { $$ =  $1;} 
+           | Constant                    { $$ =  $1;} 
+           |  T_LeftParen Expr T_RightParen           { $$ = $2; }
+           | VarExpr                     { $$ =  $1;} 
+;
+
+
+
+
+
+           | LValue                      { $$ =  $1;}
+           | AssignExpr                  { $$ =  $1;}
+           | ArithmeticExpr                      { $$ =  $1;}
+           | PostfixExpr                  { $$ =  $1;}
+           | EqualityExpr                      { $$ =  $1;}
+           | RelationalExpr                  { $$ =  $1;}
+           | LogicalExpr                      { $$ =  $1;}
+
+
+PostfixExpr    : 
+                 Expr { $$ =  $1;}
+               | VarExpr T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
+               | VarExpr T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
+
+               ;
+
+
+
+UnaryExpr     : PostfixExpr { $$ =  $1;}
+               | T_Inc UnaryExpr             { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
+               | T_Dec UnaryExpr             { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
+               ;
+
+
+
+
+ArithmeticExpr : UnaryExpr { $$ =  $1;}
+               | ArithmeticExpr T_Star UnaryExpr       { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); }
+               | ArithmeticExpr T_Slash UnaryExpr      { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
+               | ArithmeticExpr '%' UnaryExpr          { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
+               ;
+
+
+
+AddExpr        : ArithmeticExpr { $$ =  $1;}
+               | Expr T_Plus Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); }
+               | Expr T_Dash Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
+                ;
+
+
+
+RelationalExpr : AddExpr { $$ =  $1;}
+               | RelationalExpr T_LeftAngle AddExpr       { $$ = new RelationalExpr($1, new Operator(@2, "<"), $3); }
+               | RelationalExpr T_RightAngle AddExpr      { $$ = new RelationalExpr($1, new Operator(@2, ">"), $3); } 
+               | RelationalExpr T_LessEqual AddExpr       { $$ = new RelationalExpr($1, new Operator(@2, "<="), $3); }   
+               | RelationalExpr T_GreaterEqual AddExpr    { $$ = new RelationalExpr($1, new Operator(@2, ">="), $3); }
+
+               ;
+
+
+
+EqualityExpr   : RelationalExpr { $$ =  $1;}
+               | EqualityExpr T_EQ RelationalExpr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
+               | EqualityExpr T_NE RelationalExpr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); } 
+
+               ;
+
+
+
+
+
+LogicalExpr    : EqualityExpr { $$ =  $1;}
+               | LogicalExpr T_And EqualityExpr             { $$ = new LogicalExpr($1, new Operator(@2, "&&"), $3); }
+               | LogicalExpr T_Or EqualityExpr              { $$ = new LogicalExpr($1, new Operator(@2, "||"), $3); }
+
+               ;
+
+
+
+
+
+AssignExpr     : LogicalExpr { $$ =  $1;}
+               | UnaryExpr T_Equal AssignExpr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+               | UnaryExpr T_MulAssign AssignExpr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
+               | UnaryExpr T_DivAssign AssignExpr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
+               | UnaryExpr T_AddAssign AssignExpr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
+               | UnaryExpr T_SubAssign AssignExpr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
+
+
+                ;
+
+
+
+
+
+
+PostfixExpr    : VarExpr T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
+               | VarExpr T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
+
+               ;
+
+
+
+
+
+VarExpr    : T_Identifier         {  Identifier *id = new Identifier(@1, $1);
+                                     $$ = new VarExpr(@1, id);
+                                  }
+
+Exprlist   : Exprlist T_Comma Expr          { ($$ = $1)->Append($3); }
+           | Expr                    { ($$ = new List<Expr*>)->Append($1); }
+           ; 
+
+EmptyExpr  : Expr                    {$$ =  $1;}
+           |                         { $$ = new EmptyExpr(); }
+           ;
+ 
+/*            
+LValue     : 
+          //   T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
+             Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
+           | Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
+           ; 
+
+*/
+
+/*     
 Expr       : 
              Call                        { $$ =  $1;} 
            | Constant                    { $$ =  $1;} 
@@ -369,6 +500,7 @@ Expr       :
            | EqualityExpr                      { $$ =  $1;}
            | RelationalExpr                  { $$ =  $1;}
            | LogicalExpr                      { $$ =  $1;}
+
            
            ;
 
@@ -377,6 +509,7 @@ AssignExpr     : Expr T_Equal Expr           { $$ = new AssignExpr($1, new Opera
                | Expr T_DivAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
                | Expr T_AddAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
                | Expr T_SubAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
+
 
                 ;
 
@@ -417,6 +550,7 @@ LogicalExpr    : Expr T_And Expr             { $$ = new LogicalExpr($1, new Oper
 
                ;
 
+
 VarExpr    : T_Identifier         {  Identifier *id = new Identifier(@1, $1);
                                      $$ = new VarExpr(@1, id);
                                   }
@@ -429,14 +563,14 @@ EmptyExpr  : Expr                    {$$ =  $1;}
            |                         { $$ = new EmptyExpr(); }
            ;
  
-            
+          
 LValue     : 
           //   T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
              Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
            | Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
            ; 
 
-
+*/
         
 Actuals    : Exprlist                { $$ = $1; }
            |                         { $$ = new List<Expr*>; }
