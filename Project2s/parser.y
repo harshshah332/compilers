@@ -397,11 +397,11 @@ Expr       :
 */
            ;
 
-AssignExpr     : LValue T_Equal Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
-               | LValue T_MulAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
-               | LValue T_DivAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
-               | LValue T_AddAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
-               | LValue T_SubAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
+AssignExpr     : LValue '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+               | LValue '*=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
+               | LValue '/=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
+               | LValue '+=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
+               | LValue '-' Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
 
                 ;
 
@@ -430,8 +430,8 @@ EqualityExpr   : Expr T_EQ Expr              { $$ = new EqualityExpr($1, new Ope
                ;
 
 
-RelationalExpr : Expr T_LeftAngle Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<"), $3); }
-               | Expr T_RightAngle Expr      { $$ = new RelationalExpr($1, new Operator(@2, ">"), $3); } 
+RelationalExpr : Expr '<' Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<"), $3); }
+               | Expr '>' Expr      { $$ = new RelationalExpr($1, new Operator(@2, ">"), $3); } 
                | Expr T_LessEqual Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<="), $3); }   
                | Expr T_GreaterEqual Expr    { $$ = new RelationalExpr($1, new Operator(@2, ">="), $3); }
 
