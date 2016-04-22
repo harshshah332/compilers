@@ -538,7 +538,7 @@ VarDecls   : VarDecls VarDecl        { ($$ = $1)->Append($2);    }
 Call       : T_Identifier T_LeftParen Actuals T_RightParen 
                                      { $$ = new Call(Join(@1, @4), NULL, new Identifier(@1, $1), $3); }  
 
-           | Expr T_Dot T_Identifier T_LeftParen Actuals T_RightParen
+           | Expr '.' T_Identifier T_LeftParen Actuals T_RightParen
                                      { $$ = new Call(Join(@1, @6), $1, new Identifier(@3, $3), $5); }
 
 
