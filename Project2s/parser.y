@@ -356,7 +356,12 @@ Expr       :
            |  Call                        { $$ =  $1;} 
            | Constant                    { $$ =  $1;} 
            |  T_LeftParen Expr T_RightParen           { $$ = $2; }
-           | VarExpr                     { $$ =  $1;} 
+         //  | VarExpr                     { $$ =  $1;} 
+           | T_Identifier               {  Identifier *id = new Identifier(@1, $1);
+                                     $$ = new VarExpr(@1, id);
+                                  }
+
+                                  
            | LValue                      { $$ =  $1;}
 
            |  ArithmeticExpr { $$ =  $1;}
