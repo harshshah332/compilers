@@ -407,13 +407,13 @@ AssignExpr     : LValue T_Equal Expr           { $$ = new AssignExpr($1, new Ope
 
 
 
-ArithmeticExpr : Expr T_Plus Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); }
-               | Expr T_Dash Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
-               | Expr T_Star Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); }
-               | Expr T_Slash Expr      { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
+ArithmeticExpr : Expr '+' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); }
+               | Expr '-' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
+               | Expr '*' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); }
+               | Expr '/' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
                | Expr '%' Expr          { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
-               | T_Inc Expr             { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
-               | T_Dec Expr             { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
+               | '++' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
+               | '--' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
                ;
 
 
