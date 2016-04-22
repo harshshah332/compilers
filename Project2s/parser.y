@@ -397,11 +397,29 @@ Expr       :
 */
            ;
 
-AssignExpr     : VarExpr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
-               | VarExpr '*=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
-               | VarExpr '/=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
-               | VarExpr '+=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
-               | VarExpr '-' Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
+AssignExpr     : T_Identifier '=' Expr        { Identifier *id = new Identifier(@1, $1);
+                                              $$ = new AssignExpr(new VarExpr(@1, id), new Operator(@2, "="), $3); 
+                                              } 
+
+
+
+
+               | T_Identifier '*=' Expr       { Identifier *id = new Identifier(@1, $1);
+                                              $$ = new AssignExpr(new VarExpr(@1, id), new Operator(@2, "*="), $3); 
+                                              } 
+
+               | T_Identifier '/=' Expr       { Identifier *id = new Identifier(@1, $1);
+                                              $$ = new AssignExpr(new VarExpr(@1, id), new Operator(@2, "/="), $3); 
+                                              } 
+
+               | T_Identifier '+=' Expr       { Identifier *id = new Identifier(@1, $1);
+                                              $$ = new AssignExpr(new VarExpr(@1, id), new Operator(@2, "+="), $3); 
+                                              } 
+
+               | T_Identifier '-' Expr       { Identifier *id = new Identifier(@1, $1);
+                                              $$ = new AssignExpr(new VarExpr(@1, id), new Operator(@2, "-="), $3); 
+                                              } 
+
 
                 ;
 
