@@ -400,11 +400,11 @@ Expr       :
            ;
 
 AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
-               | Expr T_MulAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
+   /*            | Expr T_MulAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
                | Expr T_DivAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
                | Expr T_AddAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
                | Expr T_SubAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
-
+*/
                 ;
 
 
@@ -434,8 +434,8 @@ EqualityExpr   : Expr T_Equal Expr              { $$ = new EqualityExpr($1, new 
 
 RelationalExpr : Expr '<' Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<"), $3); }
                | Expr '>' Expr      { $$ = new RelationalExpr($1, new Operator(@2, ">"), $3); } 
-               | Expr T_LessEqual Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<="), $3); }   
-               | Expr T_GreaterEqual Expr    { $$ = new RelationalExpr($1, new Operator(@2, ">="), $3); }
+  //             | Expr T_LessEqual Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<="), $3); }   
+   //            | Expr T_GreaterEqual Expr    { $$ = new RelationalExpr($1, new Operator(@2, ">="), $3); }
 
                ;
 
