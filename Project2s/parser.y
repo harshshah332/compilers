@@ -158,7 +158,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <typequalifier> TypeQualifier
 %type <fndecl>        FnDecl
 
-%type <op> Relational;s
+%type <op> Relational
 
 
 //%type <namedtype>     NamedType
