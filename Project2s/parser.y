@@ -364,7 +364,7 @@ Expr       :
 
            | LValue                      { $$ =  $1;}
 
-           |  ArithmeticExpr { $$ =  $1;}
+ //          |  ArithmeticExpr { $$ =  $1;}
            |  EqualityExpr { $$ =  $1;}
            |  RelationalExpr { $$ =  $1;}
            |  LogicalExpr { $$ =  $1;}
