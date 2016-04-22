@@ -442,11 +442,14 @@ LogicalExpr    : Expr T_And Expr             { $$ = new LogicalExpr($1, new Oper
                | Expr T_Or Expr              { $$ = new LogicalExpr($1, new Operator(@2, "||"), $3); }
 
                ;
+*/
+
+
 
 VarExpr    : T_Identifier         {  Identifier *id = new Identifier(@1, $1);
                                      $$ = new VarExpr(@1, id);
                                   }
-*/
+
 
 /*
 
