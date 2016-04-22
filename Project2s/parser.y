@@ -297,7 +297,7 @@ Type      :    T_Int                 { $$ = Type::intType; }
           |    T_Uvec3               { $$ = Type::uvec3Type; }
           |    T_Uvec4               { $$ = Type::uvec4Type; }
     //       |    NamedType
-          |    ArrayType             
+          |    ArrayType             { $$ = $1; } 
           ;
 
 
@@ -376,8 +376,8 @@ EmptyExpr  : Expr                    {$$ =  $1;}
  
             
 LValue     : 
-             T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
-           | Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
+            // T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
+             Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
            | Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
            ; 
 
