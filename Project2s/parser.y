@@ -198,34 +198,21 @@ void yyerror(const char *msg); // standard error-handling routine
 
 
 
+
 %nonassoc LOWER_ELSE
 %nonassoc T_Else
-
-/*
 %nonassoc '='
-%left     T_Or
-%left     T_And 
-%nonassoc T_Equal T_NotEqual
-%nonassoc '<' T_LessEqual '>' T_GreaterEqual
+//%nonassoc T_Equal T_NotEqual
 %left     '+' '-' 
 %left     '*' '/' '%'
-%nonassoc '!'  T_Inc T_Dec
+//%nonassoc '!' T_Increment T_Decremen
+//%nonassoc '<' T_LessEqual '>' T_GreaterEqual
+//%left     T_Or
+//%left     T_And 
 %nonassoc '[' '.'
-*/
 
-/*
-%nonassoc LOWER_THAN_ELSE
-%nonassoc T_Else
-%nonassoc '='
-%left     T_Or
-%left     T_And 
-%nonassoc T_Equal T_NotEqual
-%nonassoc '<' T_LessEqual '>' T_GreaterEqual
-%left     '+' '-' 
-%left     '*' '/' '%'
-%nonassoc '!' UMINUS T_Increment T_Decrement
-%nonassoc '[' '.'
-*/
+
+
 
 
 
@@ -384,37 +371,6 @@ Expr       :
            | RelationalExpr                  { $$ =  $1;}
            | LogicalExpr                      { $$ =  $1;}
            
-/*
-           | Expr T_Equal Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
-           | Expr T_MulAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
-           | Expr T_DivAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
-           | Expr T_AddAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
-           | Expr T_SubAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
-
-           | Expr T_Plus Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); } 
-           | Expr T_Dash Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
-           | Expr T_Star Expr            { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); } 
-           | Expr T_Slash Expr           { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
-           | Expr '%' Expr               { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
-           | T_Inc Expr                  { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
-           | T_Dec Expr                  { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
-
-           | VarExpr T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
-           | VarExpr T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
-
-
-           | Expr T_EQ Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
-           | Expr T_NE Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); }  
-
-           | Expr T_LeftAngle Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<"), $3); }
-           | Expr T_RightAngle Expr      { $$ = new RelationalExpr($1, new Operator(@2, ">"), $3); } 
-           | Expr T_LessEqual Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<="), $3); }   
-           | Expr T_GreaterEqual Expr    { $$ = new RelationalExpr($1, new Operator(@2, ">="), $3); }
-
-           | Expr T_And Expr             { $$ = new LogicalExpr($1, new Operator(@2, "&&"), $3); }
-           | Expr T_Or Expr              { $$ = new LogicalExpr($1, new Operator(@2, "||"), $3); }
-
-*/
            ;
 
 AssignExpr     : Expr T_Equal Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
@@ -476,7 +432,7 @@ EmptyExpr  : Expr                    {$$ =  $1;}
  
             
 LValue     : 
-          //   T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
+        
              Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
            | Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
            ; 
