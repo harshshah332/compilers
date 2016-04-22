@@ -202,11 +202,15 @@ void yyerror(const char *msg); // standard error-handling routine
 %nonassoc LOWER_ELSE
 %nonassoc T_Else
 %nonassoc '='
-%left     T_Or
-%left     T_And 
+//%nonassoc '<' T_LessEqual '>' T_GreaterEqual
+//%left     T_Or
+//%left     T_And 
+//%nonassoc T_Equal T_NotEqual
 %left     '+' '-' 
 %left     '*' '/' '%'
-%nonassoc  T_Equal T_NotEqual T_Increment T_Decrement '[' '.' '<' T_LessEqual '>' T_GreaterEqual
+//%nonassoc '!' T_Increment T_Decrement
+%nonassoc '[' '.'
+
 
 
 
@@ -428,7 +432,7 @@ EmptyExpr  : Expr                    {$$ =  $1;}
  
             
 LValue     : 
-          //   T_Identifier                                { $$ = new FieldAccess(NULL, new Identifier(@1, $1)); }  
+        
              Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
            | Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
            ; 
