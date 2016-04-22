@@ -32,7 +32,7 @@ VarDecl::VarDecl(Identifier *n, Type *t, TypeQualifier *tq, Expr *e) : Decl(n) {
     (typeq=tq)->SetParent(this);
     if (e) (assignTo=e)->SetParent(this);
 }
-
+ 
 void VarDecl::PrintChildren(int indentLevel) {
    if (typeq) typeq->Print(indentLevel+1);
    if (type) type->Print(indentLevel+1);
@@ -44,8 +44,7 @@ void VarDecl::PrintChildren(int indentLevel) {
 FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
     Assert(n != NULL && r!= NULL && d != NULL);
     (returnType=r)->SetParent(this);
-    returnTypeQ = NULL; 
-
+    returnTypeq = NULL; 
     (formals=d)->SetParentAll(this);
     body = NULL;
 }
