@@ -183,14 +183,14 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <emptyexpr>     EmptyExpr
 %type <varexpr> VarExpr
 
-
+/*
 %type <arithmeticexpr> ArithmeticExpr AddExpr UnaryExpr
 %type <relationalexpr> RelationalExpr
 %type <equalityexpr>   EqualityExpr
 %type <logicalexpr>    LogicalExpr
 %type <assignexpr>     AssignExpr
 %type <postfixexpr>    PostfixExpr
-
+*/
 
 %type <expr> ArithmeticExpr AddExpr UnaryExpr
 %type <relationalexpr> RelationalExpr
@@ -198,12 +198,6 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <logicalexpr>    LogicalExpr
 %type <assignexpr>     AssignExpr
 %type <expr>    PostfixExpr
-
- 
-//%type <arithmeticexpr>  Mult
-//%type <arithmeticexpr>  Addit
-
-
 
 
 
@@ -225,6 +219,23 @@ void yyerror(const char *msg); // standard error-handling routine
 %nonassoc  T_Lower_Than_Else
 %nonassoc  T_Else
 */
+
+
+/*
+%nonassoc LOWER_THAN_ELSE
+%nonassoc T_Else
+%nonassoc '='
+%left     T_Or
+%left     T_And 
+%nonassoc T_Equal T_NotEqual
+%nonassoc '<' T_LessEqual '>' T_GreaterEqual
+%left     '+' '-' 
+%left     '*' '/' '%'
+%nonassoc '!' UMINUS T_Increment T_Decrement
+%nonassoc '[' '.'
+
+*/
+
 
 %%
 /* Rules
@@ -373,6 +384,7 @@ Expr       :
              Call                        { $$ =  $1;} 
            | Constant                    { $$ =  $1;} 
            |  T_LeftParen StartExpr T_RightParen           { $$ = $2; }
+           | StartExpr { $$ = $2; }
            | VarExpr                     { $$ =  $1;} 
                 | LValue                      { $$ =  $1;}
 ;
