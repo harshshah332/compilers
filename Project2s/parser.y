@@ -188,7 +188,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <relationalexpr> RelationalExpr
 %type <equalityexpr>   EqualityExpr
 %type <logicalexpr>    LogicalExpr
-%type <assignexpr>     AssignExpr
+//%type <assignexpr>     AssignExpr
 %type <postfixexpr>    PostfixExpr
 
 
@@ -352,8 +352,8 @@ ArrayType :    Type T_Identifier T_LeftBracket Constant T_RightBracket
                  { $$ = new ArrayType(@1, $1); } 
 		 
 Expr       : 
-            AssignExpr                  { $$ =  $1;}
-           |  Call                        { $$ =  $1;} 
+//            AssignExpr                  { $$ =  $1;}
+             Call                        { $$ =  $1;} 
            | Constant                    { $$ =  $1;} 
            |  T_LeftParen Expr T_RightParen           { $$ = $2; }
          //  | VarExpr                     { $$ =  $1;} 
@@ -369,6 +369,11 @@ Expr       :
            |  RelationalExpr { $$ =  $1;}
            |  LogicalExpr { $$ =  $1;}
            |  PostfixExpr { $$ =  $1;}
+           |  Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+               | Expr '*=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
+               | Expr '/=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
+               | Expr '+=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
+               | Expr '-' Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
 /*
            | Expr T_Equal Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
            | Expr T_MulAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
@@ -412,7 +417,7 @@ ArithmeticExpr : Expr '+' Expr       { $$ = new ArithmeticExpr($1, new Operator(
                | '--' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
                ;
 
-               
+/*
 AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
                | Expr '*=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
                | Expr '/=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
@@ -421,7 +426,7 @@ AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(
 
                 ;
 
-
+*/
 
 
 
