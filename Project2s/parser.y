@@ -178,7 +178,7 @@ void yyerror(const char *msg); // standard error-handling routine
 
 
 
-%type <expr>          Expr Constant
+%type <expr>          Expr Constant StartExpr
 %type <exprlist>    Exprlist Actuals
 %type <emptyexpr>     EmptyExpr
 %type <varexpr> VarExpr
@@ -363,7 +363,7 @@ ArrayType :    Type T_Identifier T_LeftBracket Constant T_RightBracket
 Expr       : 
              Call                        { $$ =  $1;} 
            | Constant                    { $$ =  $1;} 
-           |  T_LeftParen Expr T_RightParen           { $$ = $2; }
+           |  T_LeftParen StartExpr T_RightParen           { $$ = $2; }
            | VarExpr                     { $$ =  $1;} 
                 | LValue                      { $$ =  $1;}
 ;
@@ -448,14 +448,8 @@ AssignExpr     : LogicalExpr { $$ =  $1;}
 
 
 
-
-
-PostfixExpr    : VarExpr T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
-               | VarExpr T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
-
-               ;
-
-
+StartExpr: AssignExpr { $$ =  $1;}
+ ;
 
 
 
@@ -477,6 +471,8 @@ LValue     :
              Expr T_Dot T_Identifier                     { $$ = new FieldAccess($1, new Identifier(@3, $3)); }
            | Expr T_LeftBracket Expr T_RightBracket      { $$ = new ArrayAccess(Join(@1, @4), $1, $3); }
            ; 
+
+
 
 
 
