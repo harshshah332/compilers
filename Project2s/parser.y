@@ -201,7 +201,7 @@ void yyerror(const char *msg); // standard error-handling routine
 
 %type <call>          Call
 
-//%type <lvalue>        LValue
+%type <lvalue>        LValue
 
 /*
 %left     '='
@@ -365,19 +365,12 @@ Expr       :
            | Constant                    { $$ =  $1;} 
            |  T_LeftParen Expr T_RightParen           { $$ = $2; }
            | VarExpr                     { $$ =  $1;} 
+                | LValue                      { $$ =  $1;}
 ;
 
 
 
 
-
-           | LValue                      { $$ =  $1;}
-           | AssignExpr                  { $$ =  $1;}
-           | ArithmeticExpr                      { $$ =  $1;}
-           | PostfixExpr                  { $$ =  $1;}
-           | EqualityExpr                      { $$ =  $1;}
-           | RelationalExpr                  { $$ =  $1;}
-           | LogicalExpr                      { $$ =  $1;}
 
 
 PostfixExpr    : 
