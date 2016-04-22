@@ -437,7 +437,7 @@ RelationalExpr : Expr T_LeftAngle Expr       { $$ = new RelationalExpr($1, new O
 
                ;
 
- LogicalExpr   | Expr T_And Expr             { $$ = new LogicalExpr($1, new Operator(@2, "&&"), $3); }
+LogicalExpr    : Expr T_And Expr             { $$ = new LogicalExpr($1, new Operator(@2, "&&"), $3); }
                | Expr T_Or Expr              { $$ = new LogicalExpr($1, new Operator(@2, "||"), $3); }
 
                ;
