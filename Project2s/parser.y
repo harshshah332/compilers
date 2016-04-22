@@ -389,8 +389,8 @@ Expr       :
 
            | Expr '<' Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<"), $3); }
            | Expr '>' Expr      { $$ = new RelationalExpr($1, new Operator(@2, ">"), $3); } 
-           | Expr '<=' Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<="), $3); }   
-           | Expr '>=' Expr    { $$ = new RelationalExpr($1, new Operator(@2, ">="), $3); }
+           | Expr T_LessEqual Expr       { $$ = new RelationalExpr($1, new Operator(@2, "<="), $3); }   
+           | Expr T_GreaterEqual Expr    { $$ = new RelationalExpr($1, new Operator(@2, ">="), $3); }
 
            | Expr '&&' Expr             { $$ = new LogicalExpr($1, new Operator(@2, "&&"), $3); }
            | Expr '||' Expr              { $$ = new LogicalExpr($1, new Operator(@2, "||"), $3); }
