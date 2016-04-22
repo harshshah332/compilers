@@ -204,9 +204,9 @@ void yyerror(const char *msg); // standard error-handling routine
 
 %left     T_Or
 %left     T_And 
-%nonassoc T_DivAssign T_MulAssign T_AddAssign T_SubAssign
 %nonassoc T_Equal T_NE
 %nonassoc '<' T_LessEqual '>' T_GreaterEqual
+%nonassoc T_DivAssign T_MulAssign T_AddAssign T_SubAssign
 %left     '+' '-' 
 %left     '*' '/' '%'
 
@@ -411,8 +411,8 @@ ArithmeticExpr : Expr '+' Expr       { $$ = new ArithmeticExpr($1, new Operator(
                | Expr '*' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); }
                | Expr '/' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
                | Expr '%' Expr          { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
-               | '++' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
-               | '--' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
+               | T_Inc Expr             { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
+               | T_Dec Expr             { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
                ;
 
 
