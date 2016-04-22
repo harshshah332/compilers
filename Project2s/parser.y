@@ -184,6 +184,17 @@ void yyerror(const char *msg); // standard error-handling routine
 
 %type <lvalue>        LValue
 
+%nonassoc LOWER_ELSE
+%nonassoc T_Else
+%nonassoc '='
+%left     T_Or
+%left     T_And 
+%nonassoc T_Equal T_NotEqual
+%nonassoc '<' T_LessEqual '>' T_GreaterEqual
+%left     '+' '-' 
+%left     '*' '/' '%'
+%nonassoc '!'  T_Inc T_Dec
+%nonassoc '[' '.'
 
 
 %%
@@ -413,7 +424,7 @@ StmtBlock  : T_LeftBrace VarDecls Stmts T_RightBrace  { $$ = new StmtBlock($2, $
            | T_LeftBrace VarDecls T_RightBrace         { $$ = new StmtBlock($2, new List<Stmt*>); }
            ;
 
-IfStmt     : T_If T_LeftParen Expr T_RightParen Stmt              { $$ = new IfStmt($3, $5, NULL); }
+IfStmt     : T_If T_LeftParen Expr T_RightParen Stmt       %prec LOWER_ELSE        { $$ = new IfStmt($3, $5, NULL); }
            | T_If T_LeftParen Expr T_RightParen Stmt T_Else Stmt  { $$ = new IfStmt($3, $5, $7); }
            ;
                                      
