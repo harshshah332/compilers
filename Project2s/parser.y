@@ -204,10 +204,9 @@ void yyerror(const char *msg); // standard error-handling routine
 %left     T_And 
 %nonassoc T_Equal T_NotEqual
 %nonassoc '<' T_LessEqual '>' T_GreaterEqual
-//%left     '+' '-' 
-//%left     '*' '/' 
-%left '%'
-%left '*=' '/=' '+=' '-='
+%left     '+' '-' 
+%left     '*' '/' '%'
+
 %nonassoc '!'  T_Inc T_Dec
 %nonassoc '[' '.'
 
@@ -401,13 +400,6 @@ Expr       :
 
            ;
 
-AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
-               | Expr T_MulAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
-               | Expr T_DivAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
-               | Expr T_AddAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
-               | Expr T_SubAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
-
-                ;
 
 
 
@@ -419,6 +411,17 @@ ArithmeticExpr : Expr '+' Expr       { $$ = new ArithmeticExpr($1, new Operator(
                | '++' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
                | '--' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
                ;
+
+               
+AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+               | Expr T_MulAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
+               | Expr T_DivAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
+               | Expr T_AddAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
+               | Expr T_SubAssign Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
+
+                ;
+
+
 
 
 
