@@ -418,10 +418,19 @@ ArithmeticExpr : Expr '+' Expr       { $$ = new ArithmeticExpr($1, new Operator(
 
 
 
-PostfixExpr    : VarExpr T_Inc                { $$ = new PostfixExpr( $1, new Operator(@2, "++")); }
-               | VarExpr T_Dec                { $$ = new PostfixExpr( $1, new Operator(@2, "--")); }
+PostfixExpr    : T_Identifier T_Inc       {  Identifier *id = new Identifier(@1, $1);
+                                             $$ = new PostfixExpr( new VarExpr(@1, id), new Operator(@2, "++"));
+                                          }
 
+               | T_Identifier T_Dec       {  Identifier *id = new Identifier(@1, $1);
+                                             $$ = new PostfixExpr( new VarExpr(@1, id), new Operator(@2, "--"));
+                                          }
                ;
+
+VarExpr    : T_Identifier         {  Identifier *id = new Identifier(@1, $1);
+                                     $$ = new VarExpr(@1, id);
+                                  }
+
 
 
 EqualityExpr   : Expr T_Equal Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
@@ -442,9 +451,7 @@ LogicalExpr    : Expr T_And Expr             { $$ = new LogicalExpr($1, new Oper
 
                ;
 
-VarExpr    : T_Identifier         {  Identifier *id = new Identifier(@1, $1);
-                                     $$ = new VarExpr(@1, id);
-                                  }
+
 
 Exprlist   : Exprlist ',' Expr          { ($$ = $1)->Append($3); }
            | Expr                    { ($$ = new List<Expr*>)->Append($1); }
