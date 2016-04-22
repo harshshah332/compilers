@@ -196,20 +196,7 @@ void yyerror(const char *msg); // standard error-handling routine
 
 %type <lvalue>        LValue
 
-%nonassoc LOWER_ELSE
-%nonassoc T_Else
-%nonassoc '='
-%left     T_Or
-%left     T_And 
-%nonassoc T_Equal T_NotEqual
-%nonassoc '<' T_LessEqual '>' T_GreaterEqual
-%left     '+' '-' 
-%left     '*' '/' '%'
-%nonassoc '!'  T_Inc T_Dec
-%nonassoc '[' '.'
 
-
-%%
 /* Rules
  * -----
  * All productions and actions should be placed between the start and stop
