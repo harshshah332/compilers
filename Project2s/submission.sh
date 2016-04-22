@@ -52,7 +52,7 @@ then
 	cp utility.cc $pid/
 	cp utility.h $pid/
 	cp Makefile $pid/
-	cp Project_Description.txt $pid/
+	cp project-description.txt $pid/
 
 	zip -r $pid.zip $pid/*
 else 

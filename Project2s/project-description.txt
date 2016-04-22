@@ -1,0 +1,3 @@
+For our second project, syntax analysis of the compiler design, we decided to implement our parser by using types and having rules/actions for those types. The parser will recognize the certain type based on the specific order of tokens or expressions we specified for each type:
+For example, a post-increment expression would be defined as: VarExpr T_Inc, where VarExpr recognizes identifiers (variable names). Our program will successfully parse all of the inputs tested in this project, and will report a syntax error if the input is not properly entered. 
+
