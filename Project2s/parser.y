@@ -361,7 +361,7 @@ Expr       :
                                      $$ = new VarExpr(@1, id);
                                   }
 
-                                  
+
            | LValue                      { $$ =  $1;}
 
            |  ArithmeticExpr { $$ =  $1;}
@@ -402,6 +402,17 @@ Expr       :
 */
            ;
 
+
+ArithmeticExpr : Expr '+' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); }
+               | Expr '-' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
+               | Expr '*' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); }
+               | Expr '/' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
+               | Expr '%' Expr          { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
+               | '++' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
+               | '--' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
+               ;
+
+               
 AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
                | Expr '*=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
                | Expr '/=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
@@ -412,14 +423,7 @@ AssignExpr     : Expr '=' Expr           { $$ = new AssignExpr($1, new Operator(
 
 
 
-ArithmeticExpr : Expr '+' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); }
-               | Expr '-' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
-               | Expr '*' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); }
-               | Expr '/' Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
-               | Expr '%' Expr          { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
-               | '++' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
-               | '--' Expr             { $$ = new ArithmeticExpr( new Operator(@2, "--"), $2); }
-               ;
+
 
 
 
