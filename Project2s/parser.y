@@ -396,7 +396,7 @@ VarExpr    : T_Identifier         {  Identifier *id = new Identifier(@1, $1);
                                   }
 
 
-                                 }
+;                                 }
 
 
 /*
