@@ -333,10 +333,10 @@ TypeQualifier   : T_In               { $$ = TypeQualifier::inTypeQualifier; }
 
 
 FnDecl    :    Type VarExpr T_LeftParen Formals T_RightParen StmtBlock
-                                     { $$ = new FnDecl(new Identifier(@2, $2), $1, $4); 
+                                     { $$ = new FnDecl($2, $1, $4); 
                                        $$->SetFunctionBody($6); }
           |    T_Void VarExpr T_LeftParen Formals T_RightParen StmtBlock
-                                     { $$ = new FnDecl(new Identifier(@2, $2), Type::voidType, $4); 
+                                     { $$ = new FnDecl($2, Type::voidType, $4); 
                                        $$->SetFunctionBody($6); }
           ;
 
