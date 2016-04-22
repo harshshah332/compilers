@@ -189,7 +189,7 @@ void yyerror(const char *msg); // standard error-handling routine
 %type <equalityexpr>   EqualityExpr
 %type <logicalexpr>    LogicalExpr
 %type <assignexpr>     AssignExpr
-%type <postfixexpr>    PostfixExpr
+%type <expr>    PostfixExpr
  
 //%type <arithmeticexpr>  Mult
 //%type <arithmeticexpr>  Addit
