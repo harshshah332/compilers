@@ -397,11 +397,11 @@ Expr       :
 */
            ;
 
-AssignExpr     : LValue '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
-               | LValue '*=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
-               | LValue '/=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
-               | LValue '+=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
-               | LValue '-' Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
+AssignExpr     : VarExpr '=' Expr           { $$ = new AssignExpr($1, new Operator(@2, "="), $3); } 
+               | VarExpr '*=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "*="), $3); } 
+               | VarExpr '/=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "/="), $3); } 
+               | VarExpr '+=' Expr       { $$ = new AssignExpr($1, new Operator(@2, "+="), $3); } 
+               | VarExpr '-' Expr       { $$ = new AssignExpr($1, new Operator(@2, "-="), $3); }
 
                 ;
 
