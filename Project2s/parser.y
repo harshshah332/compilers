@@ -198,8 +198,9 @@ void yyerror(const char *msg); // standard error-handling routine
 
 
 
-%nonassoc LOWER_ELSE
-%nonassoc T_Else
+
+%nonassoc LOWER_ELSE  //for the if else statement
+%nonassoc T_Else   //for the if else statement
 %nonassoc T_Equal T_MulAssign T_DivAssign T_SubAssign T_AddAssign
 %left T_EqOp T_NeqOP T_LeftAngle T_RightAngle T_GreaterEqual
 %left T_And
