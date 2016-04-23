@@ -201,32 +201,12 @@ void yyerror(const char *msg); // standard error-handling routine
 
 %nonassoc LOWER_ELSE
 %nonassoc T_Else
-%nonassoc '='
-//%nonassoc T_Equal T_NotEqual
-%left     '+' '-' 
-%left     '*' '/' '%'
-//%nonassoc '!' T_Increment T_Decremen
-//%nonassoc '<' T_LessEqual '>' T_GreaterEqual
-//%left     T_Or
-//%left     T_And 
-%nonassoc '[' '.'
-
-/*
-
-%nonassoc LOWER_ELSE
-%nonassoc T_Else
-%left T_Or
+%nonassoc T_Equal T_MulAssign T_DivAssign T_SubAssign T_AddAssign
+%left T_EqOp T_NeqOP T_LeftAngle T_RightAngle T_GreaterEqual
 %left T_And
-%nonassoc T_Equal T_NotEqual
-%nonassoc '<' T_LessEqual '>' T_GreaterEqual
-%left     '+' '-' 
-%left     '*' '/' '%'
-%nonassoc '!' T_Inc T_Dec
-%nonassoc '[' '.'
-
-
-*/
-
+%left T_Or
+%left T_Plus T_Dash T_Star T_Slash
+%nonassoc T_Inc T_Dec
 
 
 
@@ -378,7 +358,9 @@ Variables :    Variables T_Comma Variable            { ($$ = $1)->Append($3 ); }
 
 ArrayType :    Type T_Identifier T_LeftBracket Constant T_RightBracket   
                  { $$ = new ArrayType(@1, $1); } 
-     
+
+
+
 Expr       : 
              Call                        { $$ =  $1;} 
            | Constant                    { $$ =  $1;} 
@@ -422,8 +404,9 @@ PostfixExpr    : VarExpr T_Inc                { $$ = new PostfixExpr( $1, new Op
                ;
 
 
-EqualityExpr   : Expr T_EQ Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
-               | Expr T_NE Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); } 
+EqualityExpr   : EqualityExpr T_EQ Expr              { $$ = new EqualityExpr($1, new Operator(@2, "=="), $3); }
+               | EqualityExpr T_NE Expr              { $$ = new EqualityExpr($1, new Operator(@2, "!="), $3); } 
+               | Expr  { $$ =  $1;} 
 
                ;
 
@@ -439,6 +422,7 @@ LogicalExpr    : Expr T_And Expr             { $$ = new LogicalExpr($1, new Oper
                | Expr T_Or Expr              { $$ = new LogicalExpr($1, new Operator(@2, "||"), $3); }
 
                ;
+            
 
 VarExpr    : T_Identifier         {  Identifier *id = new Identifier(@1, $1);
                                      $$ = new VarExpr(@1, id);
