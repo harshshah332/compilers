@@ -211,7 +211,21 @@ void yyerror(const char *msg); // standard error-handling routine
 //%left     T_And 
 %nonassoc '[' '.'
 
+/*
 
+%nonassoc LOWER_ELSE
+%nonassoc T_Else
+%left T_Or
+%left T_And
+%nonassoc T_Equal T_NotEqual
+%nonassoc '<' T_LessEqual '>' T_GreaterEqual
+%left     '+' '-' 
+%left     '*' '/' '%'
+%nonassoc '!' T_Inc T_Dec
+%nonassoc '[' '.'
+
+
+*/
 
 
 
@@ -302,6 +316,13 @@ Variable    : Type T_Identifier       {
              ArrayType *t = new ArrayType(@1, $1);
              $$ = new VarDecl(id, t);}
 
+           | Type T_Identifier T_LeftBracket Constant T_RightBracket T_Equal Expr
+            {
+             Identifier *id = new Identifier(@2, $2);
+             ArrayType *t = new ArrayType(@1, $1);
+             $$ = new VarDecl(id, t, $7);
+             }
+
           ;
 
 
@@ -385,7 +406,8 @@ AssignExpr     : Expr T_Equal Expr           { $$ = new AssignExpr($1, new Opera
 
 ArithmeticExpr : Expr T_Plus Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "+"), $3); }
                | Expr T_Dash Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "-"), $3); } 
-               | Expr T_Star Expr       { $$ = new ArithmeticExpr($1, new Operator(@2, "*"), $3); }
+               | Expr T_Star Expr       { $$ 
+               = new ArithmeticExpr($1, new Operator(@2, "*"), $3); }
                | Expr T_Slash Expr      { $$ = new ArithmeticExpr($1, new Operator(@2, "/"), $3); }
                | Expr '%' Expr          { $$ = new ArithmeticExpr($1, new Operator(@2, "%"), $3); }
                | T_Inc Expr             { $$ = new ArithmeticExpr( new Operator(@2, "++"), $2); }
