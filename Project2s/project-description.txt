@@ -1,3 +1,9 @@
 For our second project, syntax analysis of the compiler design, we decided to implement our parser by using types and having rules/actions for those types. The parser will recognize the certain type based on the specific order of tokens or expressions we specified for each type:
+
 For example, a post-increment expression would be defined as: VarExpr T_Inc, where VarExpr recognizes identifiers (variable names). Our program will successfully parse all of the inputs tested in this project, and will report a syntax error if the input is not properly entered. 
 
+We first wrote our rules according to the spec in the GLSl book, and then combined many rules and organized them together. We decided to follow the naming convention of the class names of the files, to keep debugging and finding code easy, similar in real life software development. 
+
+Many of our rules go back to itself, which allows for looping and iterations. For examples, the statements terminals has a rule for stmts stmt, so it loops back to itself, if the parser picked up more than 1 statement in that block. 
+
+We tried many different ways to catch and solve errors. The best one that worked was using gdb and having break statements and printing out where the seg faults occurred. We were able to solve our seg fault errors by setting the vardecl and fndecl constructors with the “typeq” to null in the ast_cc class. 
