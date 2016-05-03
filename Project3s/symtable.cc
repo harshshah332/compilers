@@ -10,6 +10,9 @@
 #include <map>
 #include <vector>
 #include "symtable.h"
+#include "ast.h"
+#include "ast_type.h"
+#include "ast_decl.h"
 using namespace std;
 
 
@@ -31,22 +34,6 @@ using namespace std;
     	vec.push_back(map); 
         level = lvl; 
     }
-
-    // Returns count of elements currently in list
-    const int Size() const { return level; }
-
-    // Adds element to list end
-    // Call this whenever we go int 
-    SymbolTable* Push()
-    { 
-      SymbolTable *temp = new SymbolTable();
-      temp->smap = new map<string, Decl*> ();
-      temp->parent = branch;
-      branch = temp;
-      level++;
-      return new SymbolTable(branch, level);
-    }
-
 
     // Adds element to list end
     // Call this whenever we go int 

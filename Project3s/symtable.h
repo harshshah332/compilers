@@ -7,6 +7,9 @@
 #include <map>
 #include <string.h>
 #include <vector>
+#include "ast.h"
+#include "ast_type.h"
+#include "ast_decl.h"
 using namespace std;
 
 
@@ -14,7 +17,7 @@ class SymbolTable {
 
 public: 
 
-	
+
 	vector<map<string, Decl*>> vec; 
 
  	int level;
@@ -23,8 +26,8 @@ public:
     SymbolTable(map<string, Decl*>  *map, int lvl);
     void Push();
     void remove();
-    Decl* SearchHead(char* id);
-  	Decl* Search(char* id);
+    Decl *SearchHead(char* id);
+  	Decl *Search(char* id);
 	void Add(char* id, Decl* decl);
 
 
