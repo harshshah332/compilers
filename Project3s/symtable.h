@@ -13,6 +13,8 @@ using namespace std;
 class SymbolTable { 
 
 public: 
+
+	
 	vector<map<string, Decl*>> vec; 
 
  	int level;

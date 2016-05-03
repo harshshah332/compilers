@@ -14,12 +14,9 @@ using namespace std;
 
 
 
-class SymbolTable {
 
-	vector<map<string, Decl*>> vec; 
-	SymbolTable *parent;
+
  
- 	int level;
 
  public:
     SymbolTable() { 
@@ -130,5 +127,4 @@ class SymbolTable {
   	   	 } 
     }
 
-    
-};
+   
