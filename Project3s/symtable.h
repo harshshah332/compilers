@@ -10,6 +10,8 @@
 #include "ast.h"
 #include "ast_type.h"
 #include "ast_decl.h"
+
+ class Decl;
 using namespace std;
 
 
@@ -18,7 +20,7 @@ class SymbolTable {
 public: 
 
 
-	vector<map<string, Decl*>> vec; 
+	vector<map<string, Decl*>> vec(); 
 
  	int level;
 

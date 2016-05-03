@@ -19,9 +19,9 @@ using namespace std;
 
 
 
- 
+ 	vector<map<string, Decl*>> SymbolTable::vec = new map<string, Decl*> ();
 
- public:
+
     SymbolTable() { 
        	vec = new map<string, Decl*> ();
         level = 0; 
@@ -83,9 +83,9 @@ using namespace std;
 
         if (vec) {
 
-       		for (std::vector<map<string, Vardecl*>>::iterator it = myvector.begin() ; it != myvector.end(); ++it){
+       		for (std::vector<map<string, Decl*>>::iterator it = vec.begin() ; it != myvector.end(); ++it){
        			
-       			auto search =  *it->find(searchID);
+       			auto search =  *it.find(searchID);
 
        			if(search != *it->end){
       				return search->second;
