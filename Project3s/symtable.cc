@@ -19,7 +19,7 @@ using namespace std;
 
 
 
- 	vector<map<string, Decl*>> SymbolTable::vec = new map<string, Decl*> ();
+ 	vector< (map<string, Decl*>) > SymbolTable::vec = new map<string, Decl*> ();
 
 
     SymbolTable() { 
@@ -83,7 +83,7 @@ using namespace std;
 
         if (vec) {
 
-       		for (std::vector<map<string, Decl*>>::iterator it = vec.begin() ; it != myvector.end(); ++it){
+       		for (std::vector< (map<string, Decl*>) >::iterator it = vec.begin() ; it != myvector.end(); ++it){
        			
        			auto search =  *it.find(searchID);
 
