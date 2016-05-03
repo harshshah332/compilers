@@ -29,14 +29,14 @@ using namespace std;
 
     SymbolTable(map<string, Decl*>  map, int lvl) {
     	level = 0; 
-    	vec = new vector< (map<string, Decl*>) > ();
+    	vec = new gvector< (map<string, Decl*>) > ();
     	vec.push_back(map); 
         level = lvl; 
     }
 
     // Adds element to list end
     // Call this whenever we go int 
-    void Push()
+    void SymbolTable::Push()
     { 
       map<string, Decl*> temp = new map<string, Decl*>();
       vec.push_back(temp);
@@ -46,7 +46,7 @@ using namespace std;
 
 
     // Removes head
-    void remove()
+    void SymbolTable::remove()
     { 
       int s;
     }
@@ -54,7 +54,7 @@ using namespace std;
 
 
     // Checks if id exists in current scope 
-    Decl* SearchHead(char* id) {
+    Decl* SymbolTable::SearchHead(char* id) {
 
     	std::string searchID(id);
     //might have to change this to search through a specific array element
@@ -77,7 +77,7 @@ using namespace std;
 
 
     
-    Decl* Search(char* id) {
+    Decl* SymbolTable::Search(char* id) {
     	std::string searchID(id);
 
         if (vec) {
@@ -105,7 +105,7 @@ using namespace std;
 
     // Add a new declared variable to current scope
         //might have to change this to search through a specific array element
-    void Add(char* id, Decl* decl) {
+    void SymbolTable::Add(char* id, Decl* decl) {
 
     	std::string searchID(id);
      	if (vec) {
