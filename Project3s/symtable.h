@@ -20,7 +20,7 @@ class SymbolTable {
 public: 
 
 
-	vector<map<string, Decl*>> vec(); 
+	vector< (map<string, Decl*>) > vec; 
 
  	int level;
 
