@@ -19,18 +19,17 @@ using namespace std;
 
 
 
- 	vector< (map<string, Decl*>) > SymbolTable::vec = new map<string, Decl*> ();
-
+ 	
 
     SymbolTable() { 
-       	vec = new map<string, Decl*> ();
+       	vec = new vector< (map<string, Decl*>) > ();
         level = 0; 
         parent = NULL;
     }
 
     SymbolTable(map<string, Decl*>  map, int lvl) {
     	level = 0; 
-    	vec = new map<string, Decl*> ();
+    	vec = new vector< (map<string, Decl*>) > ();
     	vec.push_back(map); 
         level = lvl; 
     }
