@@ -33,6 +33,7 @@ class Program : public Node
      const char *GetPrintNameForNode() { return "Program"; }
      void PrintChildren(int indentLevel);
      virtual void Check();
+    static SymbolTable *Node::symtab; //the global table
 };
 
 class Stmt : public Node

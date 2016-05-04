@@ -9,6 +9,10 @@
 #include "errors.h"
 #include "symtable.h"
 
+SymbolTable *Node::symtab = new SymbolTable();
+
+
+
 Program::Program(List<Decl*> *d) {
     Assert(d != NULL);
     (decls=d)->SetParentAll(this);
@@ -33,11 +37,31 @@ void Program::Check() {
     if ( decls->NumElements() > 0 ) {
       for ( int i = 0; i < decls->NumElements(); ++i ) {
         Decl *d = decls->Nth(i);
+          const char *decName = d->GetIdentifier()->GetName();
+          
+          if(name) {
+              
+              Decl* before = Program::symtab->searchHead(name);
+              if(before != NULL){
+                  ReportError::DeclConflict(d, before);
+                  
+              }
+              else{
+                  symtab.add(name, d);
+                  
+              }
+          }
+      }
+        
+        for (int i = 0; i < decls->NumElements(); ++i){
+            this->decls->Nth(i)->Check();
+        }
+
         /* !!! YOUR CODE HERE !!!
          * Basically you have to make sure that each declaration is 
          * semantically correct.
          */
-      }
+        
     }
 }
 
