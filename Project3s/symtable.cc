@@ -19,26 +19,17 @@ using namespace std;
 
 
 
- 	
+  
 
-    SymbolTable() { 
-       	vec = new vector< map<string, Decl*> > ();
+    SymbolTable::SymbolTable() { 
         level = 0; 
-        parent = NULL;
     }
 
-    SymbolTable( map < string, Decl* >  *mymap, int lvl) {
-    	level = 0; 
-    	vec = new vector< map < string, Decl*> > ();
-    	vec.push_back(map); 
-        level = lvl; 
-    }
 
     // Adds element to list end
     // Call this whenever we go int 
-    void SymbolTable::Push()
+    void SymbolTable::Push(map<string, Decl*> temp)
     { 
-      map<string, Decl*> temp = new map<string, Decl*>();
       vec.push_back(temp);
       level++;
     }
@@ -56,20 +47,24 @@ using namespace std;
     // Checks if id exists in current scope 
     Decl* SymbolTable::SearchHead(char* id) {
 
-    	std::string searchID(id);
+      std::string searchID(id);
     //might have to change this to search through a specific array element
-      	if (vec!=NULL){
+        if (vec.size() > 0){ //check is vector is empty, no scopes
 
-      	auto search =  vec.front().find(searchID);
+  std::map <string, Decl*>::iterator it;
+        it =  vec.front().find(searchID);
 
-      	if(search != vec.front().end() ){
-      		return search->second;
-      	}
-      	else{
-      		return NULL;
-      	}
+        if(it != vec.front().end() ){
+          return it->second;
+        }
+  else {
+    return NULL;
+  } 
 
       }
+        else{
+          return NULL;
+        }
     }
 
     // Find the location of the id in the nearest scope
@@ -78,23 +73,25 @@ using namespace std;
 
     
     Decl* SymbolTable::Search(char* id) {
-    	std::string searchID(id);
+      std::string searchID(id);
 
-        if (vec!=NULL) {
+        if (vec.size() > 0) { //check if vector is empty, no scopes
+  std::vector< map < string, Decl*> >::iterator it = vec.begin();
+          for (it ; it != vec.end(); ++it){
+            
 
-       		for (std::vector< (map<string, Decl*>) >::iterator it = vec.begin() ; it != myvector.end(); ++it){
-       			
-       			auto search =  *it.find(searchID);
+    //std::map <string, Decl*>::iterator search =  *it->find(searchID);
+    std::pair< string, Decl*> search =  *it->find(searchID);
 
-       			if(search != *it->end){
-      				return search.second;
-      			}
-      			else{
-      				return NULL;
-      			}
+            if(search.second != NULL ){  //THIS IS WRONG, SECOND is not null, need to check if null
+              return search.second;
+            }
+            else{
+              return NULL;
+            }
 
 
-       		}
+          }
 
         }
 
@@ -107,10 +104,10 @@ using namespace std;
         //might have to change this to search through a specific array element
     void SymbolTable::Add(char* id, Decl* decl) {
 
-    	std::string searchID(id);
-     	if (vec) {
-      		vec.front().insert (std::pair<string, Decl*>(searchID, decl));
-  	   	 } 
+      std::string searchID(id);
+      if (vec.size() > 0) {
+          vec.front().insert (std::pair<string, Decl*>(searchID, decl));
+         } 
     }
 
    
