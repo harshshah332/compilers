@@ -9,7 +9,7 @@
 #include "errors.h"
 #include "symtable.h"
 
-SymbolTable *Node::symtab = new SymbolTable();
+SymbolTable *Program::symtab = new SymbolTable();
 
 
 
@@ -39,15 +39,15 @@ void Program::Check() {
         Decl *d = decls->Nth(i);
           const char *decName = d->GetIdentifier()->GetName();
           
-          if(name) {
+          if(decName) {
               
-              Decl* before = Program::symtab->searchHead(name);
+              Decl* before = Program::symtab->SearchHead(decName);
               if(before != NULL){
                   ReportError::DeclConflict(d, before);
                   
               }
               else{
-                  symtab.add(name, d);
+                  symtab.add(decName, d);
                   
               }
           }
