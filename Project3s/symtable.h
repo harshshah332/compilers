@@ -20,12 +20,12 @@ class SymbolTable {
 public: 
 
 
-	vector< (map<string, Decl*>) > vec; 
+	vector< map < string, Decl*> > vec; 
 
  	int level;
 
  	SymbolTable();
-    SymbolTable(map<string, Decl*>  *map, int lvl);
+    SymbolTable(map < string, Decl*>  *map, int lvl);
     void Push();
     void remove();
     Decl *SearchHead(char* id);
