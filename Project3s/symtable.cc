@@ -22,14 +22,14 @@ using namespace std;
  	
 
     SymbolTable() { 
-       	vec = new vector< (map<string, Decl*>) > ();
+       	vec = new vector< map<string, Decl*> > ();
         level = 0; 
         parent = NULL;
     }
 
-    SymbolTable(map<string, Decl*>  map, int lvl) {
+    SymbolTable( map < string, Decl* >  *mymap, int lvl) {
     	level = 0; 
-    	vec = new gvector< (map<string, Decl*>) > ();
+    	vec = new vector< map < string, Decl*> > ();
     	vec.push_back(map); 
         level = lvl; 
     }
@@ -58,11 +58,11 @@ using namespace std;
 
     	std::string searchID(id);
     //might have to change this to search through a specific array element
-      	if (vec){
+      	if (vec!=NULL){
 
       	auto search =  vec.front().find(searchID);
 
-      	if(search != vec.front().end){
+      	if(search != vec.front().end() ){
       		return search->second;
       	}
       	else{
@@ -80,7 +80,7 @@ using namespace std;
     Decl* SymbolTable::Search(char* id) {
     	std::string searchID(id);
 
-        if (vec) {
+        if (vec!=NULL) {
 
        		for (std::vector< (map<string, Decl*>) >::iterator it = vec.begin() ; it != myvector.end(); ++it){
        			

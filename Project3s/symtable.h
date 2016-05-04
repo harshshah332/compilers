@@ -25,7 +25,7 @@ public:
  	int level;
 
  	SymbolTable();
-    SymbolTable(map < string, Decl*>  *map, int lvl);
+    SymbolTable(map < string, Decl*>  mymap, int lvl);
     void Push();
     void remove();
     Decl *SearchHead(char* id);
