@@ -15,6 +15,8 @@
 
 #include "list.h"
 #include "ast.h"
+#include <map>
+using namespace std;
 
 class Decl;
 class VarDecl;
@@ -33,7 +35,7 @@ class Program : public Node
      const char *GetPrintNameForNode() { return "Program"; }
      void PrintChildren(int indentLevel);
      virtual void Check();
-    static SymbolTable *Node::symtab; //the global table
+ 
 };
 
 class Stmt : public Node
@@ -48,11 +50,13 @@ class StmtBlock : public Stmt
   protected:
     List<VarDecl*> *decls;
     List<Stmt*> *stmts;
+   // map < string, Decl* > *stmtScope;
     
   public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
     const char *GetPrintNameForNode() { return "StmtBlock"; }
     void PrintChildren(int indentLevel);
+    virtual void Check();
 };
 
 class DeclStmt: public Stmt 
@@ -76,6 +80,7 @@ class ConditionalStmt : public Stmt
   public:
     ConditionalStmt() : Stmt(), test(NULL), body(NULL) {}
     ConditionalStmt(Expr *testExpr, Stmt *body);
+    virtual void Check();
 
 };
 

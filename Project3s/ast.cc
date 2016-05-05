@@ -9,6 +9,7 @@
 #include <string.h> // strdup
 #include <stdio.h>  // printf
 
+SymbolTable *Node::symtab = new SymbolTable();
 Node::Node(yyltype loc) {
     location = new yyltype(loc);
     parent = NULL;

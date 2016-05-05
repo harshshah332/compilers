@@ -9,7 +9,7 @@
 #include "errors.h"
 #include "symtable.h"
 
-SymbolTable *Program::symtab = new SymbolTable();
+//SymbolTable *Program::symtab = new SymbolTable();
 
 
 
@@ -35,27 +35,29 @@ void Program::Check() {
     // sample test - not the actual working code
     // replace it with your own implementation
     if ( decls->NumElements() > 0 ) {
+	std::map<string, Decl*> globalScope;
+	Node::symtab->push(globalScope);
       for ( int i = 0; i < decls->NumElements(); ++i ) {
         Decl *d = decls->Nth(i);
-          const char *decName = d->GetIdentifier()->GetName();
+           char *decName = d->GetIdentifier()->GetName();
           
           if(decName) {
               
-              Decl* before = Program::symtab->SearchHead(decName);
+              Decl* before = Node::symtab->searchHead(decName);
               if(before != NULL){
                   ReportError::DeclConflict(d, before);
                   
               }
               else{
-                  symtab.add(decName, d);
+                  Node::symtab->add(decName, d);
                   
               }
           }
       }
-        
-        for (int i = 0; i < decls->NumElements(); ++i){
+           for (int i = 0; i < decls->NumElements(); ++i){
             this->decls->Nth(i)->Check();
         }
+    
 
         /* !!! YOUR CODE HERE !!!
          * Basically you have to make sure that each declaration is 
@@ -65,11 +67,56 @@ void Program::Check() {
     }
 }
 
+//do we declare each new map scope in the check function or do we create it as a
+//variable in the .h and use that???
+void StmtBlock::Check(){
+
+    if ( decls->NumElements() > 0 ){
+      std::map <string,Decl* > stmtScope;
+      Node::symtab->push(stmtScope);
+	//std::map<string, Decl*> globalScope;
+	//Node::symtab->push(globalScope);
+
+      for ( int i = 0; i < decls->NumElements(); ++i ) {
+          VarDecl *vd = decls->Nth(i);
+          char *decName = vd->GetIdentifier()->GetName();
+          
+          if(decName) {
+              
+              Decl* before = NULL;
+ 	      std::map <string, Decl*>::iterator it = stmtScope.find(decName);
+
+	      if(it != stmtScope.end()){
+	          before = it->second;
+	      }
+
+              if(before != NULL){
+                  ReportError::DeclConflict(vd, before);
+                  
+              }
+              else{
+                  stmtScope.insert(std::pair<string, Decl*>(decName, vd));
+              }
+          }
+      }
+    }
+
+    if (stmts->NumElements() > 0 ){
+        for (int i = 0; i < stmts->NumElements(); ++i){
+	 //   Stmt *st = stmts->Nth(i);
+	 //   st->Check();
+            this->stmts->Nth(i)->Check();
+        }
+    }
+  
+
+}
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
     (decls=d)->SetParentAll(this);
     (stmts=s)->SetParentAll(this);
-}
+    // Node::symtab->push(stmtScope);
+   }
 
 void StmtBlock::PrintChildren(int indentLevel) {
     decls->PrintAll(indentLevel+1);
@@ -88,7 +135,16 @@ void DeclStmt::PrintChildren(int indentLevel) {
 ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) { 
     Assert(t != NULL && b != NULL);
     (test=t)->SetParent(this); 
-    (body=b)->SetParent(this);
+    (body=b)->SetParent(this); 
+}
+
+void ConditionalStmt::Check() {  
+    test->Check(); //call check on the test expr
+    if(strcmp(test->GetPrintNameForNode(), "BoolConstant")){
+      ReportError::TestNotBoolean(this->test);
+    }
+
+    body->Check();
 }
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) { 
