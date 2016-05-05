@@ -98,4 +98,9 @@ void ArrayType::PrintChildren(int indentLevel) {
     elemType->Print(indentLevel+1);
 }
 
+/*
+//need to actually implement this function
+char *ArrayType::getTypeName() {
+return NULL;
 
+}*/
