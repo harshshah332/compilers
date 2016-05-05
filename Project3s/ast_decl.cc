@@ -6,6 +6,7 @@
 #include "ast_type.h"
 #include "ast_stmt.h"
 #include "symtable.h"        
+#include "errors.h"
          
 Decl::Decl(Identifier *n) : Node(*n->GetLocation()) {
     Assert(n != NULL);
@@ -39,6 +40,45 @@ void VarDecl::PrintChildren(int indentLevel) {
    if (id) id->Print(indentLevel+1);
    if (assignTo) assignTo->Print(indentLevel+1, "(initializer) ");
 }
+
+void VarDecl::Check(){
+   if(type){
+	type->Check();
+   }
+}
+
+
+
+void FnDecl::Check(){
+
+    if ( formals->NumElements() > 0 ) {
+	std::map<string, Decl*> fnDeclScope;
+	Node::symtab->push(fnDeclScope);
+      for ( int i = 0; i < formals->NumElements(); ++i ) {
+          VarDecl *vd = formals->Nth(i);
+          char *decName = vd->GetIdentifier()->GetName();
+          
+          if(decName) {
+              
+              Decl* before = Node::symtab->search(decName);
+              if(before != NULL){
+                  ReportError::DeclConflict(vd, before);     
+              }
+              else{
+		  fnDeclScope.insert(std::pair<string, Decl*>(decName, vd));
+                                   
+              }
+          }
+      }
+          
+        
+    }
+   if(body){   
+	body->Check();
+   }
+   
+}   
+
 
 FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
     Assert(n != NULL && r!= NULL && d != NULL);

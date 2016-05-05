@@ -99,3 +99,8 @@ void ArrayType::PrintChildren(int indentLevel) {
 }
 
 
+//need to actually implement this function
+const char *ArrayType::getNameType() {
+return NULL;
+
+}

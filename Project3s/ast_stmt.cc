@@ -140,8 +140,9 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
 
 void ConditionalStmt::Check() {  
     test->Check(); //call check on the test expr
-    if(strcmp(test->GetPrintNameForNode(), "BoolConstant")){
-      ReportError::TestNotBoolean(this->test);
+   // if(strcmp(test-> getNameType(), "bool")){
+     if(true){
+      ReportError::TestNotBoolean(test);
     }
 
     body->Check();
