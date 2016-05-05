@@ -26,11 +26,11 @@ public:
 
  	SymbolTable();
 
-    void Push(map<string, Decl*> temp);
+    void push(map<string, Decl*> temp);
     void remove();
-    Decl *SearchHead(char* id);
-  	Decl *Search(char* id);
-	void Add(char* id, Decl* decl);
+    Decl *searchHead(char* id);
+  	Decl *search(char* id);
+	void add(char* id, Decl* decl);
 
 
 }; 

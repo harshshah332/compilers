@@ -28,7 +28,7 @@ using namespace std;
 
     // Adds element to list end
     // Call this whenever we go int 
-    void SymbolTable::Push(map<string, Decl*> temp)
+    void SymbolTable::push(map<string, Decl*> temp)
     { 
       vec.push_back(temp);
       level++;
@@ -45,7 +45,7 @@ using namespace std;
 
 
     // Checks if id exists in current scope 
-    Decl* SymbolTable::SearchHead(char* id) {
+    Decl* SymbolTable::searchHead(char* id) {
 
       std::string searchID(id);
     //might have to change this to search through a specific array element
@@ -72,7 +72,7 @@ using namespace std;
 
 
     
-    Decl* SymbolTable::Search(char* id) {
+    Decl* SymbolTable::search(char* id) {
       std::string searchID(id);
 
         if (vec.size() > 0) { //check if vector is empty, no scopes
@@ -102,7 +102,7 @@ using namespace std;
 
     // Add a new declared variable to current scope
         //might have to change this to search through a specific array element
-    void SymbolTable::Add(char* id, Decl* decl) {
+    void SymbolTable::add(char* id, Decl* decl) {
 
       std::string searchID(id);
       if (vec.size() > 0) {
