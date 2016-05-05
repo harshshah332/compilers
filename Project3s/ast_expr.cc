@@ -89,11 +89,44 @@ ConditionalExpr::ConditionalExpr(Expr *c, Expr *t, Expr *f)
     (falseExpr=f)->SetParent(this);
 }
 
+
+
+//needs to be implemented 
+void ConditionalExpr::Check(){ int x; } ;
+
+
 void ConditionalExpr::PrintChildren(int indentLevel) {
     cond->Print(indentLevel+1, "(cond) ");
     trueExpr->Print(indentLevel+1, "(true) ");
     falseExpr->Print(indentLevel+1, "(false) ");
 }
+
+//needs to be implemented 
+void ArithmeticExpr::Check(){ int x; } ;
+
+//needs to be implemented 
+void RelationalExpr::Check(){ int x; } ;
+
+//needs to be implemented 
+void EqualityExpr::Check(){ int x; } ;
+
+
+//needs to be implemented 
+void LogicalExpr::Check(){ int x; } ;
+
+
+//needs to be implemented 
+void AssignExpr::Check(){ int x; } ;
+
+
+
+//needs to be implemented 
+void PostfixExpr::Check(){ int x; } ;
+
+
+
+
+
 ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
     (base=b)->SetParent(this); 
     (subscript=s)->SetParent(this);
@@ -103,7 +136,20 @@ void ArrayAccess::PrintChildren(int indentLevel) {
     base->Print(indentLevel+1);
     subscript->Print(indentLevel+1, "(subscript) ");
 }
-     
+ 
+//needs to be implemented
+const char *ArrayAccess::getNameType(){
+	return NULL;
+}
+
+//needs to be implemented
+Type *ArrayAccess::getType(){
+	return NULL;
+}
+
+//needs to be implemented 
+void ArrayAccess::Check(){ int x; } ;
+
 FieldAccess::FieldAccess(Expr *b, Identifier *f) 
   : LValue(b? Join(b->GetLocation(), f->GetLocation()) : *f->GetLocation()) {
     Assert(f != NULL); // b can be be NULL (just means no explicit base)
@@ -117,6 +163,9 @@ void FieldAccess::PrintChildren(int indentLevel) {
     if (base) base->Print(indentLevel+1);
     field->Print(indentLevel+1);
 }
+
+//needs to be implemented 
+void FieldAccess::Check(){ int x; } ;
 
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     Assert(f != NULL && a != NULL); // b can be be NULL (just means no explicit base)
@@ -132,3 +181,5 @@ void Call::PrintChildren(int indentLevel) {
    if (actuals) actuals->PrintAll(indentLevel+1, "(actuals) ");
 }
 
+//needs to be implemented 
+void Call::Check(){ int x; } ;

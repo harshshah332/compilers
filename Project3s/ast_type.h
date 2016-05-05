@@ -61,6 +61,9 @@ class Type : public Node
     bool IsVector();
     bool IsMatrix();
     bool IsError();
+    virtual const  char *getNameType(){
+        return typeName;
+    }
 };
 
 
@@ -75,6 +78,16 @@ class NamedType : public Type
     const char *GetPrintNameForNode() { return "NamedType"; }
     void PrintChildren(int indentLevel);
     void PrintToStream(ostream& out) { out << id; }
+
+    const  char *getNameType() { if(id!=NULL) {
+        return id->GetName();
+    }
+    else {
+        return NULL;
+    }
+    };
+
+
 };
 
 class ArrayType : public Type 
@@ -90,6 +103,7 @@ class ArrayType : public Type
     void PrintChildren(int indentLevel);
     void PrintToStream(ostream& out) { out << elemType << "[]"; }
     Type *GetElemType() {return elemType;}
+    const char *getNameType();
 };
 
  
