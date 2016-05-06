@@ -27,7 +27,8 @@ public:
  	SymbolTable();
 
     void push(map<string, Decl*> temp);
-    void remove();
+    void popBack();
+    Decl *searchCurScope(char*id);
     Decl *searchHead(char* id);
   	Decl *search(char* id);
 	void add(char* id, Decl* decl);

@@ -43,7 +43,7 @@ void Program::Check() {
           
           if(decName) {
               
-              Decl* before = Node::symtab->searchHead(decName);
+              Decl* before = Node::symtab->searchCurScope(decName);
               if(before != NULL){
                   ReportError::DeclConflict(d, before);
                   
@@ -132,6 +132,12 @@ void StmtBlock::Check(){
 	 
 	}
 
+	//now pop the last scope. This would be the newly inserted stmtBlock scope or the scope of the
+	//stmtBlock from which is was created, ex) " if() { ... } " pop the if
+	
+	Node::symtab->popBack();
+	
+
     }
 
     if (stmts != NULL){
@@ -171,6 +177,7 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
     (body=b)->SetParent(this); 
 }
 
+/* //we dont need a check for this, according to piazza
 void ConditionalStmt::Check() {  
     test->Check(); //call check on the test expr
     if(strcmp(test-> getNameType(), "bool")){
@@ -179,7 +186,9 @@ void ConditionalStmt::Check() {
 
     body->Check();
 }
+*/
 
+//do we even need a check? confirm?
 void ForStmt::Check(){
 
    if(init != NULL){
@@ -210,6 +219,23 @@ void BreakStmt::Check() {
   ReportError::BreakOutsideLoop(this); 
 }
 
+void ContinueStmt::Check(){
+  Node *parent = this->GetParent();
+  while (parent)
+    {
+      if ((dynamic_cast<WhileStmt*>(parent)!=NULL) ||
+          (dynamic_cast<SwitchStmt*>(parent)!=NULL) )
+     //     || (dynamic_cast<ForStmt*>(parent)!=NULL) )  can we have continue inside ifStmt? confirm?
+      {
+       return; 
+      }
+
+      parent = parent->GetParent();
+    }
+  ReportError::ContinueOutsideLoop(this); 
+}
+
+
 
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) { 
@@ -227,6 +253,15 @@ void ForStmt::PrintChildren(int indentLevel) {
       step->Print(indentLevel+1, "(step) ");
     body->Print(indentLevel+1, "(body) ");
 }
+
+//needs implementation
+void WhileStmt::Check(){
+
+int x;
+
+
+
+} 
 
 void WhileStmt::PrintChildren(int indentLevel) {
     test->Print(indentLevel+1, "(test) ");
@@ -256,6 +291,9 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
     expr = e;
     if (e != NULL) expr->SetParent(this);
 }
+
+//needs to be implemented
+void ReturnStmt::Check(){ int x; }
 
 void ReturnStmt::PrintChildren(int indentLevel) {
     if ( expr ) 

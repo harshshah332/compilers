@@ -37,14 +37,17 @@ using namespace std;
 
 
     // Removes head
-    void SymbolTable::remove()
+    void SymbolTable::popBack()
     { 
-      int s;
+      if(!vec.empty()){
+	vec.pop_back();
+	level = level-1;
+      }
     }
 
 
 
-    // Checks if id exists in current scope 
+    // Checks if id exists in head scope 
     Decl* SymbolTable::searchHead(char* id) {
 
       std::string searchID(id);
@@ -67,11 +70,36 @@ using namespace std;
         }
     }
 
+
+    // Checks if id exists in current scope 
+    Decl* SymbolTable::searchCurScope(char* id) {
+
+      std::string searchID(id);
+        if (vec.size() > 0){ //check is vector is empty, no scopes
+
+  	  std::map <string, Decl*>::iterator it;
+          it =  vec.at(level).find(searchID);
+
+          if(it != vec.front().end() ){
+            return it->second;
+          }
+         else {
+           return NULL;
+         } 
+ 
+      }
+      else{
+        return NULL;
+      }
+}
+
+
+
+
+
     // Find the location of the id in the nearest scope
     // if not found returns NULL
 
-
-    
     Decl* SymbolTable::search(char* id) {
       std::string searchID(id);
 
