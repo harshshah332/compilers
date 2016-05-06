@@ -42,6 +42,8 @@ protected:
     virtual Type *getType() {
         return type;
     }
+
+    virtual void Check(){};
     
     friend std::ostream& operator<< (std::ostream& stream, Expr * expr) {
         return stream << expr->GetPrintNameForNode();
