@@ -8,6 +8,7 @@
 #include "ast_type.h"
 #include "ast_decl.h"
 #include "symtable.h"
+#include "errors.h"
 
 IntConstant::IntConstant(yyltype loc, int val) : Expr(loc) {
     value = val;
@@ -101,18 +102,97 @@ void ConditionalExpr::PrintChildren(int indentLevel) {
     falseExpr->Print(indentLevel+1, "(false) ");
 }
 
-//needs to be implemented 
-void ArithmeticExpr::Check(){ int x; } ;
+//needs to be checked 
+void ArithmeticExpr::Check(){
 
-//needs to be implemented 
-void RelationalExpr::Check(){ int x; } ;
+   const char *leftType = NULL;
+   const char *rightType = NULL;
+
+   if(left != NULL){		
+      left -> Check();
+      leftType = left -> getNameType();
+   }
+
+   right -> Check();
+   rightType = right -> getNameType();
+
+   if( (left != NULL) && (right != NULL) ) { 
+      //if its int+float || float+int || or they are the same type, return, else return error
+      if( (!strcmp(leftType, "int") && !strcmp(rightType, "float")) || (!strcmp(leftType, "float") && !strcmp(rightType, "int")) || (!strcmp(leftType, rightType)) ) {
+         return; 
+      }
+      else {
+	 ReportError::IncompatibleOperands(op, new Type(leftType), new Type(rightType));
+      }     
+   }
+
+//if the right side is not and int or a double
+   else if (right != NULL) {
+      if ( !strcmp(rightType, "int") || !strcmp(rightType, "double")){
+        return;
+      }
+      else{
+         ReportError::IncompatibleOperand(op, new Type(rightType));
+     }
+   }
+}
+
+
+//needs to be checked 
+void RelationalExpr::Check(){
+   const char *leftType = NULL;
+   const char *rightType = NULL;
+
+ 	
+   left -> Check();
+   leftType = left -> getNameType();
+   
+
+   right -> Check();
+   rightType = right -> getNameType();
+
+   if( (left != NULL) && (right != NULL) ) { 
+      //if its int relational float || float relational int || or they are the same type, return, else return error
+      if( (!strcmp(leftType, "int") && !strcmp(rightType, "float")) || (!strcmp(leftType, "float") && !strcmp(rightType, "int")) || (!strcmp(leftType, rightType)) ) {
+         return; 
+      }
+      else {
+	 ReportError::IncompatibleOperands(op, new Type(leftType), new Type(rightType));
+      }     
+   }
+}
 
 //needs to be implemented 
 void EqualityExpr::Check(){ int x; } ;
 
+//needs to be checked
+void LogicalExpr::Check(){
+   const char *leftType = NULL;
+   const char *rightType = NULL;
 
-//needs to be implemented 
-void LogicalExpr::Check(){ int x; } ;
+   if(left != NULL){		
+      left -> Check();
+      leftType = left -> getNameType();
+   }
+
+   right -> Check();
+   rightType = right -> getNameType();
+
+   if( (left != NULL) && (right != NULL) ) {
+      if ( strcmp(rightType, "bool") || strcmp(leftType, "bool") ){
+         ReportError::IncompatibleOperands(op, new Type(leftType), new Type(rightType));
+      }
+        
+   }
+   else if (rightType != NULL) {
+
+      if (strcmp(rightType, "bool")) {
+         ReportError::IncompatibleOperand(op, new Type(rightType));
+      }
+       
+   }
+
+}
 
 
 //needs to be implemented 
