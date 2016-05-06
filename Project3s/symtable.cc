@@ -110,4 +110,6 @@ using namespace std;
          } 
     }
 
-   
+   std::map<string, Decl*>  SymbolTable::getCurrentScope(){
+     return vec.at(level);
+   } 

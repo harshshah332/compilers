@@ -72,11 +72,14 @@ void Program::Check() {
 void StmtBlock::Check(){
 
     if ( decls->NumElements() > 0 ){
-      std::map <string,Decl* > stmtScope;
-      Node::symtab->push(stmtScope);
-	//std::map<string, Decl*> globalScope;
-	//Node::symtab->push(globalScope);
 
+     Node *parent = this->GetParent();  //get the parent of this stmt block
+     if ( dynamic_cast<StmtBlock *>(parent) != NULL){ 
+    //if the parent is a stmtblock, then we can create a new scope 
+      std::map <string,Decl* > stmtScope;
+      Node::symtab->push(stmtScope); 
+
+     
       for ( int i = 0; i < decls->NumElements(); ++i ) {
           VarDecl *vd = decls->Nth(i);
           char *decName = vd->GetIdentifier()->GetName();
@@ -99,9 +102,39 @@ void StmtBlock::Check(){
               }
           }
       }
+     }
+
+	else{
+     //if the parent is not a stmtblock, then get the current scope, and add to that
+          for ( int i = 0; i < decls->NumElements(); ++i ) {
+            VarDecl *vd = decls->Nth(i);
+            char *decName = vd->GetIdentifier()->GetName();
+          
+          if(decName) {
+              
+              Decl* before = NULL;
+	      std::map <string, Decl*> curScope = Node::symtab->getCurrentScope();
+	      std::map <string, Decl*>::iterator it = curScope.find(decName);
+
+	      if(it != curScope.end()){
+	          before = it->second;
+	      }
+
+              if(before != NULL){
+                  ReportError::DeclConflict(vd, before);
+                  
+              }
+              else{
+                  curScope.insert(std::pair<string, Decl*>(decName, vd));
+              }
+           }
+          }
+	 
+	}
+
     }
 
-    if (stmts->NumElements() > 0 ){
+    if (stmts != NULL){
         for (int i = 0; i < stmts->NumElements(); ++i){
 	 //   Stmt *st = stmts->Nth(i);
 	 //   st->Check();
@@ -140,13 +173,44 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
 
 void ConditionalStmt::Check() {  
     test->Check(); //call check on the test expr
-   // if(strcmp(test-> getNameType(), "bool")){
-     if(true){
+    if(strcmp(test-> getNameType(), "bool")){
       ReportError::TestNotBoolean(test);
     }
 
     body->Check();
 }
+
+void ForStmt::Check(){
+
+   if(init != NULL){
+      init -> Check();
+   }
+   if(step != NULL){
+      step -> Check();
+   }
+
+
+
+}
+
+
+
+void BreakStmt::Check() {
+  Node *parent = this->GetParent();
+  while (parent)
+    {
+      if ((dynamic_cast<WhileStmt*>(parent)!=NULL) ||
+          (dynamic_cast<SwitchStmt*>(parent)!=NULL)  ||
+          (dynamic_cast<ForStmt*>(parent)!=NULL) ) {
+       return; 
+      }
+
+      parent = parent->GetParent();
+    }
+  ReportError::BreakOutsideLoop(this); 
+}
+
+
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) { 
     Assert(i != NULL && t != NULL && b != NULL);
@@ -167,6 +231,12 @@ void ForStmt::PrintChildren(int indentLevel) {
 void WhileStmt::PrintChildren(int indentLevel) {
     test->Print(indentLevel+1, "(test) ");
     body->Print(indentLevel+1, "(body) ");
+}
+
+void IfStmt::Check(){
+    if(elseBody != NULL){
+      elseBody -> Check();
+    }
 }
 
 IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) { 

@@ -31,6 +31,9 @@ public:
     Decl *searchHead(char* id);
   	Decl *search(char* id);
 	void add(char* id, Decl* decl);
+   std::map<string, Decl*> getCurrentScope();
+
+
 
 
 }; 
