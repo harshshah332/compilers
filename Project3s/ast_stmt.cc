@@ -35,20 +35,24 @@ void Program::Check() {
     // sample test - not the actual working code
     // replace it with your own implementation
     if ( decls->NumElements() > 0 ) {
+	printf("decl numelements is %d\n", decls->NumElements());
 	std::map<string, Decl*> globalScope;
 	Node::symtab->push(globalScope);
       for ( int i = 0; i < decls->NumElements(); ++i ) {
         Decl *d = decls->Nth(i);
-           char *decName = d->GetIdentifier()->GetName();
+            char *decName = d->GetIdentifier()->GetName();
           
           if(decName) {
-              
+		string t = std::string(decName);
+              printf("Decname trying to be added is %s\n",t.c_str());
               Decl* before = Node::symtab->searchCurScope(decName);
+	 //  printf("name of before is %s\n", std::string(before->GetIdentifier()->GetName()).c_str());
+
               if(before != NULL){
                   ReportError::DeclConflict(d, before);
                   
               }
-              else{
+              else{ printf("yee decname is not there before\n");
                   Node::symtab->add(decName, d);
                   
               }
@@ -57,6 +61,8 @@ void Program::Check() {
            for (int i = 0; i < decls->NumElements(); ++i){
             this->decls->Nth(i)->Check();
         }
+
+printf("the size on starting is %d\n", static_cast<int>(Node::symtab->getCurrentScope().size()) ); 
     
 
         /* !!! YOUR CODE HERE !!!
@@ -71,15 +77,19 @@ void Program::Check() {
 //variable in the .h and use that???
 void StmtBlock::Check(){
 
-    if ( decls->NumElements() > 0 ){
+printf("in stmtbLOCK\n");
+	//printf("stmts numelements is %d\n", stmts->NumElements());
 
+    if ( stmts->NumElements() > 0 ){
+	printf("stmts numelements is %d\n", stmts->NumElements());
      Node *parent = this->GetParent();  //get the parent of this stmt block
      if ( dynamic_cast<StmtBlock *>(parent) != NULL){ 
     //if the parent is a stmtblock, then we can create a new scope 
       std::map <string,Decl* > stmtScope;
+printf("parent is stmtblock\n");
       Node::symtab->push(stmtScope); 
 
-     
+    /* 
       for ( int i = 0; i < decls->NumElements(); ++i ) {
           VarDecl *vd = decls->Nth(i);
           char *decName = vd->GetIdentifier()->GetName();
@@ -101,9 +111,9 @@ void StmtBlock::Check(){
                   stmtScope.insert(std::pair<string, Decl*>(decName, vd));
               }
           }
-      }
-     }
-
+      } */
+     } 
+/*
 	else{
      //if the parent is not a stmtblock, then get the current scope, and add to that
           for ( int i = 0; i < decls->NumElements(); ++i ) {
@@ -131,22 +141,29 @@ void StmtBlock::Check(){
           }
 	 
 	}
-
+ */
 	//now pop the last scope. This would be the newly inserted stmtBlock scope or the scope of the
 	//stmtBlock from which is was created, ex) " if() { ... } " pop the if
-	
+        for (int i = 0; i < stmts->NumElements(); ++i){
+	 //   Stmt *st = stmts->Nth(i);
+	 //   st->Check();
+	 printf("here\n");
+            this->stmts->Nth(i)->Check();
+        }
+	printf("symtab size is %d\n",static_cast<int>(Node::symtab->vec.size()) );
 	Node::symtab->popBack();
+	printf("symtab size is %d\n",static_cast<int>(Node::symtab->vec.size()) );
 	
 
     }
-
-    if (stmts != NULL){
+/*
+    if (stmts->NumElements() > 0){
         for (int i = 0; i < stmts->NumElements(); ++i){
 	 //   Stmt *st = stmts->Nth(i);
 	 //   st->Check();
             this->stmts->Nth(i)->Check();
         }
-    }
+    } */
   
 
 }
