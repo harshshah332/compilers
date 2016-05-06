@@ -41,10 +41,27 @@ void VarDecl::PrintChildren(int indentLevel) {
    if (assignTo) assignTo->Print(indentLevel+1, "(initializer) ");
 }
 
+
 void VarDecl::Check(){
-   if(type){
-	type->Check();
-   }
+
+	std::map<string, Decl*> curScope = Node::symtab->getCurrentScope();
+	Decl* before = Node::symtab -> searchCurScope(this->GetIdentifier()->GetName()); 
+
+	if ( before == NULL ) {
+
+		if (this->type == assignTo->getType()) {
+			curScope.insert( std::pair<string, Decl*>(this->GetIdentifier()->GetName(), this) );
+		}
+		else{
+			ReportError::InvalidInitialization(this->GetIdentifier(), type, assignTo->getType());  
+			//report error that type does not match assignto
+		}
+
+	}
+	else{
+		ReportError::DeclConflict(this, before);  
+	}
+
 }
 
 
@@ -60,7 +77,7 @@ void FnDecl::Check(){
           
           if(decName) {
               
-              Decl* before = Node::symtab->search(decName);
+              Decl* before = Node::symtab->searchCurScope(decName);
               if(before != NULL){
                   ReportError::DeclConflict(vd, before);     
               }

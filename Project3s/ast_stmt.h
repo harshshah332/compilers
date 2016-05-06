@@ -80,7 +80,7 @@ class ConditionalStmt : public Stmt
   public:
     ConditionalStmt() : Stmt(), test(NULL), body(NULL) {}
     ConditionalStmt(Expr *testExpr, Stmt *body);
-    void Check();
+    //void Check();
 
 };
 
@@ -110,6 +110,7 @@ class WhileStmt : public LoopStmt
     WhileStmt(Expr *test, Stmt *body) : LoopStmt(test, body) {}
     const char *GetPrintNameForNode() { return "WhileStmt"; }
     void PrintChildren(int indentLevel);
+    void Check();
 
 };
 
@@ -148,6 +149,7 @@ class ContinueStmt : public Stmt
   public:
     ContinueStmt(yyltype loc) : Stmt(loc) {}
     const char *GetPrintNameForNode() { return "ContinueStmt"; }
+    void Check();
 
 };
 
@@ -160,6 +162,7 @@ class ReturnStmt : public Stmt
     ReturnStmt(yyltype loc, Expr *expr = NULL);
     const char *GetPrintNameForNode() { return "ReturnStmt"; }
     void PrintChildren(int indentLevel);
+    void Check();
 
 };
 
