@@ -13,6 +13,7 @@
 #include "ast.h"
 #include "ast_type.h"
 #include "ast_decl.h"
+#include <stdio.h>
 using namespace std;
 
 
@@ -22,7 +23,8 @@ using namespace std;
   
 
     SymbolTable::SymbolTable() { 
-        level = 0; 
+//printf("test");
+        level = -1; 
     }
 
 
@@ -32,6 +34,7 @@ using namespace std;
     { 
       vec.push_back(temp);
       level++;
+//printf("level");
     }
 
 
@@ -75,12 +78,14 @@ using namespace std;
     Decl* SymbolTable::searchCurScope(char* id) {
 
       std::string searchID(id);
-        if (vec.size() > 0){ //check is vector is empty, no scopes
-
+        if (!vec.empty()){ //check is vector is empty, no scopes
+int x = 4;
+	printf("in symtab searchcurscope, its not empty, level is %d", level);
+	printf("\n");
   	  std::map <string, Decl*>::iterator it;
           it =  vec.at(level).find(searchID);
 
-          if(it != vec.front().end() ){
+          if(it != vec.at(level).end() ){
             return it->second;
           }
          else {
@@ -103,7 +108,7 @@ using namespace std;
     Decl* SymbolTable::search(char* id) {
       std::string searchID(id);
 
-        if (vec.size() > 0) { //check if vector is empty, no scopes
+        if (!vec.empty()) { //check if vector is empty, no scopes
   std::vector< map < string, Decl*> >::iterator it = vec.begin();
           for (it ; it != vec.end(); ++it){
             
@@ -139,5 +144,7 @@ using namespace std;
     }
 
    std::map<string, Decl*>  SymbolTable::getCurrentScope(){
+  printf("in symtab get curr scope. level is %d\n", level);
+printf("\n");
      return vec.at(level);
    } 

@@ -44,6 +44,7 @@ void VarDecl::PrintChildren(int indentLevel) {
 
 void VarDecl::Check(){
 
+printf("test");
 	std::map<string, Decl*> curScope = Node::symtab->getCurrentScope();
 	Decl* before = Node::symtab -> searchCurScope(this->GetIdentifier()->GetName()); 
 
