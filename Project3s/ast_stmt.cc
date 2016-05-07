@@ -35,7 +35,7 @@ void Program::Check() {
     // sample test - not the actual working code
     // replace it with your own implementation
     if ( decls->NumElements() > 0 ) {
-	printf("decl numelements is %d\n", decls->NumElements());
+//	printf("decl numelements is %d\n", decls->NumElements());
 	std::map<string, Decl*> globalScope;
 	Node::symtab->push(globalScope);
       for ( int i = 0; i < decls->NumElements(); ++i ) {
@@ -44,29 +44,27 @@ void Program::Check() {
           
           if(decName) {
 		string t = std::string(decName);
-              printf("Decname trying to be added is %s\n",t.c_str());
+      //        printf("Decname trying to be added is %s\n",t.c_str());
               Decl* before = Node::symtab->searchCurScope(decName);
-	 //  printf("name of before is %s\n", std::string(before->GetIdentifier()->GetName()).c_str());
+
 
               if(before != NULL){
                   ReportError::DeclConflict(d, before);
                   
               }
-              else{ printf("yee decname is not there before\n");
-                  Node::symtab->add(decName, d);
+              else{  // printf("yee decname is not there before\n");
+                  Node::symtab->insertCurScope(decName, d);
                   
               }
           }
-printf("the level is %d\n",(Node::symtab->level) ); 
+//printf("the level is %d\n",(Node::symtab->level) ); 
 
 	  d->Check();
       }
-          // for (int i = 0; i < decls->NumElements(); ++i){
-          //  this->decls->Nth(i)->Check();
-        //}
 
-printf("the level is %d\n",(Node::symtab->level) ); 
-//printf("the size on starting is %d\n", static_cast<int>(Node::symtab->getCurrentScope().size()) ); 
+
+//printf("the level is %d\n",(Node::symtab->level) ); 
+ 
     
 
         /* !!! YOUR CODE HERE !!!
@@ -88,14 +86,14 @@ void DeclStmt::Check(){
 //variable in the .h and use that???
 void StmtBlock::Check(List<VarDecl*> *formals){
 
-printf("in stmtbLOCK\n");
+//printf("in stmtbLOCK\n");
 	//printf("stmts numelements is %d\n", stmts->NumElements());
          std::map <string,Decl* > stmtScope;
          Node::symtab->push(stmtScope); 
 
 if(formals!=NULL){
     if ( formals->NumElements() > 0 ){
-	printf("stmts numelements is %d\n", stmts->NumElements());
+//	printf("stmts numelements is %d\n", stmts->NumElements());
 
       for ( int i = 0; i < formals->NumElements(); ++i ) {
           Decl *vd = formals->Nth(i);
@@ -126,48 +124,22 @@ if(formals!=NULL){
 }
 
     if ( stmts->NumElements() > 0 ){
-	printf("stmts numelements is %d\n", stmts->NumElements());
+//	printf("stmts numelements is %d\n", stmts->NumElements());
 
       for ( int i = 0; i < stmts->NumElements(); ++i ) {
-printf("in for loop. I is %d\n", i);
+//printf("in for loop. I is %d\n", i);
 
           Stmt *st = stmts->Nth(i);
 	  st->Check();
-/*
-          char *decName = st->GetIdentifier()->GetName();
-printf("after decname \n");
-          
-          if(decName) {
-              
-              Stmt* before = NULL;
- 	      std::map <string, Decl*>::iterator it = Node::Symtab e.find(decName);
 
-	      if(it != stmtScope.end()){
-	          before = it->second;
-	      }
+//printf("return from for. size of the map at level %d is %d \n",Node::symtab->level,  static_cast<int>(Node::symtab->vec.at(1).size()));
 
-              if(before != NULL){
-                  ReportError::DeclConflict(st, before);
-                  
-              }
-              else{
-                  stmtScope.insert(std::pair<string, Decl*>(decName, st));
-              }
-          } */
       } 
      } 
-	//now pop the last scope. This would be the newly inserted stmtBlock scope or the scope of the
-	//stmtBlock from which is was created, ex) " if() { ... } " pop the if
-  /*      for (int i = 0; i < stmts->NumElements(); ++i){
 
-	 //   Stmt *st = stmts->Nth(i);
-	 //   st->Check();
-	 printf("here\n");
-            this->stmts->Nth(i)->Check();
-        } */
-	printf("symtab size is %d\n",static_cast<int>(Node::symtab->vec.size()) );
+//	printf("symtab size is %d\n",static_cast<int>(Node::symtab->vec.size()) );
 	Node::symtab->popBack();
-	printf("symtab size is %d\n",static_cast<int>(Node::symtab->vec.size()) );
+//	printf("symtab size is %d\n",static_cast<int>(Node::symtab->vec.size()) );
 	
 
     }
