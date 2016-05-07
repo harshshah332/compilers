@@ -57,12 +57,16 @@ void Program::Check() {
                   
               }
           }
-      }
-           for (int i = 0; i < decls->NumElements(); ++i){
-            this->decls->Nth(i)->Check();
-        }
+printf("the level is %d\n",(Node::symtab->level) ); 
 
-printf("the size on starting is %d\n", static_cast<int>(Node::symtab->getCurrentScope().size()) ); 
+	  d->Check();
+      }
+          // for (int i = 0; i < decls->NumElements(); ++i){
+          //  this->decls->Nth(i)->Check();
+        //}
+
+printf("the level is %d\n",(Node::symtab->level) ); 
+//printf("the size on starting is %d\n", static_cast<int>(Node::symtab->getCurrentScope().size()) ); 
     
 
         /* !!! YOUR CODE HERE !!!
@@ -73,25 +77,28 @@ printf("the size on starting is %d\n", static_cast<int>(Node::symtab->getCurrent
     }
 }
 
+void DeclStmt::Check(){
+
+	if(decl !=NULL){
+	decl->Check();
+	}
+}
+
 //do we declare each new map scope in the check function or do we create it as a
 //variable in the .h and use that???
-void StmtBlock::Check(){
+void StmtBlock::Check(List<VarDecl*> *formals){
 
 printf("in stmtbLOCK\n");
 	//printf("stmts numelements is %d\n", stmts->NumElements());
+         std::map <string,Decl* > stmtScope;
+         Node::symtab->push(stmtScope); 
 
-    if ( stmts->NumElements() > 0 ){
+if(formals!=NULL){
+    if ( formals->NumElements() > 0 ){
 	printf("stmts numelements is %d\n", stmts->NumElements());
-     Node *parent = this->GetParent();  //get the parent of this stmt block
-     if ( dynamic_cast<StmtBlock *>(parent) != NULL){ 
-    //if the parent is a stmtblock, then we can create a new scope 
-      std::map <string,Decl* > stmtScope;
-printf("parent is stmtblock\n");
-      Node::symtab->push(stmtScope); 
 
-    /* 
-      for ( int i = 0; i < decls->NumElements(); ++i ) {
-          VarDecl *vd = decls->Nth(i);
+      for ( int i = 0; i < formals->NumElements(); ++i ) {
+          Decl *vd = formals->Nth(i);
           char *decName = vd->GetIdentifier()->GetName();
           
           if(decName) {
@@ -111,62 +118,60 @@ printf("parent is stmtblock\n");
                   stmtScope.insert(std::pair<string, Decl*>(decName, vd));
               }
           }
-      } */
+      } 
      } 
+
+
+
+}
+
+    if ( stmts->NumElements() > 0 ){
+	printf("stmts numelements is %d\n", stmts->NumElements());
+
+      for ( int i = 0; i < stmts->NumElements(); ++i ) {
+printf("in for loop. I is %d\n", i);
+
+          Stmt *st = stmts->Nth(i);
+	  st->Check();
 /*
-	else{
-     //if the parent is not a stmtblock, then get the current scope, and add to that
-          for ( int i = 0; i < decls->NumElements(); ++i ) {
-            VarDecl *vd = decls->Nth(i);
-            char *decName = vd->GetIdentifier()->GetName();
+          char *decName = st->GetIdentifier()->GetName();
+printf("after decname \n");
           
           if(decName) {
               
-              Decl* before = NULL;
-	      std::map <string, Decl*> curScope = Node::symtab->getCurrentScope();
-	      std::map <string, Decl*>::iterator it = curScope.find(decName);
+              Stmt* before = NULL;
+ 	      std::map <string, Decl*>::iterator it = Node::Symtab e.find(decName);
 
-	      if(it != curScope.end()){
+	      if(it != stmtScope.end()){
 	          before = it->second;
 	      }
 
               if(before != NULL){
-                  ReportError::DeclConflict(vd, before);
+                  ReportError::DeclConflict(st, before);
                   
               }
               else{
-                  curScope.insert(std::pair<string, Decl*>(decName, vd));
+                  stmtScope.insert(std::pair<string, Decl*>(decName, st));
               }
-           }
-          }
-	 
-	}
- */
+          } */
+      } 
+     } 
 	//now pop the last scope. This would be the newly inserted stmtBlock scope or the scope of the
 	//stmtBlock from which is was created, ex) " if() { ... } " pop the if
-        for (int i = 0; i < stmts->NumElements(); ++i){
+  /*      for (int i = 0; i < stmts->NumElements(); ++i){
+
 	 //   Stmt *st = stmts->Nth(i);
 	 //   st->Check();
 	 printf("here\n");
             this->stmts->Nth(i)->Check();
-        }
+        } */
 	printf("symtab size is %d\n",static_cast<int>(Node::symtab->vec.size()) );
 	Node::symtab->popBack();
 	printf("symtab size is %d\n",static_cast<int>(Node::symtab->vec.size()) );
 	
 
     }
-/*
-    if (stmts->NumElements() > 0){
-        for (int i = 0; i < stmts->NumElements(); ++i){
-	 //   Stmt *st = stmts->Nth(i);
-	 //   st->Check();
-            this->stmts->Nth(i)->Check();
-        }
-    } */
-  
 
-}
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
     (decls=d)->SetParentAll(this);
