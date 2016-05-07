@@ -44,29 +44,44 @@ void VarDecl::PrintChildren(int indentLevel) {
 
 void VarDecl::Check(){
 
-printf("test in var decl \n");
-	std::map<string, Decl*> curScope = Node::symtab->getCurrentScope();
+//printf(" \ntest in var decl \n");
+
 	Decl* before = Node::symtab -> searchCurScope(this->GetIdentifier()->GetName());
-	puts(  this->GetIdentifier()->GetName());
+//	puts(  this->GetIdentifier()->GetName());
+
+//	printf("\n");
 
 	if ( before == NULL ) {
-
-	/*	if (this->type == assignTo->getType()) {
-			curScope.insert( std::pair<string, Decl*>(this->GetIdentifier()->GetName(), this) );
-		}
-		else{
-			ReportError::InvalidInitialization(this->GetIdentifier(), type, assignTo->getType());  
+/*           if(this->assignTo != NULL) {
+               
+                if ( Node::symtab->search(assignTo->GetIdentifier()->GetName()) != NULL ) {
+                   if (this->type != assignTo->getType()) {
+			 ReportError::InvalidInitialization(this->GetIdentifier(), this->type, assignTo->getType());  
 			//report error that type does not match assignto
-		}
- */
-	printf("inserting \n");
-	curScope.insert( std::pair<string, Decl*>(this->GetIdentifier()->GetName(), this) );
+	    	   }  	
+		   else {
+			Node::symtab -> insertCurScope(this->GetIdentifier()->GetName(), this) ;	
+                   }
+	           
+               }
+	         else{
+	           ReportError::IdentifierNotDeclared ((assignTo->GetIdentifier(), LookingForVariable)
+			//report error that its looking for the variable to assign it to
+	        }
+
+
+
+          }  */
+//	printf("inserting \n");
+	Node::symtab -> insertCurScope(this->GetIdentifier()->GetName(), this) ;
+//	printf("the size of the curscope map at this level is %d\n", static_cast<int>( Node::symtab->getCurrentScope().size()));
 
 	}
 	else{
 		ReportError::DeclConflict(this, before);  
-	}
 
+	}
+//https://piazza.com/class/ilg2qlo1ijg10f?cid=790
 }
 
 
@@ -96,7 +111,14 @@ void FnDecl::Check(){
           
         
     } */
+
+   if(returnType != NULL){
+	Program::fnReturnType = returnType->getNameType();
+puts(Program::fnReturnType);
+}
+
    if(body){   
+//printf("in fndecl. formals size is %d\n", static_cast<int>(formals->size()));
         StmtBlock *b = dynamic_cast<StmtBlock*>(body);
 	b->Check(formals);
    }

@@ -31,7 +31,7 @@ public:
     Decl *searchCurScope(char*id);
     Decl *searchHead(char* id);
   	Decl *search(char* id);
-	void add(char* id, Decl* decl);
+	void insertCurScope(char* id, Decl* decl);
    std::map<string, Decl*> getCurrentScope();
 //	static SymbolTable symtab;
 

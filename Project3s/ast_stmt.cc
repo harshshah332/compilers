@@ -12,7 +12,7 @@
 //SymbolTable *Program::symtab = new SymbolTable();
 
 
-
+const char *Program::fnReturnType = NULL;
 Program::Program(List<Decl*> *d) {
     Assert(d != NULL);
     (decls=d)->SetParentAll(this);
@@ -35,7 +35,7 @@ void Program::Check() {
     // sample test - not the actual working code
     // replace it with your own implementation
     if ( decls->NumElements() > 0 ) {
-	printf("decl numelements is %d\n", decls->NumElements());
+//	printf("decl numelements is %d\n", decls->NumElements());
 	std::map<string, Decl*> globalScope;
 	Node::symtab->push(globalScope);
       for ( int i = 0; i < decls->NumElements(); ++i ) {
@@ -44,29 +44,27 @@ void Program::Check() {
           
           if(decName) {
 		string t = std::string(decName);
-              printf("Decname trying to be added is %s\n",t.c_str());
+//               printf("Decname trying to be added is %s\n",t.c_str());
               Decl* before = Node::symtab->searchCurScope(decName);
-	 //  printf("name of before is %s\n", std::string(before->GetIdentifier()->GetName()).c_str());
+
 
               if(before != NULL){
                   ReportError::DeclConflict(d, before);
                   
               }
-              else{ printf("yee decname is not there before\n");
-                  Node::symtab->add(decName, d);
+              else{  // printf("yee decname is not there before\n");
+                  Node::symtab->insertCurScope(decName, d);
                   
               }
           }
-printf("the level is %d\n",(Node::symtab->level) ); 
+//printf("the level is %d\n",(Node::symtab->level) ); 
 
 	  d->Check();
       }
-          // for (int i = 0; i < decls->NumElements(); ++i){
-          //  this->decls->Nth(i)->Check();
-        //}
 
-printf("the level is %d\n",(Node::symtab->level) ); 
-//printf("the size on starting is %d\n", static_cast<int>(Node::symtab->getCurrentScope().size()) ); 
+
+//printf("the level is %d\n",(Node::symtab->level) ); 
+ 
     
 
         /* !!! YOUR CODE HERE !!!
@@ -88,14 +86,14 @@ void DeclStmt::Check(){
 //variable in the .h and use that???
 void StmtBlock::Check(List<VarDecl*> *formals){
 
-printf("in stmtbLOCK\n");
+//printf("in stmtbLOCK\n");
 	//printf("stmts numelements is %d\n", stmts->NumElements());
          std::map <string,Decl* > stmtScope;
          Node::symtab->push(stmtScope); 
 
 if(formals!=NULL){
     if ( formals->NumElements() > 0 ){
-	printf("stmts numelements is %d\n", stmts->NumElements());
+//	printf("stmts numelements is %d\n", stmts->NumElements());
 
       for ( int i = 0; i < formals->NumElements(); ++i ) {
           Decl *vd = formals->Nth(i);
@@ -126,48 +124,22 @@ if(formals!=NULL){
 }
 
     if ( stmts->NumElements() > 0 ){
-	printf("stmts numelements is %d\n", stmts->NumElements());
+//	printf("stmts numelements is %d\n", stmts->NumElements());
 
       for ( int i = 0; i < stmts->NumElements(); ++i ) {
-printf("in for loop. I is %d\n", i);
+//printf("in for loop. I is %d\n", i);
 
           Stmt *st = stmts->Nth(i);
 	  st->Check();
-/*
-          char *decName = st->GetIdentifier()->GetName();
-printf("after decname \n");
-          
-          if(decName) {
-              
-              Stmt* before = NULL;
- 	      std::map <string, Decl*>::iterator it = Node::Symtab e.find(decName);
 
-	      if(it != stmtScope.end()){
-	          before = it->second;
-	      }
+//printf("return from for. size of the map at level %d is %d \n",Node::symtab->level,  static_cast<int>(Node::symtab->vec.at(1).size()));
 
-              if(before != NULL){
-                  ReportError::DeclConflict(st, before);
-                  
-              }
-              else{
-                  stmtScope.insert(std::pair<string, Decl*>(decName, st));
-              }
-          } */
       } 
      } 
-	//now pop the last scope. This would be the newly inserted stmtBlock scope or the scope of the
-	//stmtBlock from which is was created, ex) " if() { ... } " pop the if
-  /*      for (int i = 0; i < stmts->NumElements(); ++i){
 
-	 //   Stmt *st = stmts->Nth(i);
-	 //   st->Check();
-	 printf("here\n");
-            this->stmts->Nth(i)->Check();
-        } */
-	printf("symtab size is %d\n",static_cast<int>(Node::symtab->vec.size()) );
+//	printf("symtab size is %d\n",static_cast<int>(Node::symtab->vec.size()) );
 	Node::symtab->popBack();
-	printf("symtab size is %d\n",static_cast<int>(Node::symtab->vec.size()) );
+//	printf("symtab size is %d\n",static_cast<int>(Node::symtab->vec.size()) );
 	
 
     }
@@ -210,20 +182,6 @@ void ConditionalStmt::Check() {
 }
 */
 
-//do we even need a check? confirm?
-void ForStmt::Check(){
-
-   if(init != NULL){
-      init -> Check();
-   }
-   if(step != NULL){
-      step -> Check();
-   }
-
-
-
-}
-
 
 
 void BreakStmt::Check() {
@@ -245,10 +203,10 @@ void ContinueStmt::Check(){
   Node *parent = this->GetParent();
   while (parent)
     {
-      if ((dynamic_cast<WhileStmt*>(parent)!=NULL) ||
-          (dynamic_cast<SwitchStmt*>(parent)!=NULL) )
-     //     || (dynamic_cast<ForStmt*>(parent)!=NULL) )  can we have continue inside ifStmt? confirm?
-      {
+      if ((dynamic_cast<WhileStmt*>(parent)!=NULL) 
+     //     (dynamic_cast<SwitchStmt*>(parent)!=NULL) ) can we have continue inside ifStmt? confirm?
+         || (dynamic_cast<ForStmt*>(parent)!=NULL) )     
+       {
        return; 
       }
 
@@ -259,6 +217,22 @@ void ContinueStmt::Check(){
 
 
 
+//do we even need a check? confirm?
+void ForStmt::Check(){
+
+   if(init != NULL){
+      init -> Check();
+   }
+   if(step != NULL){
+      step -> Check();
+   }
+
+   if( test->getType() != Type::boolType ) {	
+	ReportError::TestNotBoolean (test);
+   }
+  
+}
+
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) { 
     Assert(i != NULL && t != NULL && b != NULL);
@@ -266,6 +240,7 @@ ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
     step = s;
     if ( s )
       (step=s)->SetParent(this);
+
 }
 
 void ForStmt::PrintChildren(int indentLevel) {
@@ -276,11 +251,16 @@ void ForStmt::PrintChildren(int indentLevel) {
     body->Print(indentLevel+1, "(body) ");
 }
 
-//needs implementation
 void WhileStmt::Check(){
 
-int x;
+  if (body != NULL) {
+    
+      body -> Check();
+   }
 
+   if( test->getType() != Type::boolType ) {	
+	ReportError::TestNotBoolean (test);
+   }
 
 
 } 
@@ -294,6 +274,13 @@ void IfStmt::Check(){
     if(elseBody != NULL){
       elseBody -> Check();
     }
+
+
+   if( test->getType() != Type::boolType ) {	
+	ReportError::TestNotBoolean (test);
+   }
+  
+
 }
 
 IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) { 
@@ -314,13 +301,77 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
     if (e != NULL) expr->SetParent(this);
 }
 
-//needs to be implemented
-void ReturnStmt::Check(){ int x; }
+// returns a seg fault, the getNameType returns null
+void ReturnStmt::Check(){
+
+  if(expr != NULL){
+    const char * given;
+    given =  expr->getType()->getNameType();
+
+   if ( !strcmp(given, Program::fnReturnType) ) { //if they are the same type,return
+     return; 
+   }
+  
+   else{
+     if( !strcmp(given, "null")){  //if the given type is null, return
+	return;
+     }  
+     ReportError::ReturnMismatch(this, new Type(given), new Type(Program::fnReturnType));  //else report error
+   }
+  }
+  //if no return type give, and the fnReturnType is not void, return error
+  else if ( strcmp( Program::fnReturnType, "void") ){  
+    ReportError::ReturnMismatch(this, new Type("void"), new Type(Program::fnReturnType));
+    
+  }
+   
+
+}
 
 void ReturnStmt::PrintChildren(int indentLevel) {
     if ( expr ) 
       expr->Print(indentLevel+1);
 }
+
+void SwitchStmt::Check() {
+
+   if( expr != NULL){
+	expr -> Check();
+   }
+
+   if( cases != NULL){
+      for ( int i = 0; i < cases->NumElements(); ++i ) {
+	cases->Nth(i)->Check();
+      }
+   }
+
+   if( def != NULL){
+        def -> Check();
+   }
+
+
+}
+
+
+void Case::Check() {
+
+   if (label != NULL){
+	label->Check();
+   }
+
+   if (stmt != NULL){
+	stmt -> Check();
+   }
+}
+
+void Default::Check() {
+
+   if (stmt != NULL){
+	stmt -> Check();
+   }
+}
+
+
 
 SwitchLabel::SwitchLabel(Expr *l, Stmt *s) {
     Assert(l != NULL && s != NULL);

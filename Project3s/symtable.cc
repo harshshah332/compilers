@@ -80,8 +80,8 @@ using namespace std;
       std::string searchID(id);
         if (!vec.empty()){ //check is vector is empty, no scopes
 int x = 4;
-	printf("in symtab searchcurscope, its not empty, level is %d", level);
-	printf("\n");
+//	printf("in symtab searchcurscope, its not empty, level is %d. Searching for %s \n", level, searchID.c_str());
+//printf("the size of the map at this level is %d", static_cast<int>(vec.at(level).size()));
   	  std::map <string, Decl*>::iterator it;
           it =  vec.at(level).find(searchID);
 
@@ -108,43 +108,37 @@ int x = 4;
     Decl* SymbolTable::search(char* id) {
       std::string searchID(id);
 
-        if (!vec.empty()) { //check if vector is empty, no scopes
-  std::vector< map < string, Decl*> >::iterator it = vec.begin();
-          for (it ; it != vec.end(); ++it){
-            
+     if (!vec.empty() && vec.size() > 0) { //check if vector is empty, no scopes
+  	int curLevel = level;
+	while( curLevel >= 1 ) {
+  	  std::map <string, Decl*>::iterator it;
+          it =  vec.at(curLevel).find(searchID);
 
-    //std::map <string, Decl*>::iterator search =  *it->find(searchID);
-    std::pair< string, Decl*> search =  *it->find(searchID);
-
-            if(search.second != NULL ){  //THIS IS WRONG, SECOND is not null, need to check if null
-              return search.second;
-            }
-            else{
-              return NULL;
-            }
-
-
+          if(it != vec.at(curLevel).end() ){
+            return it->second;
           }
+      	  curLevel = curLevel -1; 
+          
+	}
+ 	return NULL;
+   }
+   else {
+     return NULL;
+      }
+}
+	   
 
-        }
 
-        return NULL;
-
-    }
-
-
-    // Add a new declared variable to current scope
-        //might have to change this to search through a specific array element
-    void SymbolTable::add(char* id, Decl* decl) {
+    void SymbolTable::insertCurScope(char* id, Decl* decl) {
 
       std::string searchID(id);
       if (vec.size() > 0) {
-          vec.front().insert (std::pair<string, Decl*>(searchID, decl));
+          vec.at(level).insert (std::pair<string, Decl*>(searchID, decl));
          } 
     }
 
    std::map<string, Decl*>  SymbolTable::getCurrentScope(){
-  printf("in symtab get curr scope. level is %d\n", level);
-printf("\n");
+//  printf("in symtab get curr scope. level is %d\n", level);
+
      return vec.at(level);
    } 
