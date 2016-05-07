@@ -108,29 +108,26 @@ int x = 4;
     Decl* SymbolTable::search(char* id) {
       std::string searchID(id);
 
-        if (!vec.empty()) { //check if vector is empty, no scopes
-  std::vector< map < string, Decl*> >::iterator it = vec.begin();
-          for (it ; it != vec.end(); ++it){
-            
+     if (!vec.empty() && vec.size() > 0) { //check if vector is empty, no scopes
+  	int curLevel = level;
+	while( curLevel >= 1 ) {
+  	  std::map <string, Decl*>::iterator it;
+          it =  vec.at(curLevel).find(searchID);
 
-    //std::map <string, Decl*>::iterator search =  *it->find(searchID);
-    std::pair< string, Decl*> search =  *it->find(searchID);
-
-            if(search.second != NULL ){  //THIS IS WRONG, SECOND is not null, need to check if null
-              return search.second;
-            }
-            else{
-              return NULL;
-            }
-
-
+          if(it != vec.at(curLevel).end() ){
+            return it->second;
           }
+      	  curLevel = curLevel -1; 
+          
+	}
+ 	return NULL;
+   }
+   else {
+     return NULL;
+      }
+}
+	   
 
-        }
-
-        return NULL;
-
-    }
 
     void SymbolTable::insertCurScope(char* id, Decl* decl) {
 
