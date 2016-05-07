@@ -93,7 +93,27 @@ ConditionalExpr::ConditionalExpr(Expr *c, Expr *t, Expr *f)
 
 
 //needs to be implemented 
-void ConditionalExpr::Check(){ int x; } ;
+void ConditionalExpr::Check(){   
+
+   Type* condType = NULL;
+   const char* name = NULL;
+
+  if(cond != NULL) {
+    cond -> Check();
+    condType = cond -> getType();
+    name = condType->getNameType();
+      if(!strcmp(name, "bool")) {
+          return;
+      }
+      else {
+
+         ReportError::TestNotBoolean(cond);         
+
+      }
+  }
+
+
+} ;
 
 
 void ConditionalExpr::PrintChildren(int indentLevel) {
@@ -117,8 +137,8 @@ void ArithmeticExpr::Check(){
    rightType = right -> getNameType();
 
    if( (left != NULL) && (right != NULL) ) { 
-      //if its int+float || float+int || or they are the same type, return, else return error
-      if( (!strcmp(leftType, "int") && !strcmp(rightType, "float")) || (!strcmp(leftType, "float") && !strcmp(rightType, "int")) || (!strcmp(leftType, rightType)) ) {
+      //if they are the same type, return, else return error
+      if( ((!strcmp(leftType, rightType))) ) {
          return; 
       }
       else {
@@ -152,8 +172,8 @@ void RelationalExpr::Check(){
    rightType = right -> getNameType();
 
    if( (left != NULL) && (right != NULL) ) { 
-      //if its int relational float || float relational int || or they are the same type, return, else return error
-      if( (!strcmp(leftType, "int") && !strcmp(rightType, "float")) || (!strcmp(leftType, "float") && !strcmp(rightType, "int")) || (!strcmp(leftType, rightType)) ) {
+      //if they are the same type, return, else return error
+      if( ((!strcmp(leftType, rightType)) )) {
          return; 
       }
       else {
@@ -162,8 +182,29 @@ void RelationalExpr::Check(){
    }
 }
 
-//needs to be implemented 
-void EqualityExpr::Check(){ int x; } ;
+//needs to be checked
+void EqualityExpr::Check(){ 
+   const char *leftType = NULL;
+   const char *rightType = NULL;
+       
+   if(left != NULL) {
+     left -> Check();
+     leftType = left -> getNameType();
+   }
+ 
+   right -> Check();
+   rightType = right -> getNameType();
+
+   if( (left != NULL) && (right != NULL)){
+      if (!strcmp(leftType, rightType)) {
+        return;
+       }
+
+       else {
+            ReportError::IncompatibleOperands(op, new Type(leftType), new Type(rightType));
+       }
+   }
+} 
 
 //needs to be checked
 void LogicalExpr::Check(){
@@ -195,15 +236,48 @@ void LogicalExpr::Check(){
 }
 
 
-//needs to be implemented 
-void AssignExpr::Check(){ int x; } ;
+//needs to be checked 
+void AssignExpr::Check(){ 
+     const char* leftType;
+     const char* rightType;
+     
+    if(left != NULL) {
+         left->Check();
+	 leftType = left -> getNameType();
+    }
+
+    if(right != NULL) {
+          right -> Check();
+	  rightType = right -> getNameType();
+    }
+    
+    if( (left != NULL) && (right != NULL)) {
+       if(!strcmp(leftType, rightType)) {
+          return;
+       }
+     else {
+       
+	 ReportError::IncompatibleOperands(op, new Type(leftType), new Type(rightType));
+      }     
+     }
+    } 
 
 
 
-//needs to be implemented 
-void PostfixExpr::Check(){ int x; } ;
-
-
+//needs to be checked 
+void PostfixExpr::Check(){ 
+ const char* leftType = NULL;
+ if(left != NULL) {
+    left->Check();
+    leftType = left -> getNameType();
+ }
+    if(!strcmp(leftType, "int") || !strcmp(leftType, "float") || !strcmp(leftType, "bool")) {
+          return;
+    }
+    else {
+         ReportError::IncompatibleOperand(op, new Type(leftType));
+    }
+}
 
 
 
