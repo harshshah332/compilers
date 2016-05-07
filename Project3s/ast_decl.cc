@@ -44,10 +44,10 @@ void VarDecl::PrintChildren(int indentLevel) {
 
 void VarDecl::Check(){
 
-printf("test in var decl \n");
-	std::map<string, Decl*> curScope = Node::symtab->getCurrentScope();
+//printf(" \ntest in var decl \n");
+
 	Decl* before = Node::symtab -> searchCurScope(this->GetIdentifier()->GetName());
-	puts(  this->GetIdentifier()->GetName());
+	//puts(  this->GetIdentifier()->GetName());
 
 	if ( before == NULL ) {
 
@@ -59,8 +59,10 @@ printf("test in var decl \n");
 			//report error that type does not match assignto
 		}
  */
-	printf("inserting \n");
-	curScope.insert( std::pair<string, Decl*>(this->GetIdentifier()->GetName(), this) );
+//	printf("inserting \n");
+
+	Node::symtab -> insertCurScope(this->GetIdentifier()->GetName(), this) ;
+//	printf("the size of the curscope map at this level is %d\n", static_cast<int>( Node::symtab->getCurrentScope().size()));
 
 	}
 	else{
