@@ -62,7 +62,10 @@ class Type : public Node
     bool IsMatrix();
     bool IsError();
     virtual const  char *getNameType(){
-        return typeName;
+	if(typeName != NULL) {
+        return typeName;}
+	else {
+	return NULL; }
     }
 };
 
