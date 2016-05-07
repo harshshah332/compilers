@@ -44,19 +44,23 @@ void VarDecl::PrintChildren(int indentLevel) {
 
 void VarDecl::Check(){
 
-printf("test");
+printf("test in var decl \n");
 	std::map<string, Decl*> curScope = Node::symtab->getCurrentScope();
-	Decl* before = Node::symtab -> searchCurScope(this->GetIdentifier()->GetName()); 
+	Decl* before = Node::symtab -> searchCurScope(this->GetIdentifier()->GetName());
+	puts(  this->GetIdentifier()->GetName());
 
 	if ( before == NULL ) {
 
-		if (this->type == assignTo->getType()) {
+	/*	if (this->type == assignTo->getType()) {
 			curScope.insert( std::pair<string, Decl*>(this->GetIdentifier()->GetName(), this) );
 		}
 		else{
 			ReportError::InvalidInitialization(this->GetIdentifier(), type, assignTo->getType());  
 			//report error that type does not match assignto
 		}
+ */
+	printf("inserting \n");
+	curScope.insert( std::pair<string, Decl*>(this->GetIdentifier()->GetName(), this) );
 
 	}
 	else{
@@ -69,6 +73,7 @@ printf("test");
 
 void FnDecl::Check(){
 
+/*
     if ( formals->NumElements() > 0 ) {
 	std::map<string, Decl*> fnDeclScope;
 	Node::symtab->push(fnDeclScope);
@@ -90,9 +95,10 @@ void FnDecl::Check(){
       }
           
         
-    }
+    } */
    if(body){   
-	body->Check();
+        StmtBlock *b = dynamic_cast<StmtBlock*>(body);
+	b->Check(formals);
    }
    
 }   

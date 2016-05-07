@@ -33,6 +33,7 @@ public:
   	Decl *search(char* id);
 	void add(char* id, Decl* decl);
    std::map<string, Decl*> getCurrentScope();
+//	static SymbolTable symtab;
 
 
 
