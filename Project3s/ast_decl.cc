@@ -47,7 +47,9 @@ void VarDecl::Check(){
 //printf(" \ntest in var decl \n");
 
 	Decl* before = Node::symtab -> searchCurScope(this->GetIdentifier()->GetName());
-	//puts(  this->GetIdentifier()->GetName());
+//	puts(  this->GetIdentifier()->GetName());
+
+//	printf("\n");
 
 	if ( before == NULL ) {
 
@@ -99,6 +101,7 @@ void FnDecl::Check(){
         
     } */
    if(body){   
+//printf("in fndecl. formals size is %d\n", static_cast<int>(formals->size()));
         StmtBlock *b = dynamic_cast<StmtBlock*>(body);
 	b->Check(formals);
    }

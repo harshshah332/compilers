@@ -44,7 +44,7 @@ void Program::Check() {
           
           if(decName) {
 		string t = std::string(decName);
-      //        printf("Decname trying to be added is %s\n",t.c_str());
+    //          printf("Decname trying to be added is %s\n",t.c_str());
               Decl* before = Node::symtab->searchCurScope(decName);
 
 
@@ -182,20 +182,6 @@ void ConditionalStmt::Check() {
 }
 */
 
-//do we even need a check? confirm?
-void ForStmt::Check(){
-
-   if(init != NULL){
-      init -> Check();
-   }
-   if(step != NULL){
-      step -> Check();
-   }
-
-
-
-}
-
 
 
 void BreakStmt::Check() {
@@ -231,6 +217,22 @@ void ContinueStmt::Check(){
 
 
 
+//do we even need a check? confirm?
+void ForStmt::Check(){
+
+   if(init != NULL){
+      init -> Check();
+   }
+   if(step != NULL){
+      step -> Check();
+   }
+
+   if( test->getType() != Type::boolType ) {	
+	ReportError::TestNotBoolean (test);
+   }
+  
+}
+
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) { 
     Assert(i != NULL && t != NULL && b != NULL);
@@ -238,6 +240,7 @@ ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
     step = s;
     if ( s )
       (step=s)->SetParent(this);
+
 }
 
 void ForStmt::PrintChildren(int indentLevel) {
@@ -266,6 +269,13 @@ void IfStmt::Check(){
     if(elseBody != NULL){
       elseBody -> Check();
     }
+
+
+   if( test->getType() != Type::boolType ) {	
+	ReportError::TestNotBoolean (test);
+   }
+  
+
 }
 
 IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) { 
