@@ -113,7 +113,24 @@ void ConditionalExpr::Check(){
   }
 
 
-} ;
+} 
+
+void VarExpr::Check() {
+
+ const char * idName = NULL;
+    if(id != NULL) 
+    {
+         idName = id -> GetName();
+    }
+     
+   Decl* vardecl = dynamic_cast<SymbolTable*>(this)->SymbolTable::search((char*)idName);
+   if(vardecl != NULL) {
+        return;
+   }
+  else {
+     ReportError::IdentifierNotDeclared(id, LookingForVariable);
+  }
+}
 
 
 void ConditionalExpr::PrintChildren(int indentLevel) {
