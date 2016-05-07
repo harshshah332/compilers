@@ -12,7 +12,7 @@
 //SymbolTable *Program::symtab = new SymbolTable();
 
 
-
+const char *Program::fnReturnType = NULL;
 Program::Program(List<Decl*> *d) {
     Assert(d != NULL);
     (decls=d)->SetParentAll(this);
@@ -44,7 +44,7 @@ void Program::Check() {
           
           if(decName) {
 		string t = std::string(decName);
-    //          printf("Decname trying to be added is %s\n",t.c_str());
+//               printf("Decname trying to be added is %s\n",t.c_str());
               Decl* before = Node::symtab->searchCurScope(decName);
 
 
@@ -203,10 +203,10 @@ void ContinueStmt::Check(){
   Node *parent = this->GetParent();
   while (parent)
     {
-      if ((dynamic_cast<WhileStmt*>(parent)!=NULL) ||
-          (dynamic_cast<SwitchStmt*>(parent)!=NULL) )
-     //     || (dynamic_cast<ForStmt*>(parent)!=NULL) )  can we have continue inside ifStmt? confirm?
-      {
+      if ((dynamic_cast<WhileStmt*>(parent)!=NULL) 
+     //     (dynamic_cast<SwitchStmt*>(parent)!=NULL) ) can we have continue inside ifStmt? confirm?
+         || (dynamic_cast<ForStmt*>(parent)!=NULL) )     
+       {
        return; 
       }
 
@@ -251,11 +251,16 @@ void ForStmt::PrintChildren(int indentLevel) {
     body->Print(indentLevel+1, "(body) ");
 }
 
-//needs implementation
 void WhileStmt::Check(){
 
-int x;
+  if (body != NULL) {
+    
+      body -> Check();
+   }
 
+   if( test->getType() != Type::boolType ) {	
+	ReportError::TestNotBoolean (test);
+   }
 
 
 } 
@@ -296,13 +301,77 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
     if (e != NULL) expr->SetParent(this);
 }
 
-//needs to be implemented
-void ReturnStmt::Check(){ int x; }
+// returns a seg fault, the getNameType returns null
+void ReturnStmt::Check(){
+
+  if(expr != NULL){
+    const char * given;
+    given =  expr->getType()->getNameType();
+
+   if ( !strcmp(given, Program::fnReturnType) ) { //if they are the same type,return
+     return; 
+   }
+  
+   else{
+     if( !strcmp(given, "null")){  //if the given type is null, return
+	return;
+     }  
+     ReportError::ReturnMismatch(this, new Type(given), new Type(Program::fnReturnType));  //else report error
+   }
+  }
+  //if no return type give, and the fnReturnType is not void, return error
+  else if ( strcmp( Program::fnReturnType, "void") ){  
+    ReportError::ReturnMismatch(this, new Type("void"), new Type(Program::fnReturnType));
+    
+  }
+   
+
+}
 
 void ReturnStmt::PrintChildren(int indentLevel) {
     if ( expr ) 
       expr->Print(indentLevel+1);
 }
+
+void SwitchStmt::Check() {
+
+   if( expr != NULL){
+	expr -> Check();
+   }
+
+   if( cases != NULL){
+      for ( int i = 0; i < cases->NumElements(); ++i ) {
+	cases->Nth(i)->Check();
+      }
+   }
+
+   if( def != NULL){
+        def -> Check();
+   }
+
+
+}
+
+
+void Case::Check() {
+
+   if (label != NULL){
+	label->Check();
+   }
+
+   if (stmt != NULL){
+	stmt -> Check();
+   }
+}
+
+void Default::Check() {
+
+   if (stmt != NULL){
+	stmt -> Check();
+   }
+}
+
+
 
 SwitchLabel::SwitchLabel(Expr *l, Stmt *s) {
     Assert(l != NULL && s != NULL);
