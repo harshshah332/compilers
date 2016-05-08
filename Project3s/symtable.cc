@@ -98,11 +98,36 @@ int x = 4;
       }
 }
 
+    // Find the location of the id in all scopes
+    // if not found returns NULL
+
+    Decl* SymbolTable::searchAllScopes(char* id) {
+      std::string searchID(id);
+
+     if (!vec.empty() && vec.size() > 0) { //check if vector is empty, no scopes
+  	int curLevel = level;
+	while( curLevel >= 0 ) {
+  	  std::map <string, Decl*>::iterator it;
+          it =  vec.at(curLevel).find(searchID);
+
+          if(it != vec.at(curLevel).end() ){
+            return it->second;
+          }
+      	  curLevel = curLevel -1; 
+          
+	}
+ 	return NULL;
+   }
+   else {
+     return NULL;
+      }
+}
+	
 
 
 
 
-    // Find the location of the id in the nearest scope
+    // Find the location of the id in all the scopes except global
     // if not found returns NULL
 
     Decl* SymbolTable::search(char* id) {
@@ -137,8 +162,8 @@ int x = 4;
          } 
     }
 
-   std::map<string, Decl*>  SymbolTable::getCurrentScope(){
+   std::map<string, Decl*> & SymbolTable::getCurrentScope(){
 //  printf("in symtab get curr scope. level is %d\n", level);
 
-     return vec.at(level);
+     return vec.back();// vec.at(level);
    } 

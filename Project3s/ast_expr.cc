@@ -90,10 +90,37 @@ ConditionalExpr::ConditionalExpr(Expr *c, Expr *t, Expr *f)
     (falseExpr=f)->SetParent(this);
 }
 
+void VarExpr::Check(){
 
+          char *vid = id->GetName();
+          
+          if(vid) {
+              
+              Decl* before = NULL;
+ 	      before = Node::symtab->searchAllScopes(vid);		
+   
+              if(before == NULL){
+                 ReportError::IdentifierNotDeclared(id, LookingForType);                  
+              }
+
+
+              }
+      } 
 
 //needs to be implemented 
-void ConditionalExpr::Check(){ int x; } ;
+void ConditionalExpr::Check(){   
+printf("in conditionalexpr\n");
+    cond -> Check();
+    if(cond->getType() == Type::boolType ) {
+          return;
+      }
+      else {
+
+         ReportError::TestNotBoolean(cond);         
+
+      }
+  }
+
 
 
 void ConditionalExpr::PrintChildren(int indentLevel) {
@@ -104,106 +131,119 @@ void ConditionalExpr::PrintChildren(int indentLevel) {
 
 //needs to be checked 
 void ArithmeticExpr::Check(){
-
-   const char *leftType = NULL;
-   const char *rightType = NULL;
-
-   if(left != NULL){		
-      left -> Check();
-      leftType = left -> getNameType();
-   }
-
+  printf("sdfsdf");
+ if(left != NULL) { 
+   left -> Check();
    right -> Check();
-   rightType = right -> getNameType();
+printf(" in arithmetic");
 
-   if( (left != NULL) && (right != NULL) ) { 
-      //if its int+float || float+int || or they are the same type, return, else return error
-      if( (!strcmp(leftType, "int") && !strcmp(rightType, "float")) || (!strcmp(leftType, "float") && !strcmp(rightType, "int")) || (!strcmp(leftType, rightType)) ) {
-         return; 
-      }
-      else {
-	 ReportError::IncompatibleOperands(op, new Type(leftType), new Type(rightType));
-      }     
-   }
+if ( (left->getType() -> IsEquivalentTo(right->getType())) != true ) {
+ ReportError::IncompatibleOperands(op, left->getType(), right->getType());
+}
 
-//if the right side is not and int or a double
-   else if (right != NULL) {
-      if ( !strcmp(rightType, "int") || !strcmp(rightType, "double")){
-        return;
-      }
-      else{
-         ReportError::IncompatibleOperand(op, new Type(rightType));
-     }
-   }
+ 
+   if( (left->getType() == Type::boolType) || (left->getType() == Type::voidType) || (right->getType() == Type::boolType) || (right->getType() == Type::boolType) ) { 
+
+	 ReportError::IncompatibleOperands(op, left->getType(), right->getType()) ;
+      } 
+}  
+
+else{
+
+  right -> Check();
+printf(" in arithmetic right");
+  
+
+   if( (right->getType() == Type::boolType) || (right->getType() == Type::boolType) ) { 
+
+	 ReportError::IncompatibleOperand(op, right->getType()) ;
+      } 
+
+
+
+}  
+  
 }
 
 
 //needs to be checked 
 void RelationalExpr::Check(){
-   const char *leftType = NULL;
-   const char *rightType = NULL;
-
- 	
+  
    left -> Check();
-   leftType = left -> getNameType();
-   
-
    right -> Check();
-   rightType = right -> getNameType();
-
-   if( (left != NULL) && (right != NULL) ) { 
-      //if its int relational float || float relational int || or they are the same type, return, else return error
-      if( (!strcmp(leftType, "int") && !strcmp(rightType, "float")) || (!strcmp(leftType, "float") && !strcmp(rightType, "int")) || (!strcmp(leftType, rightType)) ) {
-         return; 
-      }
-      else {
-	 ReportError::IncompatibleOperands(op, new Type(leftType), new Type(rightType));
+printf("in relatinalexpr");
+   
+  if( ( (left->getType() == Type::intType) || (left->getType() == Type::floatType) || (right->getType() == Type::intType) || (right->getType() == Type::floatType) ) && ( left->getType()->IsEquivalentTo(right->getType()) )  ) { 
+	return;
+	}
+	else {
+	 ReportError::IncompatibleOperands(op, left->getType(), right->getType()) ;
       }     
-   }
+  
 }
 
-//needs to be implemented 
-void EqualityExpr::Check(){ int x; } ;
+//needs to be checked
+void EqualityExpr::Check(){ 
+
+left->Check();
+right->Check();
+
+printf("in equalityexpr\n");
+   if( (left->getType()->IsEquivalentTo(right->getType())) ){
+      return;
+    }
+
+       else {
+            ReportError::IncompatibleOperands(op, left->getType(), right->getType());
+       }
+  } 
 
 //needs to be checked
 void LogicalExpr::Check(){
-   const char *leftType = NULL;
-   const char *rightType = NULL;
+   
+left->Check();
+right->Check();
+printf("in logical\n");
 
-   if(left != NULL){		
-      left -> Check();
-      leftType = left -> getNameType();
-   }
-
-   right -> Check();
-   rightType = right -> getNameType();
-
-   if( (left != NULL) && (right != NULL) ) {
-      if ( strcmp(rightType, "bool") || strcmp(leftType, "bool") ){
-         ReportError::IncompatibleOperands(op, new Type(leftType), new Type(rightType));
+if( (left->getType() == Type::boolType) && (right->getType() == Type::boolType) ) {
+         ReportError::IncompatibleOperands(op, left->getType(), right->getType() );
       }
         
-   }
-   else if (rightType != NULL) {
-
-      if (strcmp(rightType, "bool")) {
-         ReportError::IncompatibleOperand(op, new Type(rightType));
-      }
-       
-   }
-
+ 
 }
 
 
-//needs to be implemented 
-void AssignExpr::Check(){ int x; } ;
+//needs to be checked 
+void AssignExpr::Check(){ 
+   printf("in assign \n");  
+left->Check();
+right->Check();
+    if( left->getType() != NULL && right->getType() != NULL){
+    if( left->getType()->IsEquivalentTo(right->getType()) ) {
+      return; 
+    }    
+      else {
+       		
+          VarExpr *v = dynamic_cast<VarExpr*>(left);
+	  ReportError::InvalidInitialization(v->GetIdentifier(),  left->getType(), right->getType());
+      }     
+     }
+} 
 
 
 
-//needs to be implemented 
-void PostfixExpr::Check(){ int x; } ;
+//needs to be checked 
+void PostfixExpr::Check(){ 
+   printf("in postfix \n");  
+left->Check();
+   
 
-
+    if( left->getType() == Type::boolType || left->getType() == Type::voidType  ) {
+          ReportError::IncompatibleOperand(op, left->getType());
+    }
+    
+	else return;
+}
 
 
 

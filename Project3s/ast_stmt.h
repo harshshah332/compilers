@@ -22,7 +22,7 @@ class Decl;
 class VarDecl;
 class Expr;
 class IntConstant;
-  
+class Type;
 void yyerror(const char *msg);
 
 class Program : public Node
@@ -35,7 +35,9 @@ class Program : public Node
      const char *GetPrintNameForNode() { return "Program"; }
      void PrintChildren(int indentLevel);
      virtual void Check();
-     static const char *fnReturnType;
+     static Type *fnReturnType;
+     static int returnExist; 
+   //  static FnDecl *funcDecl;
  
 };
 
