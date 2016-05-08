@@ -95,8 +95,8 @@ void VarExpr::Check(){
           char *vid = id->GetName();
           
           if(vid) {
-               printf("looking for ");
-   	       puts(vid); printf("\n");
+           //    printf("looking for ");
+   	 //      puts(vid); printf("\n");
               Decl* before = NULL;
  	      before = Node::symtab->searchAllScopes(vid);		
    
