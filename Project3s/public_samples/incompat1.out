@@ -1,6 +1,4 @@
+in symtab searchcurscope, its not empty, level is 0
+in symtab get curr scope. level is 0
 
-*** Error line 6.
-	y = x;	
-          ^
-*** Incompatible operands: float = int
-
+the size on starting is 1

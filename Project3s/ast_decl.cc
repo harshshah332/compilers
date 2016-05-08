@@ -46,15 +46,17 @@ void VarDecl::Check(){
 
 //printf(" \ntest in var decl \n");
 
-	Decl* before = Node::symtab -> searchCurScope(this->GetIdentifier()->GetName());
+	Decl* before = Node::symtab -> searchAllScopes(this->GetIdentifier()->GetName());
 //	puts(  this->GetIdentifier()->GetName());
 
 //	printf("\n");
 
 	if ( before == NULL ) {
-/*           if(this->assignTo != NULL) {
+           if(this->assignTo != NULL) {
+ 
+		assignTo->Check();
                
-                if ( Node::symtab->search(assignTo->GetIdentifier()->GetName()) != NULL ) {
+       //         if ( Node::symtab->searchAllScopes(assignTo->GetIdentifier()->GetName()) != NULL ) {
                    if (this->type != assignTo->getType()) {
 			 ReportError::InvalidInitialization(this->GetIdentifier(), this->type, assignTo->getType());  
 			//report error that type does not match assignto
@@ -63,17 +65,17 @@ void VarDecl::Check(){
 			Node::symtab -> insertCurScope(this->GetIdentifier()->GetName(), this) ;	
                    }
 	           
-               }
+         /*      }
 	         else{
 	           ReportError::IdentifierNotDeclared ((assignTo->GetIdentifier(), LookingForVariable)
 			//report error that its looking for the variable to assign it to
-	        }
+	        } */
 
 
 
-          }  */
+          }  
 //	printf("inserting \n");
-	Node::symtab -> insertCurScope(this->GetIdentifier()->GetName(), this) ;
+	//Node::symtab -> insertCurScope(this->GetIdentifier()->GetName(), this) ;
 //	printf("the size of the curscope map at this level is %d\n", static_cast<int>( Node::symtab->getCurrentScope().size()));
 
 	}
@@ -97,7 +99,7 @@ void FnDecl::Check(){
        char * decName = this->GetIdentifier()->GetName();
           if(decName) {
 		string t = std::string(decName);
-               printf("fnName trying to be added is %s\n",t.c_str());
+//               printf("fnName trying to be added is %s\n",t.c_str());
               Decl* before = Node::symtab->searchCurScope(decName);
 
 
@@ -114,7 +116,7 @@ void FnDecl::Check(){
 
 
    if(body){   
-printf("in fndecl. formals size is %d\n", static_cast<int>(formals->NumElements()));
+//printf("in fndecl. formals size is %d\n", static_cast<int>(formals->NumElements()));
         StmtBlock *b = dynamic_cast<StmtBlock*>(body);
 	b->Check(formals);
        // b->Check();

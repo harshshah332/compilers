@@ -95,7 +95,7 @@ void StmtBlock::Check(List<VarDecl*> *formals){
 
 if(formals!=NULL){
     if ( formals->NumElements() > 0 ){
-	printf("formals != null,  formals numelements is %d\n", formals->NumElements());
+//	printf("formals != null,  formals numelements is %d\n", formals->NumElements());
 
       for ( int i = 0; i < formals->NumElements(); ++i ) {
           Decl *vd = formals->Nth(i);

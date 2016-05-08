@@ -4,12 +4,11 @@ int x;
 void main()
 {
    int y;
-   vec2 v;
-
-   if ( x > 1 ) {
+ int x;
+   if ( x  ) {
      y = x;
    } else {
-     y = v.xz;
+     y = x
    }
 }
 

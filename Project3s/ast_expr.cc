@@ -95,17 +95,22 @@ void VarExpr::Check(){
           char *vid = id->GetName();
           
           if(vid) {
-              
+               printf("looking for ");
+   	       puts(vid); printf("\n");
               Decl* before = NULL;
  	      before = Node::symtab->searchAllScopes(vid);		
    
               if(before == NULL){
                  ReportError::IdentifierNotDeclared(id, LookingForType);                  
               }
+       	     else{
 
+ 	       VarDecl *vd = dynamic_cast<VarDecl *>(before);
+	       this->type = vd->GetType();
+  	     }	
 
-              }
-      } 
+         }
+} 
 
 //needs to be implemented 
 void ConditionalExpr::Check(){   
@@ -220,12 +225,14 @@ left->Check();
 right->Check();
     if( left->getType() != NULL && right->getType() != NULL){
     if( left->getType()->IsEquivalentTo(right->getType()) ) {
+printf("about to return");
       return; 
     }    
       else {
        		
           VarExpr *v = dynamic_cast<VarExpr*>(left);
-	  ReportError::InvalidInitialization(v->GetIdentifier(),  left->getType(), right->getType());
+	  //ReportError::InvalidInitialization(v->GetIdentifier(),  left->getType(), right->getType());
+	 ReportError::IncompatibleOperands(op, left->getType(), right->getType() );
       }     
      }
 } 
