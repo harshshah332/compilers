@@ -88,40 +88,41 @@ void VarDecl::Check(){
 
 void FnDecl::Check(){
 
-/*
-    if ( formals->NumElements() > 0 ) {
-	std::map<string, Decl*> fnDeclScope;
-	Node::symtab->push(fnDeclScope);
-      for ( int i = 0; i < formals->NumElements(); ++i ) {
-          VarDecl *vd = formals->Nth(i);
-          char *decName = vd->GetIdentifier()->GetName();
-          
-          if(decName) {
-              
-              Decl* before = Node::symtab->searchCurScope(decName);
-              if(before != NULL){
-                  ReportError::DeclConflict(vd, before);     
-              }
-              else{
-		  fnDeclScope.insert(std::pair<string, Decl*>(decName, vd));
-                                   
-              }
-          }
-      }
-          
-        
-    } */
 
    if(returnType != NULL){
-	Program::fnReturnType = returnType->getNameType();
-puts(Program::fnReturnType);
+	Program::fnReturnType = returnType;
+//puts(Program::fnReturnType);
 }
 
+       char * decName = this->GetIdentifier()->GetName();
+          if(decName) {
+		string t = std::string(decName);
+               printf("fnName trying to be added is %s\n",t.c_str());
+              Decl* before = Node::symtab->searchCurScope(decName);
+
+
+              if(before != NULL){
+                  ReportError::DeclConflict(this, before);
+                  
+              }
+              else{  // printf("yee decname is not there before\n");
+                  Node::symtab->insertCurScope(decName, this);
+                  
+              }
+          } 
+
+
+
    if(body){   
-//printf("in fndecl. formals size is %d\n", static_cast<int>(formals->size()));
+printf("in fndecl. formals size is %d\n", static_cast<int>(formals->NumElements()));
         StmtBlock *b = dynamic_cast<StmtBlock*>(body);
 	b->Check(formals);
+       // b->Check();
    }
+/*
+if (Program::returnExist == (0 || 1 )){
+ReportError::ReturnMissing(this);
+} */
    
 }   
 

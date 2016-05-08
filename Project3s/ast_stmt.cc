@@ -11,8 +11,10 @@
 
 //SymbolTable *Program::symtab = new SymbolTable();
 
+Type *Program::fnReturnType = NULL;
+int Program::returnExist = 0;
+//FnDecl *Program::funcDecl = NULL;
 
-const char *Program::fnReturnType = NULL;
 Program::Program(List<Decl*> *d) {
     Assert(d != NULL);
     (decls=d)->SetParentAll(this);
@@ -41,7 +43,7 @@ void Program::Check() {
       for ( int i = 0; i < decls->NumElements(); ++i ) {
         Decl *d = decls->Nth(i);
             char *decName = d->GetIdentifier()->GetName();
-          
+      /*    
           if(decName) {
 		string t = std::string(decName);
 //               printf("Decname trying to be added is %s\n",t.c_str());
@@ -56,7 +58,7 @@ void Program::Check() {
                   Node::symtab->insertCurScope(decName, d);
                   
               }
-          }
+          } */
 //printf("the level is %d\n",(Node::symtab->level) ); 
 
 	  d->Check();
@@ -93,7 +95,7 @@ void StmtBlock::Check(List<VarDecl*> *formals){
 
 if(formals!=NULL){
     if ( formals->NumElements() > 0 ){
-//	printf("stmts numelements is %d\n", stmts->NumElements());
+	printf("formals != null,  formals numelements is %d\n", formals->NumElements());
 
       for ( int i = 0; i < formals->NumElements(); ++i ) {
           Decl *vd = formals->Nth(i);
@@ -102,9 +104,9 @@ if(formals!=NULL){
           if(decName) {
               
               Decl* before = NULL;
- 	      std::map <string, Decl*>::iterator it = stmtScope.find(decName);
+ 	      std::map <string, Decl*>::iterator it = symtab->getCurrentScope().find(decName);
 
-	      if(it != stmtScope.end()){
+	      if(it != symtab->getCurrentScope().end()){
 	          before = it->second;
 	      }
 
@@ -113,7 +115,8 @@ if(formals!=NULL){
                   
               }
               else{
-                  stmtScope.insert(std::pair<string, Decl*>(decName, vd));
+                  symtab->insertCurScope(decName, vd);
+//	printf("just for test\n");
               }
           }
       } 
@@ -124,8 +127,8 @@ if(formals!=NULL){
 }
 
     if ( stmts->NumElements() > 0 ){
-//	printf("stmts numelements is %d\n", stmts->NumElements());
-
+	printf("stmts numelements is %d\n", stmts->NumElements());
+	printf("cur level is %d\n", Node::symtab->level);
       for ( int i = 0; i < stmts->NumElements(); ++i ) {
 //printf("in for loop. I is %d\n", i);
 
@@ -243,6 +246,8 @@ ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
 
 }
 
+
+
 void ForStmt::PrintChildren(int indentLevel) {
     init->Print(indentLevel+1, "(init) ");
     test->Print(indentLevel+1, "(test) ");
@@ -274,7 +279,9 @@ void IfStmt::Check(){
     if(elseBody != NULL){
       elseBody -> Check();
     }
-
+    if(body != NULL) {
+    body->Check();
+}
 
    if( test->getType() != Type::boolType ) {	
 	ReportError::TestNotBoolean (test);
@@ -304,26 +311,25 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
 // returns a seg fault, the getNameType returns null
 void ReturnStmt::Check(){
 
-  if(expr != NULL){
-    const char * given;
-    given =  expr->getType()->getNameType();
+//Boolean *t = true;
+//int * t = 1;
+Program::returnExist = 1;
+    Type *given = NULL;
+    if(expr == NULL) { 
+    given = Type::voidType;
+    } else {
+    given =  expr->getType();
+    }
 
-   if ( !strcmp(given, Program::fnReturnType) ) { //if they are the same type,return
+   if ( given->IsEquivalentTo(Program::fnReturnType) ) { //if they are the same type,return
      return; 
    }
   
    else{
-     if( !strcmp(given, "null")){  //if the given type is null, return
-	return;
-     }  
-     ReportError::ReturnMismatch(this, new Type(given), new Type(Program::fnReturnType));  //else report error
+ 
+     ReportError::ReturnMismatch(this, given, Program::fnReturnType);  //else report error
    }
-  }
-  //if no return type give, and the fnReturnType is not void, return error
-  else if ( strcmp( Program::fnReturnType, "void") ){  
-    ReportError::ReturnMismatch(this, new Type("void"), new Type(Program::fnReturnType));
-    
-  }
+ 
    
 
 }
