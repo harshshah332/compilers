@@ -95,8 +95,8 @@ void VarExpr::Check(){
           char *vid = id->GetName();
           
           if(vid) {
-           //    printf("looking for ");
-   	 //      puts(vid); printf("\n");
+              // printf("looking for ");
+   	     //  puts(vid); printf("\n");
               Decl* before = NULL;
  	      before = Node::symtab->searchAllScopes(vid);		
    
@@ -114,7 +114,7 @@ void VarExpr::Check(){
 
 //needs to be implemented 
 void ConditionalExpr::Check(){   
-printf("in conditionalexpr\n");
+//printf("in conditionalexpr\n");
     cond -> Check();
     if(cond->getType() == Type::boolType ) {
           return;
@@ -136,11 +136,11 @@ void ConditionalExpr::PrintChildren(int indentLevel) {
 
 //needs to be checked 
 void ArithmeticExpr::Check(){
-  printf("sdfsdf");
+//  printf("sdfsdf");
  if(left != NULL) { 
    left -> Check();
    right -> Check();
-printf(" in arithmetic");
+//printf(" in arithmetic");
 
 if ( (left->getType() -> IsEquivalentTo(right->getType())) != true ) {
  ReportError::IncompatibleOperands(op, left->getType(), right->getType());
@@ -156,7 +156,7 @@ if ( (left->getType() -> IsEquivalentTo(right->getType())) != true ) {
 else{
 
   right -> Check();
-printf(" in arithmetic right");
+//printf(" in arithmetic right");
   
 
    if( (right->getType() == Type::boolType) || (right->getType() == Type::boolType) ) { 
@@ -176,7 +176,7 @@ void RelationalExpr::Check(){
   
    left -> Check();
    right -> Check();
-printf("in relatinalexpr");
+//printf("in relatinalexpr");
    
   if( ( (left->getType() == Type::intType) || (left->getType() == Type::floatType) || (right->getType() == Type::intType) || (right->getType() == Type::floatType) ) && ( left->getType()->IsEquivalentTo(right->getType()) )  ) { 
 	return;
@@ -193,7 +193,7 @@ void EqualityExpr::Check(){
 left->Check();
 right->Check();
 
-printf("in equalityexpr\n");
+//printf("in equalityexpr\n");
    if( (left->getType()->IsEquivalentTo(right->getType())) ){
       return;
     }
@@ -208,7 +208,7 @@ void LogicalExpr::Check(){
    
 left->Check();
 right->Check();
-printf("in logical\n");
+//printf("in logical\n");
 
 if( (left->getType() == Type::boolType) && (right->getType() == Type::boolType) ) {
          ReportError::IncompatibleOperands(op, left->getType(), right->getType() );
@@ -220,12 +220,12 @@ if( (left->getType() == Type::boolType) && (right->getType() == Type::boolType) 
 
 //needs to be checked 
 void AssignExpr::Check(){ 
-   printf("in assign \n");  
+ //  printf("in assign \n");  
 left->Check();
 right->Check();
     if( left->getType() != NULL && right->getType() != NULL){
     if( left->getType()->IsEquivalentTo(right->getType()) ) {
-printf("about to return");
+//printf("about to return");
       return; 
     }    
       else {
@@ -241,7 +241,7 @@ printf("about to return");
 
 //needs to be checked 
 void PostfixExpr::Check(){ 
-   printf("in postfix \n");  
+ //  printf("in postfix \n");  
 left->Check();
    
 
@@ -263,7 +263,7 @@ void ArrayAccess::PrintChildren(int indentLevel) {
     base->Print(indentLevel+1);
     subscript->Print(indentLevel+1, "(subscript) ");
 }
- 
+ /*
 //needs to be implemented
 const char *ArrayAccess::getNameType(){
 	return NULL;
@@ -272,10 +272,15 @@ const char *ArrayAccess::getNameType(){
 //needs to be implemented
 Type *ArrayAccess::getType(){
 	return NULL;
-}
+} */
 
 //needs to be implemented 
-void ArrayAccess::Check(){ int x; } ;
+void ArrayAccess::Check(){
+
+base->Check();
+subscript -> Check();
+	Type *t = base->getType();
+ }
 
 FieldAccess::FieldAccess(Expr *b, Identifier *f) 
   : LValue(b? Join(b->GetLocation(), f->GetLocation()) : *f->GetLocation()) {
@@ -309,4 +314,52 @@ void Call::PrintChildren(int indentLevel) {
 }
 
 //needs to be implemented 
-void Call::Check(){ int x; } ;
+void Call::Check(){ 
+//printf("here");
+Decl* d = Node::symtab->searchAllScopes(field->GetName());
+FnDecl *fn = NULL;
+
+if(d==NULL){
+  ReportError::IdentifierNotDeclared(field, LookingForFunction);
+  return;
+}
+else{
+fn = dynamic_cast<FnDecl*>(d);
+ if(fn==NULL){
+  ReportError::NotAFunction(field);
+ // return;
+} 
+//printf("here3\n");
+else if( actuals->NumElements() > fn->GetFormals()->NumElements() )
+{
+  this->type = fn->GetType();
+  ReportError::ExtraFormals(field, fn->GetFormals()->NumElements(),  actuals->NumElements());
+  //return;
+}
+
+
+//printf("here4\n");
+else if( actuals->NumElements() < fn->GetFormals()->NumElements() )
+{
+  this->type = fn->GetType();   
+  ReportError::LessFormals(field, fn->GetFormals()->NumElements(), actuals->NumElements());
+//  return;
+}
+else{
+   this->type = fn->GetType();
+  
+  //  printf("Actuals elements = %d\n", actuals->NumElements());
+      for ( int i = 0; i < actuals->NumElements(); i++ ) {
+//	printf("Here in for\n");
+        Expr *e = actuals->Nth(i);
+	e->Check();
+//	printf("formals size is %d, we are at index %d\n", fn->GetFormals()->NumElements(), i);
+	VarDecl *vd = fn->GetFormals()->Nth(i);
+	//vd->Check();
+	if( (e->getType() -> IsEquivalentTo(vd->GetType()) ) == false){
+  	  ReportError::FormalsTypeMismatch(field, i, vd->GetType(),  e->getType());
+	}
+      } 
+   }
+  }
+} 

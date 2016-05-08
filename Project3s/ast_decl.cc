@@ -58,7 +58,10 @@ void VarDecl::Check(){
 		assignTo->Check();
                
        //         if ( Node::symtab->searchAllScopes(assignTo->GetIdentifier()->GetName()) != NULL ) {
-                   if (this->type != assignTo->getType()) {
+                   if (this->type != assignTo->getType()) { //printf("in init\n");
+	//	puts(assignTo->getType()->getNameType());
+	//	FnDecl* fn = NULL;// dynamic_cast<FnDecl*>(Node::symtab->searchAllScopes(assignTo->GetIdentifier()->GetName()));
+	//	if(fn!=NULL){printf("fndecl type is "); }//puts(fn->GetType()->getNameType()); }
 			 ReportError::InvalidInitialization(this->GetIdentifier(), this->type, assignTo->getType());  
 			//report error that type does not match assignto
 	    	   }  	
@@ -129,7 +132,7 @@ void FnDecl::Check(){
        // b->Check();
    }
 
-if (Program::returnExist == 0) {
+if (Program::returnExist == 0 && returnType != Type::voidType) {
 ReportError::ReturnMissing(this);
 } 
    

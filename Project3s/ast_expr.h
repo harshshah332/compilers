@@ -275,8 +275,16 @@ class ArrayAccess : public LValue
     ArrayAccess(yyltype loc, Expr *base, Expr *subscript);
     const char *GetPrintNameForNode() { return "ArrayAccess"; }
     void PrintChildren(int indentLevel);
-    Type *getType();
-    const char *getNameType();
+    Type *getType() {
+        return type;
+    }
+    const char *GetNameType() {
+        if (type!= NULL){
+            return type->getNameType();
+        }
+        else
+            return NULL;
+    }
     void Check();
 };
 
