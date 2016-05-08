@@ -60,7 +60,8 @@ class Node  {
     yyltype *GetLocation()   { return location; }
     void SetParent(Node *p)  { parent = p; }
     Node *GetParent()        { return parent; }
-    static SymbolTable *symtab; 
+    static SymbolTable *symtab;
+     
 
     virtual const char *GetPrintNameForNode() = 0;
     

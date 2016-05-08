@@ -127,8 +127,8 @@ if(formals!=NULL){
 }
 
     if ( stmts->NumElements() > 0 ){
-	printf("stmts numelements is %d\n", stmts->NumElements());
-	printf("cur level is %d\n", Node::symtab->level);
+//	printf("stmts numelements is %d\n", stmts->NumElements());
+//	printf("cur level is %d\n", Node::symtab->level);
       for ( int i = 0; i < stmts->NumElements(); ++i ) {
 //printf("in for loop. I is %d\n", i);
 
@@ -317,11 +317,32 @@ Program::returnExist = 1;
     Type *given = NULL;
     if(expr == NULL) { 
     given = Type::voidType;
+//	printf("given is null, so set as void");
     } else {
+	expr->Check();
     given =  expr->getType();
     }
+VarDecl *returnDecl = dynamic_cast<VarDecl*>(given);
+//if the return type is a varexpr, then check if that varexpr exists in current scope, 
+//if not, then return not declared error, else check if its type matches with return, and 
+//report error or return
+if(returnDecl != NULL){
+   if( (Node::symtab->searchCurScope(returnDecl->GetIdentifier()->GetName()) == NULL) || (Node::symtab->searchHead(returnDecl->GetIdentifier()->GetName()) == NULL)  ){
+	ReportError::IdentifierNotDeclared(returnDecl->GetIdentifier(), LookingForVariable);
+   }
+     else if ( given->IsEquivalentTo( Program::fnReturnType) != true ) { //if they are not the same type,return error, else return
+       ReportError::ReturnMismatch(this, given, Program::fnReturnType);  //else report error
+     }
+  
+     else{
+ 
+	return;    
+     }
+}
 
-   if ( given->IsEquivalentTo(Program::fnReturnType) ) { //if they are the same type,return
+//if the return type is not a varexpr, then check if its type matches with return, and
+//report error or return
+   if ( given->IsEquivalentTo( Program::fnReturnType) ) { //if they are the same type,return
      return; 
    }
   
@@ -332,7 +353,8 @@ Program::returnExist = 1;
  
    
 
-}
+}   
+
 
 void ReturnStmt::PrintChildren(int indentLevel) {
     if ( expr ) 
