@@ -104,9 +104,9 @@ int x = 4;
     Decl* SymbolTable::searchAllScopes(char* id) {
       std::string searchID(id);
 
-     if (!vec.empty() && vec.size() > 0) { //check if vector is empty, no scopes
+     if (!vec.empty() && vec.size() >= 0) { //check if vector is empty, no scopes
   	int curLevel = level;
-	printf("incurscope, level is %d, looking for\n", level);
+//	printf("incurscope, level is %d, looking for\n", level);
 	puts(id);
 	while( curLevel >= 0 ) {
   	  std::map <string, Decl*>::iterator it;
@@ -161,7 +161,12 @@ int x = 4;
       std::string searchID(id);
       if (vec.size() > 0) {
           vec.at(level).insert (std::pair<string, Decl*>(searchID, decl));
-         } 
+         
+  //printf("in symtab insert curr scope. level is %d. Just inserted ", level);
+ //  puts(id);
+//printf("\n");
+
+} 
     }
 
    std::map<string, Decl*> & SymbolTable::getCurrentScope(){

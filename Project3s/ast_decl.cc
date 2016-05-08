@@ -45,8 +45,9 @@ void VarDecl::PrintChildren(int indentLevel) {
 void VarDecl::Check(){
 
 //printf(" \ntest in var decl \n");
-
-	Decl* before = Node::symtab -> searchAllScopes(this->GetIdentifier()->GetName());
+	//call symtab->searchCurScope, which searches the current scope, we can declare a 
+	//variable in method with same as in any scope except current scope
+	Decl* before = Node::symtab -> searchCurScope(this->GetIdentifier()->GetName());
 //	puts(  this->GetIdentifier()->GetName());
 
 //	printf("\n");
@@ -74,9 +75,13 @@ void VarDecl::Check(){
 
 
           }  
+	else{
+
+
 //	printf("inserting \n");
-	//Node::symtab -> insertCurScope(this->GetIdentifier()->GetName(), this) ;
+	Node::symtab -> insertCurScope(this->GetIdentifier()->GetName(), this) ;
 //	printf("the size of the curscope map at this level is %d\n", static_cast<int>( Node::symtab->getCurrentScope().size()));
+         }
 
 	}
 	else{
@@ -93,7 +98,9 @@ void FnDecl::Check(){
 
    if(returnType != NULL){
 	Program::fnReturnType = returnType;
-//puts(Program::fnReturnType);
+//printf("the return type is ");
+//puts(Program::fnReturnType->getNameType());
+//printf("\n");
 }
 
        char * decName = this->GetIdentifier()->GetName();
@@ -121,10 +128,10 @@ void FnDecl::Check(){
 	b->Check(formals);
        // b->Check();
    }
-/*
-if (Program::returnExist == (0 || 1 )){
+
+if (Program::returnExist == 0) {
 ReportError::ReturnMissing(this);
-} */
+} 
    
 }   
 
