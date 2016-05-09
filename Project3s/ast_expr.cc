@@ -267,8 +267,7 @@ void ArrayAccess::PrintChildren(int indentLevel) {
 //needs to be implemented 
 void ArrayAccess::Check(){
 
-base->Check();
-	//Type *base_t = dynamic_cast<VarExpr*>(base)->getType();
+
         Identifier *id = dynamic_cast<VarExpr*>(base)->GetIdentifier();
         Type* elemType = NULL;
         Decl* d = Node::symtab->searchAllScopes(id->GetName());
@@ -319,7 +318,71 @@ void FieldAccess::PrintChildren(int indentLevel) {
 }
 
 //needs to be implemented 
-void FieldAccess::Check(){ int x; } ;
+void FieldAccess::Check(){ 
+ Decl* d = Node::symtab->searchAllScopes(dynamic_cast<VarExpr*>(base)->GetIdentifier() ->GetName());
+ Type* t = dynamic_cast<VarExpr*>(base)->getType();
+ char* fieldS = NULL;
+
+ d->Check();
+ if(d == NULL) {
+  ReportError::IdentifierNotDeclared(dynamic_cast<VarExpr*>(base) ->GetIdentifier(), LookingForVariable);
+ }
+
+ if(!t->IsVector()) {
+     ReportError::InaccessibleSwizzle(field, base);
+ }
+
+ fieldS = field->GetName();
+ std::string fieldString(fieldS);
+
+if(fieldString.size() == 1) {
+    return;
+}
+ if(fieldString.size() > 4) {
+   ReportError::OversizedVector(field, base);
+  }
+ if(t->IsVector()) {
+ if(t == Type::vec2Type) {
+   if((fieldString.size() > 1 && fieldString.size() < 5)){
+
+   if(fieldString.find('x') != std::string::npos || fieldString.find('y') != std::string::npos){
+       if(fieldString.find('z') != std::string::npos || (fieldString.find('w') != std::string::npos)) {
+          ReportError::SwizzleOutOfBound(field, base);
+       }
+       else{ return;}
+
+   }
+   else { ReportError::InvalidSwizzle(field, base);}
+   }    
+   }
+
+   if(t == Type::vec3Type) {
+      if(fieldString.size() > 1 && fieldString.size() < 5) {
+         if( (fieldString.find('x') != std::string::npos) || (fieldString.find('y') != std::string::npos) || (fieldString.find('z') != std::string::npos)) {
+              if(fieldString.find('w') != std::string::npos) { ReportError::SwizzleOutOfBound(field, base);}
+	      else {return;}
+	 }
+
+	 else {ReportError::InvalidSwizzle(field, base);}
+      }
+   }
+
+   if(t == Type::vec4Type) {
+      if(fieldString.size() > 1 && fieldString.size() < 5) {
+       if( (fieldString.find('x') != std::string::npos) || (fieldString.find('y') != std::string::npos) || (fieldString.find('z') != std::string::npos) || (fieldString.find('w') != std::string::npos)) {
+          return;
+       
+       }
+
+       else {ReportError::InvalidSwizzle(field, base);}
+     }
+    
+   }
+
+ }
+ if(t->IsNumeric()) {ReportError::InvalidSwizzle(field, base);}
+ }
+
 
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     Assert(f != NULL && a != NULL); // b can be be NULL (just means no explicit base)
