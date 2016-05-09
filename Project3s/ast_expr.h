@@ -152,10 +152,10 @@ class ArithmeticExpr : public CompoundExpr
     const char *GetPrintNameForNode() { return "ArithmeticExpr"; }
 
     Type *getType() {
-        return right -> getType();
-    }
+        return this -> type;
+    } 
     const char *getNameType() {
-        return right -> getNameType();
+        return this -> getNameType();
     }
      void Check();
 };
@@ -166,8 +166,7 @@ class RelationalExpr : public CompoundExpr
     RelationalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     const char *GetPrintNameForNode() { return "RelationalExpr"; }
    Type *getType() {
-        return Type::boolType;
-        return NULL;
+        return this->type;
     }
     const char *getNameType() {
         return ("bool");
@@ -181,7 +180,7 @@ class EqualityExpr : public CompoundExpr
     EqualityExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     const char *GetPrintNameForNode() { return "EqualityExpr"; }
     Type *getType() {
-        return Type::boolType;
+       return this->type;
         //return NULL;
     }
     const char *getNameType() {
@@ -198,7 +197,7 @@ class LogicalExpr : public CompoundExpr
     const char *GetPrintNameForNode() { return "LogicalExpr"; }
 
     Type *getType() {
-      	return Type::boolType;
+      	return this->type;
       //  return NULL;
     }
     const char *getNameType() {
@@ -214,7 +213,7 @@ class AssignExpr : public CompoundExpr
     AssignExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     const char *GetPrintNameForNode() { return "AssignExpr"; }
     Type *getType() {
-        return left -> getType();
+        return this -> type;
     }
     const char *getNameType() {
         return left -> getNameType();
@@ -229,13 +228,14 @@ class PostfixExpr : public CompoundExpr
     const char *GetPrintNameForNode() { return "PostfixExpr"; }
 
     Type *getType() {
-        if(left != NULL) {
-            return left -> getType();
-        }
-        else {
-            return NULL;
-        }
-    }
+	if(this->type != NULL){
+  	  return this->type;
+	}
+	else {
+	  return NULL;
+	}
+	
+     }
     const char *getNameType() {
         if(left != NULL) {
             return left -> getNameType();
@@ -275,8 +275,16 @@ class ArrayAccess : public LValue
     ArrayAccess(yyltype loc, Expr *base, Expr *subscript);
     const char *GetPrintNameForNode() { return "ArrayAccess"; }
     void PrintChildren(int indentLevel);
-    Type *getType();
-    const char *getNameType();
+    Type *getType() {
+        return type;
+    }
+    const char *GetNameType() {
+        if (type!= NULL){
+            return type->getNameType();
+        }
+        else
+            return NULL;
+    }
     void Check();
 };
 

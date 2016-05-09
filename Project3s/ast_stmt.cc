@@ -226,14 +226,21 @@ void ForStmt::Check(){
    if(init != NULL){
       init -> Check();
    }
+
+   test->Check();
+
+   if( test->getType() ->IsConvertibleTo( Type::boolType) == false ) {	
+	ReportError::TestNotBoolean (test);
+   }
+
    if(step != NULL){
       step -> Check();
    }
 
-   if( test->getType() != Type::boolType ) {	
-	ReportError::TestNotBoolean (test);
+   if(body != NULL){
+      body -> Check();
    }
-  
+    
 }
 
 
@@ -257,14 +264,16 @@ void ForStmt::PrintChildren(int indentLevel) {
 }
 
 void WhileStmt::Check(){
+	
+	test->Check();
+	
+   if( test->getType()->IsConvertibleTo(Type::boolType) == false ) {	
+	ReportError::TestNotBoolean (test);
+   }
 
   if (body != NULL) {
     
       body -> Check();
-   }
-
-   if( test->getType() != Type::boolType ) {	
-	ReportError::TestNotBoolean (test);
    }
 
 
@@ -276,17 +285,21 @@ void WhileStmt::PrintChildren(int indentLevel) {
 }
 
 void IfStmt::Check(){
+ 
+test->Check(); 
+ if( test->getType()->IsConvertibleTo(Type::boolType) == false ) {	
+	ReportError::TestNotBoolean (test);
+   }
+
+
+    if(body != NULL) {
+    body->Check();
+   }
+
     if(elseBody != NULL){
       elseBody -> Check();
     }
-    if(body != NULL) {
-    body->Check();
-}
 
-   if( test->getType() != Type::boolType ) {	
-	ReportError::TestNotBoolean (test);
-   }
-  
 
 }
 
@@ -330,7 +343,7 @@ if(returnDecl != NULL){
    if( (Node::symtab->searchCurScope(returnDecl->GetIdentifier()->GetName()) == NULL) || (Node::symtab->searchHead(returnDecl->GetIdentifier()->GetName()) == NULL)  ){
 	ReportError::IdentifierNotDeclared(returnDecl->GetIdentifier(), LookingForVariable);
    }
-     else if ( given->IsEquivalentTo( Program::fnReturnType) != true ) { //if they are not the same type,return error, else return
+     else if ( given->IsConvertibleTo( Program::fnReturnType) != true ) { //if they are not the same type,return error, else return
        ReportError::ReturnMismatch(this, given, Program::fnReturnType);  //else report error
      }
   
@@ -342,7 +355,7 @@ if(returnDecl != NULL){
 
 //if the return type is not a varexpr, then check if its type matches with return, and
 //report error or return
-   if ( given->IsEquivalentTo( Program::fnReturnType) ) { //if they are the same type,return
+   if ( given->IsConvertibleTo( Program::fnReturnType) ) { //if they are the same type,return
      return; 
    }
   

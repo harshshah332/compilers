@@ -107,7 +107,7 @@ int x = 4;
      if (!vec.empty() && vec.size() >= 0) { //check if vector is empty, no scopes
   	int curLevel = level;
 //	printf("incurscope, level is %d, looking for\n", level);
-	puts(id);
+//	puts(id);
 	while( curLevel >= 0 ) {
   	  std::map <string, Decl*>::iterator it;
           it =  vec.at(curLevel).find(searchID);
