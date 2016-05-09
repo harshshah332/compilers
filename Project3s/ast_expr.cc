@@ -298,9 +298,9 @@ Type *ArrayAccess::getType(){
 
 //needs to be implemented 
 void ArrayAccess::Check(){
+        
+	base->Check();
 
-base->Check();
-	//Type *base_t = dynamic_cast<VarExpr*>(base)->getType();
         Identifier *id = dynamic_cast<VarExpr*>(base)->GetIdentifier();
         Type* elemType = NULL;
         Decl* d = Node::symtab->searchAllScopes(id->GetName());
@@ -311,8 +311,9 @@ base->Check();
            ReportError::IdentifierNotDeclared(id, LookingForVariable);
 	   return;
 	}
-
+  
            else{	
+	    d->Check();
             v = dynamic_cast<VarDecl*>(d);
 	    if(v == NULL) {
               ReportError::NotAnArray(id);
@@ -351,21 +352,22 @@ void FieldAccess::PrintChildren(int indentLevel) {
     field->Print(indentLevel+1);
 }
 
+
+
 //needs to be implemented 
-void FieldAccess::Check(){ 
-if(base != NULL){
-base->Check();
-}
+void FieldAccess::Check(){
+
+base -> Check();
+
  Decl* d = Node::symtab->searchAllScopes(dynamic_cast<VarExpr*>(base)->GetIdentifier() ->GetName());
  Type* t = dynamic_cast<VarExpr*>(base)->getType();
-
  char* fieldS = NULL;
 
  d->Check();
  if(d == NULL) {
   ReportError::IdentifierNotDeclared(dynamic_cast<VarExpr*>(base) ->GetIdentifier(), LookingForVariable);
  }
-
+if (t != NULL) {
  if(!t->IsVector()) {
      ReportError::InaccessibleSwizzle(field, base);
  }
@@ -416,10 +418,12 @@ if(fieldString.size() == 1) {
      }
     
    }
-
+}
  }
  if(t->IsNumeric()) {ReportError::InvalidSwizzle(field, base);}
  }
+
+
 
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     Assert(f != NULL && a != NULL); // b can be be NULL (just means no explicit base)
