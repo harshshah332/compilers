@@ -279,14 +279,39 @@ void ArrayAccess::PrintChildren(int indentLevel) {
 void ArrayAccess::Check(){
         
 	base->Check();
+	Decl *d = Node::symtab->searchAllScopes(dynamic_cast<VarExpr*>(base)->GetIdentifier()->GetName());
+      Type *t = dynamic_cast<VarExpr*>(base)->getType();
+      ArrayType* ar = NULL;
+      d->Check();
+      
 
+	if(d == NULL) {
+        ReportError::IdentifierNotDeclared(dynamic_cast<VarExpr*>(base)->GetIdentifier(), LookingForVariable);
+
+      }
+
+      VarDecl* v = dynamic_cast<VarDecl*>(d);
+      ar = dynamic_cast<ArrayType*>(v->GetType());
+      if(ar == NULL) {
+         ReportError::NotAnArray(dynamic_cast<VarExpr*>(base)->GetIdentifier());
+      }
+
+      else {
+         if(ar->GetElemType() == Type::intType || ar->GetElemType() == Type::boolType || ar->GetElemType() == Type::floatType)
+ 
+        {return;}
+
+	}
+
+/*
         Identifier *id = dynamic_cast<VarExpr*>(base)->GetIdentifier();
         Type* elemType = NULL;
         Decl* d = Node::symtab->searchAllScopes(id->GetName());
+	
         ArrayType* ar = NULL;       
 	VarDecl* v = NULL;
 
-	if(d ==NULL) {
+	if(d == NULL) {
            ReportError::IdentifierNotDeclared(id, LookingForVariable);
 	   return;
 	}
@@ -313,7 +338,7 @@ void ArrayAccess::Check(){
 	   }
 	   
 }
- 
+ */
  }
 
 FieldAccess::FieldAccess(Expr *b, Identifier *f) 
@@ -339,7 +364,7 @@ base -> Check();
  Type* t = dynamic_cast<VarExpr*>(base)->getType();
  char* fieldS = NULL;
 
- d->Check();
+ 
  if(d == NULL) {
   ReportError::IdentifierNotDeclared(dynamic_cast<VarExpr*>(base) ->GetIdentifier(), LookingForVariable);
  }
@@ -366,9 +391,9 @@ if(fieldString.size() == 1) {
           ReportError::SwizzleOutOfBound(field, base);
        }
        else{ return;}
-
+       
    }
-   else { ReportError::InvalidSwizzle(field, base);}
+   else { ReportError::SwizzleOutOfBound(field, base);}
    }    
    }
 
@@ -379,7 +404,7 @@ if(fieldString.size() == 1) {
 	      else {return;}
 	 }
 
-	 else {ReportError::InvalidSwizzle(field, base);}
+	 else {ReportError::SwizzleOutOfBound(field, base);}
       }
    }
 
@@ -390,15 +415,19 @@ if(fieldString.size() == 1) {
        
        }
 
-       else {ReportError::InvalidSwizzle(field, base);}
+       else {ReportError::SwizzleOutOfBound(field, base);}
      }
     
    }
 }
- }
+ 
  if(t->IsNumeric()) {ReportError::InvalidSwizzle(field, base);}
- }
 
+
+   if( (fieldString.find('x') == std::string::npos) && (fieldString.find('y') == std::string::npos) && (fieldString.find('z') == std::string::npos) && (fieldString.find('w') == std::string::npos)) {
+     ReportError::InvalidSwizzle(field, base); }
+ }
+}
 
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     Assert(f != NULL && a != NULL); // b can be be NULL (just means no explicit base)
