@@ -363,7 +363,7 @@ base -> Check();
  Type* t = dynamic_cast<VarExpr*>(base)->getType();
  char* fieldS = NULL;
 
- d->Check();
+ //d->Check();
  if(d == NULL) {
   ReportError::IdentifierNotDeclared(dynamic_cast<VarExpr*>(base) ->GetIdentifier(), LookingForVariable);
  }
