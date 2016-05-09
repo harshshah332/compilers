@@ -1,25 +1,25 @@
 #!/bin/bash
 
-name="Ajeet"
-pid="A53101232"
-email="ajk054@ucsd.edu"
+name="HarshShah_MomoSavier"
+pid="A12396344_A11230603"
+email="hmshah@ucsd.edu_msavier@ucsd.edu"
 
 if [[ $name == "" ]]
-then 
-	echo "Edit this script to enter your name and partners name above"
-	exit
+then
+echo "Edit this script to enter your name and partners name above"
+exit
 fi
 
 if [[ $pid == "" ]]
 then
-        echo "Edit this script to enter your PID and partners PID above"
-        exit
+echo "Edit this script to enter your PID and partners PID above"
+exit
 fi
 
 if [[ $email == "" ]]
 then
-        echo "Edit this script to enter one email where you can be reached easily"
-        exit
+echo "Edit this script to enter one email where you can be reached easily"
+exit
 fi
 
 
