@@ -263,23 +263,45 @@ void ArrayAccess::PrintChildren(int indentLevel) {
     base->Print(indentLevel+1);
     subscript->Print(indentLevel+1, "(subscript) ");
 }
- /*
-//needs to be implemented
-const char *ArrayAccess::getNameType(){
-	return NULL;
-}
-
-//needs to be implemented
-Type *ArrayAccess::getType(){
-	return NULL;
-} */
-
+ 
 //needs to be implemented 
 void ArrayAccess::Check(){
 
 base->Check();
-subscript -> Check();
-	Type *t = base->getType();
+	//Type *base_t = dynamic_cast<VarExpr*>(base)->getType();
+        Identifier *id = dynamic_cast<VarExpr*>(base)->GetIdentifier();
+        Type* elemType = NULL;
+        Decl* d = Node::symtab->searchAllScopes(id->GetName());
+        ArrayType* ar = NULL;       
+	VarDecl* v = NULL;
+
+	if(d ==NULL) {
+           ReportError::IdentifierNotDeclared(id, LookingForVariable);
+	   return;
+	}
+
+           else{	
+            v = dynamic_cast<VarDecl*>(d);
+	    if(v == NULL) {
+              ReportError::NotAnArray(id);
+	    }
+          
+	   elemType = v->GetType();
+           ar = dynamic_cast<ArrayType*>(elemType);
+
+	   if(ar == NULL){
+              ReportError::NotAnArray(id);
+	   } 
+
+	   else {
+              if(ar->GetElemType() == Type::intType || ar->GetElemType() == Type::boolType || ar->GetElemType() == Type::floatType)
+	      {
+	        return;
+	      }
+	   }
+	   
+}
+ 
  }
 
 FieldAccess::FieldAccess(Expr *b, Identifier *f) 
