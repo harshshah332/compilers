@@ -220,7 +220,18 @@ if( (left->getType() == Type::boolType) && (right->getType() == Type::boolType) 
 
 //needs to be checked 
 void AssignExpr::Check(){ 
+left->Check();
+right->Check();
+
+Type* leftType = left->getType();
+Type * rightType = right->getType();
+
+if(!(leftType->IsConvertibleTo(rightType)) || !(rightType->IsConvertibleTo(leftType))) {
+  ReportError::IncompatibleOperands(this->op, leftType, rightType);
+  this->type = Type::errorType;
+}
  //  printf("in assign \n");  
+ /*
 left->Check();
 right->Check();
     if( left->getType() != NULL && right->getType() != NULL){
@@ -234,7 +245,7 @@ right->Check();
 	  //ReportError::InvalidInitialization(v->GetIdentifier(),  left->getType(), right->getType());
 	 ReportError::IncompatibleOperands(op, left->getType(), right->getType() );
       }     
-     }
+     } */
 } 
 
 
@@ -266,7 +277,8 @@ void ArrayAccess::PrintChildren(int indentLevel) {
  
 //needs to be implemented 
 void ArrayAccess::Check(){
-
+        
+	base->Check();
 
         Identifier *id = dynamic_cast<VarExpr*>(base)->GetIdentifier();
         Type* elemType = NULL;
@@ -278,8 +290,9 @@ void ArrayAccess::Check(){
            ReportError::IdentifierNotDeclared(id, LookingForVariable);
 	   return;
 	}
-
+  
            else{	
+	    d->Check();
             v = dynamic_cast<VarDecl*>(d);
 	    if(v == NULL) {
               ReportError::NotAnArray(id);
@@ -318,7 +331,10 @@ void FieldAccess::PrintChildren(int indentLevel) {
 }
 
 //needs to be implemented 
-void FieldAccess::Check(){ 
+void FieldAccess::Check(){
+
+base -> Check();
+
  Decl* d = Node::symtab->searchAllScopes(dynamic_cast<VarExpr*>(base)->GetIdentifier() ->GetName());
  Type* t = dynamic_cast<VarExpr*>(base)->getType();
  char* fieldS = NULL;
@@ -327,7 +343,7 @@ void FieldAccess::Check(){
  if(d == NULL) {
   ReportError::IdentifierNotDeclared(dynamic_cast<VarExpr*>(base) ->GetIdentifier(), LookingForVariable);
  }
-
+if (t != NULL) {
  if(!t->IsVector()) {
      ReportError::InaccessibleSwizzle(field, base);
  }
@@ -378,7 +394,7 @@ if(fieldString.size() == 1) {
      }
     
    }
-
+}
  }
  if(t->IsNumeric()) {ReportError::InvalidSwizzle(field, base);}
  }
