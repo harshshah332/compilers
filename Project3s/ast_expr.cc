@@ -95,13 +95,13 @@ void VarExpr::Check(){
           char *vid = id->GetName();
           
           if(vid) {
-              // printf("looking for ");
+           //    printf("looking for ");
    	     //  puts(vid); printf("\n");
               Decl* before = NULL;
  	      before = Node::symtab->searchAllScopes(vid);		
    
               if(before == NULL){
-                 ReportError::IdentifierNotDeclared(id, LookingForType);                  
+                 ReportError::IdentifierNotDeclared(id, LookingForVariable);                  
               }
        	     else{
 
@@ -134,7 +134,7 @@ void ConditionalExpr::PrintChildren(int indentLevel) {
     falseExpr->Print(indentLevel+1, "(false) ");
 }
 
-//needs to be checked 
+//added error type
 void ArithmeticExpr::Check(){
 //  printf("sdfsdf");
  if(left != NULL) { 
@@ -142,15 +142,22 @@ void ArithmeticExpr::Check(){
    right -> Check();
 //printf(" in arithmetic");
 
-if ( (left->getType() -> IsEquivalentTo(right->getType())) != true ) {
+if ( ( left->getType() -> IsConvertibleTo(right->getType()) == false) || left->getType() == Type::voidType || left->getType() == Type::boolType  ) {
+
+this ->type = Type::errorType;
+
  ReportError::IncompatibleOperands(op, left->getType(), right->getType());
+
+}
+else{
+this->type = left->getType();
 }
 
- 
+ /*
    if( (left->getType() == Type::boolType) || (left->getType() == Type::voidType) || (right->getType() == Type::boolType) || (right->getType() == Type::boolType) ) { 
-
+	this->type = Type::errorType;
 	 ReportError::IncompatibleOperands(op, left->getType(), right->getType()) ;
-      } 
+      }  */
 }  
 
 else{
@@ -160,78 +167,90 @@ else{
   
 
    if( (right->getType() == Type::boolType) || (right->getType() == Type::boolType) ) { 
-
+	this->type = Type::errorType;
 	 ReportError::IncompatibleOperand(op, right->getType()) ;
       } 
-
-
-
 }  
   
 }
 
 
-//needs to be checked 
+//added error type
 void RelationalExpr::Check(){
   
    left -> Check();
    right -> Check();
-//printf("in relatinalexpr");
+// printf("in relatinalexpr");
    
-  if( ( (left->getType() == Type::intType) || (left->getType() == Type::floatType) || (right->getType() == Type::intType) || (right->getType() == Type::floatType) ) && ( left->getType()->IsEquivalentTo(right->getType()) )  ) { 
-	return;
+  if( ( (left->getType() == Type::intType) || (left->getType() == Type::floatType) || (right->getType() == Type::intType) || (right->getType() == Type::floatType) ) && ( left->getType()->IsConvertibleTo(right->getType()) )  ) { 
+	this->type = Type::boolType;
+//	printf("bool");
+	
 	}
 	else {
+//	printf("heter");
+	 this->type = Type::errorType;
 	 ReportError::IncompatibleOperands(op, left->getType(), right->getType()) ;
       }     
   
 }
 
-//needs to be checked
+//added error type
 void EqualityExpr::Check(){ 
 
 left->Check();
 right->Check();
 
 //printf("in equalityexpr\n");
-   if( (left->getType()->IsEquivalentTo(right->getType())) ){
-      return;
+   if( (left->getType()->IsConvertibleTo(right->getType())) ){
+	if(left->getType() == Type::errorType){
+	  this->type = Type::errorType;
+ 	} else {
+ 	this->type = Type::boolType;    
+	}
     }
 
        else {
+	    this->type = Type::errorType;
             ReportError::IncompatibleOperands(op, left->getType(), right->getType());
        }
   } 
 
-//needs to be checked
+//added errortype
 void LogicalExpr::Check(){
    
 left->Check();
 right->Check();
 //printf("in logical\n");
 
-if( (left->getType() == Type::boolType) && (right->getType() == Type::boolType) ) {
+if( (left->getType() != Type::boolType) || (right->getType() != Type::boolType) ) {
+	this->type = Type::errorType;
          ReportError::IncompatibleOperands(op, left->getType(), right->getType() );
       }
+else {
+  this->type = Type::boolType;
+}
         
  
 }
 
 
-//needs to be checked 
+//added the error check
 void AssignExpr::Check(){ 
  //  printf("in assign \n");  
 left->Check();
 right->Check();
     if( left->getType() != NULL && right->getType() != NULL){
-    if( left->getType()->IsEquivalentTo(right->getType()) ) {
+    if( ( right->getType()->IsConvertibleTo(left->getType()) )  ) {
+	this->type = left->getType();
 //printf("about to return");
       return; 
     }    
       else {
-       		
+       //	printf("here");	
           VarExpr *v = dynamic_cast<VarExpr*>(left);
 	  //ReportError::InvalidInitialization(v->GetIdentifier(),  left->getType(), right->getType());
+	 this->type = Type::errorType;
 	 ReportError::IncompatibleOperands(op, left->getType(), right->getType() );
       }     
      }
@@ -246,10 +265,13 @@ left->Check();
    
 
     if( left->getType() == Type::boolType || left->getType() == Type::voidType  ) {
+	  this->type = Type::errorType;
           ReportError::IncompatibleOperand(op, left->getType());
     }
     
-	else return;
+	else {
+	this->type = left->getType();
+	}
 }
 
 
@@ -278,9 +300,42 @@ Type *ArrayAccess::getType(){
 void ArrayAccess::Check(){
 
 base->Check();
-subscript -> Check();
-	Type *t = base->getType();
+	//Type *base_t = dynamic_cast<VarExpr*>(base)->getType();
+        Identifier *id = dynamic_cast<VarExpr*>(base)->GetIdentifier();
+        Type* elemType = NULL;
+        Decl* d = Node::symtab->searchAllScopes(id->GetName());
+        ArrayType* ar = NULL;       
+	VarDecl* v = NULL;
+
+	if(d ==NULL) {
+           ReportError::IdentifierNotDeclared(id, LookingForVariable);
+	   return;
+	}
+
+           else{	
+            v = dynamic_cast<VarDecl*>(d);
+	    if(v == NULL) {
+              ReportError::NotAnArray(id);
+	    }
+          
+	   elemType = v->GetType();
+           ar = dynamic_cast<ArrayType*>(elemType);
+
+	   if(ar == NULL){
+              ReportError::NotAnArray(id);
+	   } 
+
+	   else {
+              if(ar->GetElemType() == Type::intType || ar->GetElemType() == Type::boolType || ar->GetElemType() == Type::floatType)
+	      {
+	        return;
+	      }
+	   }
+	   
+}
+ 
  }
+
 
 FieldAccess::FieldAccess(Expr *b, Identifier *f) 
   : LValue(b? Join(b->GetLocation(), f->GetLocation()) : *f->GetLocation()) {
@@ -297,7 +352,74 @@ void FieldAccess::PrintChildren(int indentLevel) {
 }
 
 //needs to be implemented 
-void FieldAccess::Check(){ int x; } ;
+void FieldAccess::Check(){ 
+if(base != NULL){
+base->Check();
+}
+ Decl* d = Node::symtab->searchAllScopes(dynamic_cast<VarExpr*>(base)->GetIdentifier() ->GetName());
+ Type* t = dynamic_cast<VarExpr*>(base)->getType();
+
+ char* fieldS = NULL;
+
+ d->Check();
+ if(d == NULL) {
+  ReportError::IdentifierNotDeclared(dynamic_cast<VarExpr*>(base) ->GetIdentifier(), LookingForVariable);
+ }
+
+ if(!t->IsVector()) {
+     ReportError::InaccessibleSwizzle(field, base);
+ }
+
+ fieldS = field->GetName();
+ std::string fieldString(fieldS);
+
+if(fieldString.size() == 1) {
+    return;
+}
+ if(fieldString.size() > 4) {
+   ReportError::OversizedVector(field, base);
+  }
+ if(t->IsVector()) {
+ if(t == Type::vec2Type) {
+   if((fieldString.size() > 1 && fieldString.size() < 5)){
+
+   if(fieldString.find('x') != std::string::npos || fieldString.find('y') != std::string::npos){
+       if(fieldString.find('z') != std::string::npos || (fieldString.find('w') != std::string::npos)) {
+          ReportError::SwizzleOutOfBound(field, base);
+       }
+       else{ return;}
+
+   }
+   else { ReportError::InvalidSwizzle(field, base);}
+   }    
+   }
+
+   if(t == Type::vec3Type) {
+      if(fieldString.size() > 1 && fieldString.size() < 5) {
+         if( (fieldString.find('x') != std::string::npos) || (fieldString.find('y') != std::string::npos) || (fieldString.find('z') != std::string::npos)) {
+              if(fieldString.find('w') != std::string::npos) { ReportError::SwizzleOutOfBound(field, base);}
+	      else {return;}
+	 }
+
+	 else {ReportError::InvalidSwizzle(field, base);}
+      }
+   }
+
+   if(t == Type::vec4Type) {
+      if(fieldString.size() > 1 && fieldString.size() < 5) {
+       if( (fieldString.find('x') != std::string::npos) || (fieldString.find('y') != std::string::npos) || (fieldString.find('z') != std::string::npos) || (fieldString.find('w') != std::string::npos)) {
+          return;
+       
+       }
+
+       else {ReportError::InvalidSwizzle(field, base);}
+     }
+    
+   }
+
+ }
+ if(t->IsNumeric()) {ReportError::InvalidSwizzle(field, base);}
+ }
 
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     Assert(f != NULL && a != NULL); // b can be be NULL (just means no explicit base)
@@ -313,7 +435,7 @@ void Call::PrintChildren(int indentLevel) {
    if (actuals) actuals->PrintAll(indentLevel+1, "(actuals) ");
 }
 
-//needs to be implemented 
+//seems to work, possible check for call with errorType
 void Call::Check(){ 
 //printf("here");
 Decl* d = Node::symtab->searchAllScopes(field->GetName());
@@ -356,8 +478,9 @@ else{
 //	printf("formals size is %d, we are at index %d\n", fn->GetFormals()->NumElements(), i);
 	VarDecl *vd = fn->GetFormals()->Nth(i);
 	//vd->Check();
-	if( (e->getType() -> IsEquivalentTo(vd->GetType()) ) == false){
-  	  ReportError::FormalsTypeMismatch(field, i, vd->GetType(),  e->getType());
+	if( (e->getType() -> IsConvertibleTo(vd->GetType()) ) == false){
+  	  ReportError::FormalsTypeMismatch(field, i+1, vd->GetType(),  e->getType());
+	  return;
 	}
       } 
    }
