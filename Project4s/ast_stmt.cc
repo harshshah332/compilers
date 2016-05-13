@@ -69,6 +69,26 @@ void StmtBlock::PrintChildren(int indentLevel) {
     stmts->PrintAll(indentLevel+1);
 }
 
+
+llvm::Value *StmtBlock::Emit() {
+    int i;
+    for(i = 0; i < stmts->NumElements(); i++) {
+        if(!(irgen->GetBasicBlock()->getTerminator())) {
+            if(strcmp("StmtBlock", stmts->Nth(i)->GetPrintNameForNode()))
+                stmts->Nth(i)->Emit();
+            else {
+                symtab->insertScope();
+                stmts->Nth(i)->Emit();
+                symtab->deleteScope();
+            }
+        }
+    }
+    
+    return NULL;
+}
+
+
+
 DeclStmt::DeclStmt(Decl *d) {
     Assert(d != NULL);
     (decl=d)->SetParent(this);
@@ -78,10 +98,26 @@ void DeclStmt::PrintChildren(int indentLevel) {
     decl->Print(indentLevel+1);
 }
 
+llvm::Value *DeclStmt::Emit() {
+
+  decl->Emit();
+
+  return NULL;
+}
+
 ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) { 
     Assert(t != NULL && b != NULL);
     (test=t)->SetParent(this); 
     (body=b)->SetParent(this);
+}
+
+
+
+llvm::Value *ConditionalStmt::Emit() {
+  test->Emit();
+  body->Emit();
+
+  return NULL;
 }
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) { 
@@ -100,10 +136,18 @@ void ForStmt::PrintChildren(int indentLevel) {
     body->Print(indentLevel+1, "(body) ");
 }
 
+//needs to be implemented
+llvm::Value *ForStmt::Emit() { return NULL; }
+
+
+
 void WhileStmt::PrintChildren(int indentLevel) {
     test->Print(indentLevel+1, "(test) ");
     body->Print(indentLevel+1, "(body) ");
 }
+
+//needs to be implemented
+llvm::Value *WhileStmt::Emit() { return NULL; }
 
 IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) { 
     Assert(t != NULL && tb != NULL); // else can be NULL
@@ -117,6 +161,21 @@ void IfStmt::PrintChildren(int indentLevel) {
     if (elseBody) elseBody->Print(indentLevel+1, "(else) ");
 }
 
+//needs to be implemented
+llvm::Value *IfStmt::Emit() { return NULL; }
+
+llvm::Value *BreakStmt::Emit() {
+  llvm::BranchInst::Create(blk->back(),irgen->GetBasicBlock());  
+
+  return NULL;
+}
+
+llvm::Value *ContinueStmt::Emit() {
+  llvm::BranchInst::Create(clk->back(),irgen->GetBasicBlock());
+
+  return NULL;
+}
+
 
 ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) { 
     expr = e;
@@ -126,6 +185,17 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
 void ReturnStmt::PrintChildren(int indentLevel) {
     if ( expr ) 
       expr->Print(indentLevel+1);
+}
+
+llvm::Value *ReturnStmt::Emit() {
+  if(expr) {
+    llvm::Value *retV = expr->Emit();
+    llvm::ReturnInst::Create(*(irgen->GetContext()),retV,irgen->GetBasicBlock());
+  } else {
+    llvm::ReturnInst::Create(*(irgen->GetContext()),irgen->GetBasicBlock());
+  }
+
+  return NULL;
 }
 
 SwitchLabel::SwitchLabel(Expr *l, Stmt *s) {
@@ -145,6 +215,13 @@ void SwitchLabel::PrintChildren(int indentLevel) {
     if (stmt)  stmt->Print(indentLevel+1);
 }
 
+llvm::Value *SwitchLabel::Emit() {
+ 
+  stmt->Emit();
+
+  return NULL;
+}
+
 SwitchStmt::SwitchStmt(Expr *e, List<Stmt *> *c, Default *d) {
     Assert(e != NULL && c != NULL && c->NumElements() != 0 );
     (expr=e)->SetParent(this);
@@ -159,3 +236,5 @@ void SwitchStmt::PrintChildren(int indentLevel) {
     if (def) def->Print(indentLevel+1);
 }
 
+//needs to be implemented
+llvm::Value *SwitchStmt::Emit() { return NULL; }

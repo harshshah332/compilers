@@ -40,6 +40,8 @@ class Stmt : public Node
   public:
      Stmt() : Node() {}
      Stmt(yyltype loc) : Node(loc) {}
+     virtual llvm::Value *Emit() = 0;
+
 };
 
 class StmtBlock : public Stmt 
@@ -51,7 +53,8 @@ class StmtBlock : public Stmt
   public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
     const char *GetPrintNameForNode() { return "StmtBlock"; }
-    void PrintChildren(int indentLevel);
+    void PrintChildren(int indentLevel); 
+    llvm::Value *Emit();
 };
 
 class DeclStmt: public Stmt 
@@ -63,6 +66,7 @@ class DeclStmt: public Stmt
     DeclStmt(Decl *d);
     const char *GetPrintNameForNode() { return "DeclStmt"; }
     void PrintChildren(int indentLevel);
+    llvm::Value *Emit();
 
 };
   
@@ -75,6 +79,7 @@ class ConditionalStmt : public Stmt
   public:
     ConditionalStmt() : Stmt(), test(NULL), body(NULL) {}
     ConditionalStmt(Expr *testExpr, Stmt *body);
+    llvm::Value *Emit();
 
 };
 
@@ -94,6 +99,7 @@ class ForStmt : public LoopStmt
     ForStmt(Expr *init, Expr *test, Expr *step, Stmt *body);
     const char *GetPrintNameForNode() { return "ForStmt"; }
     void PrintChildren(int indentLevel);
+    llvm::Value *Emit();
 
 };
 
@@ -103,6 +109,7 @@ class WhileStmt : public LoopStmt
     WhileStmt(Expr *test, Stmt *body) : LoopStmt(test, body) {}
     const char *GetPrintNameForNode() { return "WhileStmt"; }
     void PrintChildren(int indentLevel);
+    llvm::Value *Emit();
 
 };
 
@@ -116,6 +123,7 @@ class IfStmt : public ConditionalStmt
     IfStmt(Expr *test, Stmt *thenBody, Stmt *elseBody);
     const char *GetPrintNameForNode() { return "IfStmt"; }
     void PrintChildren(int indentLevel);
+    llvm::Value *Emit();
 
 };
 
@@ -131,6 +139,7 @@ class BreakStmt : public Stmt
   public:
     BreakStmt(yyltype loc) : Stmt(loc) {}
     const char *GetPrintNameForNode() { return "BreakStmt"; }
+    llvm::Value *Emit();
 
 };
 
@@ -138,7 +147,8 @@ class ContinueStmt : public Stmt
 {
   public:
     ContinueStmt(yyltype loc) : Stmt(loc) {}
-    const char *GetPrintNameForNode() { return "ContinueStmt"; }
+    const char *GetPrintNameForNode() { return "ContinueStmt"; } 
+    llvm::Value *Emit();
 
 };
 
@@ -151,8 +161,10 @@ class ReturnStmt : public Stmt
     ReturnStmt(yyltype loc, Expr *expr = NULL);
     const char *GetPrintNameForNode() { return "ReturnStmt"; }
     void PrintChildren(int indentLevel);
+    llvm::Value *Emit();
 
 };
+
 
 class SwitchLabel : public Stmt
 {
@@ -165,6 +177,7 @@ class SwitchLabel : public Stmt
     SwitchLabel(Expr *label, Stmt *stmt);
     SwitchLabel(Stmt *stmt);
     void PrintChildren(int indentLevel);
+    llvm::Value *Emit();
 
 };
 
@@ -195,6 +208,7 @@ class SwitchStmt : public Stmt
     SwitchStmt(Expr *expr, List<Stmt*> *cases, Default *def);
     virtual const char *GetPrintNameForNode() { return "SwitchStmt"; }
     void PrintChildren(int indentLevel);
+    llvm::Value *Emit();
 
 };
 

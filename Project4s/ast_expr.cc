@@ -16,6 +16,10 @@ void IntConstant::PrintChildren(int indentLevel) {
     printf("%d", value);
 }
 
+llvm::Value* IntConstant::Emit() {
+  return llvm::ConstantInt::get(irgen->GetIntType(), value);
+}
+
 FloatConstant::FloatConstant(yyltype loc, double val) : Expr(loc) {
     value = val;
 }
@@ -23,11 +27,19 @@ void FloatConstant::PrintChildren(int indentLevel) {
     printf("%g", value);
 }
 
+llvm::Value* FloatConstant::Emit() {
+  return llvm::ConstantFP::get(irgen->GetFloatType(), value);
+}
+
 BoolConstant::BoolConstant(yyltype loc, bool val) : Expr(loc) {
     value = val;
 }
 void BoolConstant::PrintChildren(int indentLevel) { 
     printf("%s", value ? "true" : "false");
+}
+
+llvm::Value* BoolConstant::Emit() {
+  return llvm::ConstantInt::get(irgen->GetBoolType(), value);
 }
 
 VarExpr::VarExpr(yyltype loc, Identifier *ident) : Expr(loc) {
@@ -38,6 +50,9 @@ VarExpr::VarExpr(yyltype loc, Identifier *ident) : Expr(loc) {
 void VarExpr::PrintChildren(int indentLevel) {
     id->Print(indentLevel+1);
 }
+
+llvm::Value* VarExpr::Emit() { return NULL; }
+
 
 Operator::Operator(yyltype loc, const char *tok) : Node(loc) {
     Assert(tok != NULL);
@@ -80,6 +95,18 @@ void CompoundExpr::PrintChildren(int indentLevel) {
    op->Print(indentLevel+1);
    if (right) right->Print(indentLevel+1);
 }
+
+//needs to be implemented
+llvm::Value* ArithmeticExpr::Emit() { return NULL; }
+
+//needs to be implemented
+llvm::Value* PostfixExpr::Emit() {return NULL; }
+
+//needs to be implemented
+llvm::Value* RelationalExpr::Emit() { return NULL; }
+
+//needs to be implemented
+llvm::Value* AssignExpr::Emit() { return NULL; }
    
 ConditionalExpr::ConditionalExpr(Expr *c, Expr *t, Expr *f)
   : Expr(Join(c->GetLocation(), f->GetLocation())) {
@@ -94,6 +121,11 @@ void ConditionalExpr::PrintChildren(int indentLevel) {
     trueExpr->Print(indentLevel+1, "(true) ");
     falseExpr->Print(indentLevel+1, "(false) ");
 }
+
+//needs to be implemented
+llvm::Value* ConditionalExpr::Emit() { return NULL; }
+
+
 ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
     (base=b)->SetParent(this); 
     (subscript=s)->SetParent(this);
@@ -117,6 +149,10 @@ void FieldAccess::PrintChildren(int indentLevel) {
     if (base) base->Print(indentLevel+1);
     field->Print(indentLevel+1);
 }
+
+//needs to be implemented
+llvm::Value* FieldAccess::Emit() { return NULL; }
+
 
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     Assert(f != NULL && a != NULL); // b can be be NULL (just means no explicit base)

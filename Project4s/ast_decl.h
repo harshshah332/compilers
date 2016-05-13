@@ -35,7 +35,7 @@ class Decl : public Node
     Decl(Identifier *name);
     Identifier *GetIdentifier() const { return id; }
     friend ostream& operator<<(ostream& out, Decl *d) { return out << d->id; }
-
+    virtual void Emit() = 0;
 };
 
 class VarDecl : public Decl 

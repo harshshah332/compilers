@@ -79,7 +79,7 @@ class Node  {
     static std::vector<llvm::BasicBlock*> *clk;
 
 
-    virtual void Emit() {}
+  //  virtual void Emit() {}
 };
    
 
