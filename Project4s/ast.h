@@ -40,6 +40,11 @@
 #include <stdlib.h>   // for NULL
 #include "location.h"
 #include <iostream>
+#include "irgen.h"
+#include "list.h"
+#include <map>
+#include <string.h>
+#include <vector>
 
 using namespace std;
 
@@ -67,6 +72,12 @@ class Node  {
     // subclasses should override PrintChildren() instead
     void Print(int indentLevel, const char *label = NULL); 
     virtual void PrintChildren(int indentLevel)  {}
+    
+    static SymbolTable* symtab;
+    static IRGenerator* irgen;
+    static std::vector<llvm::BasicBlock*> *blk;
+    static std::vector<llvm::BasicBlock*> *clk;
+
 
     virtual void Emit() {}
 };

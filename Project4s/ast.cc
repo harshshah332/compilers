@@ -9,6 +9,14 @@
 #include <string.h> // strdup
 #include <stdio.h>  // printf
 
+
+IRGenerator *Node::irgen = new IRGenerator();
+std::vector<llvm::BasicBlock*> *Node::clk = new std::vector<llvm::BasicBlock*>();
+SymbolTable *Node::symtab = new SymbolTable();
+std::vector<llvm::BasicBlock*> *Node::blk = new std::vector<llvm::BasicBlock*>();
+
+
+
 Node::Node(yyltype loc) {
     location = new yyltype(loc);
     parent = NULL;

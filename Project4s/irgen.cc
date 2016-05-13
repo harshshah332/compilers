@@ -4,6 +4,11 @@
  */
 
 #include "irgen.h"
+#include "ast_decl.h"
+#include "ast_type.h"
+#include "ast_stmt.h"
+#include <vector>
+
 
 IRGenerator::IRGenerator() :
     context(NULL),
@@ -58,6 +63,66 @@ llvm::Type *IRGenerator::GetFloatType() const {
    return ty;
 }
 
+llvm::Type *IRGenerator::GetVec2Type() const {
+  llvm::Type *ty = llvm::VectorType::get(llvm::Type::getFloatTy(*context), 2);
+  return ty;
+}
+
+llvm::Type *IRGenerator::GetVec3Type() const {
+  llvm::Type *ty = llvm::VectorType::get(llvm::Type::getFloatTy(*context), 3);
+  return ty;
+}
+
+llvm::Type *IRGenerator::GetVec4Type() const {
+  llvm::Type *ty = llvm::VectorType::get(llvm::Type::getFloatTy(*context), 4);
+  return ty;
+}
+
+llvm::Type *IRGenerator::GetMat2Type() const {
+  llvm::Type *eleTy = llvm::VectorType::get(llvm::Type::getFloatTy(*context), 2);
+  llvm::Type *ty = llvm::ArrayType::get(eleTy, 2);
+  return ty;
+}
+
+llvm::Type *IRGenerator::GetMat3Type() const {
+  llvm::Type *eleTy = llvm::VectorType::get(llvm::Type::getFloatTy(*context), 3);
+  llvm::Type *ty = llvm::ArrayType::get(eleTy, 3);
+  return ty;
+}
+
+llvm::Type *IRGenerator::GetMat4Type() const {
+  llvm::Type *eleTy = llvm::VectorType::get(llvm::Type::getFloatTy(*context), 4);
+  llvm::Type *ty = llvm::ArrayType::get(eleTy, 4);
+  return ty;
+}
+
+
+llvm::Type *IRGenerator::GetType(Type *t) const {
+
+    llvm::Type *ty = llvm::Type::getVoidTy(*(this->GetContext()));
+    
+    if( t->IsEquivalentTo(Type::intType)){
+        ty = this->GetIntType();
+    }
+    else if(t->IsEquivalentTo(Type::floatType)){
+        ty = this->GetFloatType();
+    }
+    else if(t->IsEquivalentTo(Type::boolType)){
+        ty = this->GetBoolType();
+    }
+    else if(t->IsEquivalentTo(Type::vec2Type)){
+        ty = this->GetVec2Type();
+    }
+    else if(t->IsEquivalentTo(Type::vec3Type)){
+        ty = this->GetVec3Type();
+    }
+    else if(t->IsEquivalentTo(Type::vec4Type)){
+        ty = this->GetVec4Type();
+    }
+    
+    return ty;
+    
+}
 const char *IRGenerator::TargetLayout = "e-p:64:64:64-i1:8:8-i8:8:8-i16:16:16-i32:32:32-i64:64:64-f32:32:32-f64:64:64-v64:64:64-v128:128:128-a0:0:64-s0:64:64-f80:128:128-n8:16:32:64-S128";
 
 const char *IRGenerator::TargetTriple = "x86_64-redhat-linux-gnu";
