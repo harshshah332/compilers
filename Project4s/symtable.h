@@ -37,7 +37,7 @@ public:
 
 
 	List< Symbol* > *symtab_list;
-    
+    Symbol* at(int i) { return symtab_list->Nth(i); } 
     SymbolTable() { symtab_list = new List<Symbol*>(); }
     Symbol* getCurScope(){ return symtab_list->Nth(symtab_list->NumElements()-1); }
     Symbol* getGScope(){ return symtab_list->Nth(0); }

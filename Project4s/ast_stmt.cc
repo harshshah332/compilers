@@ -30,6 +30,50 @@ void Program::Emit() {
     // You can use this as a template and create Emit() function
     // for individual node to fill in the module structure and instructions.
     //
+    //IRGenerator irgen;
+    llvm::Module *mod = irgen->GetOrCreateModule("foo.bc");
+  
+    symtab->insertScope();
+  
+    int i;
+    for(i = 0; i < decls->NumElements(); i++)
+      decls->Nth(i)->Emit();
+  
+    // create a function signature
+    /*std::vector<llvm::Type *> argTypes;
+    llvm::Type *intTy = irgen->GetIntType();
+    argTypes.push_back(intTy);
+    llvm::ArrayRef<llvm::Type *> argArray(argTypes);
+    llvm::FunctionType *funcTy = llvm::FunctionType::get(intTy, argArray, false);
+*/
+    // llvm::Function *f = llvm::cast<llvm::Function>(mod->getOrInsertFunction("foo", intTy, intTy, (Type *)0));
+    /*llvm::Function *f = llvm::cast<llvm::Function>(mod->getOrInsertFunction("foo", funcTy));
+    llvm::Argument *arg = f->arg_begin();
+    arg->setName("x");*/
+
+    // insert a block into the runction
+    /*llvm::LLVMContext *context = irgen->GetContext();
+    llvm::BasicBlock *bb = llvm::BasicBlock::Create(*context, "entry", f);*/
+
+    // create a return instruction
+    /*llvm::Value *val = llvm::ConstantInt::get(intTy, 1);
+    llvm::Value *sum = llvm::BinaryOperator::CreateAdd(arg, val, "", bb);
+    llvm::ReturnInst::Create(*context, sum, bb);*/
+
+    mod->dump();
+
+    // write the BC into standard output
+    llvm::WriteBitcodeToFile(mod, llvm::outs());
+}
+
+/*
+void Program::Emit() {
+    // TODO:
+    // This is just a reference for you to get started
+    //
+    // You can use this as a template and create Emit() function
+    // for individual node to fill in the module structure and instructions.
+    //
     IRGenerator irgen;
     llvm::Module *mod = irgen.GetOrCreateModule("Name_the_Module.bc");
 
@@ -41,7 +85,7 @@ void Program::Emit() {
     llvm::FunctionType *funcTy = llvm::FunctionType::get(intTy, argArray, false);
 
     // llvm::Function *f = llvm::cast<llvm::Function>(mod->getOrInsertFunction("foo", intTy, intTy, (Type *)0));
-    llvm::Function *f = llvm::cast<llvm::Function>(mod->getOrInsertFunction("Name_the_function", funcTy));
+   llvm::Function *f = llvm::cast<llvm::Function>(mod->getOrInsertFunction("foo", funcTy));
     llvm::Argument *arg = f->arg_begin();
     arg->setName("x");
 
@@ -57,6 +101,8 @@ void Program::Emit() {
     // write the BC into standard output
     llvm::WriteBitcodeToFile(mod, llvm::outs());
 }
+*/
+
 
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
@@ -137,7 +183,45 @@ void ForStmt::PrintChildren(int indentLevel) {
 }
 
 //needs to be implemented
-llvm::Value *ForStmt::Emit() { return NULL; }
+llvm::Value *ForStmt::Emit() {
+  llvm::LLVMContext *con = irgen->GetContext();
+  llvm::Function *f = irgen->GetFunction();
+  llvm::BasicBlock *footBB = llvm::BasicBlock::Create(*con,"footer",f);
+  llvm::BasicBlock *stepBB = llvm::BasicBlock::Create(*con,"stepBB",f);
+  llvm::BasicBlock *bodyBB = llvm::BasicBlock::Create(*con,"bodyBB",f);
+  llvm::BasicBlock *headBB = llvm::BasicBlock::Create(*con,"header",f);
+
+  init->Emit();
+
+  llvm::BranchInst::Create(headBB, irgen->GetBasicBlock());
+  irgen->SetBasicBlock(headBB);
+  llvm::Value *cond = test->Emit();
+
+  llvm::BranchInst::Create(bodyBB,footBB,cond,headBB);
+
+  symtab->insertScope();
+  irgen->SetBasicBlock(bodyBB);
+  blk->push_back(footBB);
+  clk->push_back(stepBB);
+  body->Emit();
+  if(irgen->GetBasicBlock()->getTerminator() == NULL)
+    llvm::BranchInst::Create(stepBB,irgen->GetBasicBlock());
+  /*if(brstk->NumElements() >= 1)
+    brstk->RemoveAt(brstk->NumElements()-1);
+  if(contstk->NumElements() >= 1)
+    contstk->RemoveAt(brstk->NumElements()-1);*/
+  symtab->deleteScope();
+
+  irgen->SetBasicBlock(stepBB);
+  step->Emit();
+  llvm::BranchInst::Create(headBB,stepBB);
+
+  irgen->SetBasicBlock(footBB);
+  blk->pop_back();
+  clk->pop_back();
+
+  return NULL;
+}
 
 
 
@@ -147,7 +231,34 @@ void WhileStmt::PrintChildren(int indentLevel) {
 }
 
 //needs to be implemented
-llvm::Value *WhileStmt::Emit() { return NULL; }
+llvm::Value *WhileStmt::Emit() {
+  llvm::LLVMContext *con = irgen->GetContext();
+  llvm::Function *f = irgen->GetFunction();
+  llvm::BasicBlock *footBB = llvm::BasicBlock::Create(*con,"footer",f);
+  llvm::BasicBlock *bodyBB = llvm::BasicBlock::Create(*con,"bodyBB",f);
+  llvm::BasicBlock *headBB = llvm::BasicBlock::Create(*con,"header",f);
+  
+  llvm::BranchInst::Create(headBB, irgen->GetBasicBlock());
+  irgen->SetBasicBlock(headBB);
+  llvm::Value *cond = test->Emit();
+
+  llvm::BranchInst::Create(bodyBB,footBB,cond,headBB);
+
+  symtab->insertScope();
+  blk->push_back(footBB);
+  clk->push_back(headBB);
+  irgen->SetBasicBlock(bodyBB);
+  body->Emit();
+  if(bodyBB->getTerminator() == NULL)
+    llvm::BranchInst::Create(headBB,bodyBB);
+  symtab->deleteScope();
+
+  irgen->SetBasicBlock(footBB);
+  blk->pop_back();
+  clk->pop_back();
+
+  return NULL;  
+}
 
 IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) { 
     Assert(t != NULL && tb != NULL); // else can be NULL
@@ -162,7 +273,42 @@ void IfStmt::PrintChildren(int indentLevel) {
 }
 
 //needs to be implemented
-llvm::Value *IfStmt::Emit() { return NULL; }
+llvm::Value *IfStmt::Emit() {
+  //ConditionalStmt::Emit();
+  llvm::Value *cond = test->Emit();
+  
+  llvm::LLVMContext *con = irgen->GetContext();
+  llvm::Function *f = irgen->GetFunction();
+  llvm::BasicBlock *footBB = llvm::BasicBlock::Create(*con,"footer",f);
+  llvm::BasicBlock *elseBB = NULL;
+  if(elseBody)
+    elseBB = llvm::BasicBlock::Create(*con,"elseBB",f);
+  llvm::BasicBlock *thenBB = llvm::BasicBlock::Create(*con,"thenBB",f);
+  llvm::BasicBlock *curBB = irgen->GetBasicBlock();
+
+  llvm::BranchInst::Create(thenBB,elseBody?elseBB:footBB,cond,curBB);
+
+  symtab->insertScope();
+  irgen->SetBasicBlock(thenBB);
+  body->Emit();
+  if(irgen->GetBasicBlock()->getTerminator() == NULL)
+    llvm::BranchInst::Create(footBB,irgen->GetBasicBlock());
+  symtab->deleteScope();
+
+  irgen->SetBasicBlock(footBB);
+
+  if(elseBody) {
+    symtab->insertScope();
+    irgen->SetBasicBlock(elseBB);
+    elseBody->Emit();
+    if(irgen->GetBasicBlock()->getTerminator() == NULL)
+      llvm::BranchInst::Create(footBB,irgen->GetBasicBlock());
+    symtab->deleteScope();
+    irgen->SetBasicBlock(footBB);
+  }
+
+  return NULL;
+}
 
 llvm::Value *BreakStmt::Emit() {
   llvm::BranchInst::Create(blk->back(),irgen->GetBasicBlock());  
@@ -236,5 +382,49 @@ void SwitchStmt::PrintChildren(int indentLevel) {
     if (def) def->Print(indentLevel+1);
 }
 
-//needs to be implemented
-llvm::Value *SwitchStmt::Emit() { return NULL; }
+llvm::Value *SwitchStmt::Emit() {
+  int cnum = cases->NumElements(); // number of cases
+  llvm::LLVMContext *con = irgen->GetContext();
+  llvm::Function *f = irgen->GetFunction();
+  // empty default case
+  llvm::BasicBlock *defBB = llvm::BasicBlock::Create(*con,"defaultBB",f);
+
+  // made footer early for break stack
+  llvm::BasicBlock *footBB = llvm::BasicBlock::Create(*con,"footer",f);
+  blk->push_back(footBB);
+
+  // create switch instance
+  llvm::SwitchInst *swi = llvm::SwitchInst::Create(expr->Emit(),defBB,cnum,
+  irgen->GetBasicBlock());
+
+
+  for(int i = 0; i < cnum; i++) {
+    if(dynamic_cast<Case*>(cases->Nth(i))) {
+      llvm::BasicBlock *caseBB = llvm::BasicBlock::Create(*con,"caseBB",f);
+      llvm::Value* cond = dynamic_cast<Case*>(cases->Nth(i))->caseLabel()->Emit();
+      swi->addCase((llvm::ConstantInt*)cond,caseBB);
+      if(irgen->GetBasicBlock()->getTerminator() == NULL)
+        llvm::BranchInst::Create(caseBB,irgen->GetBasicBlock());
+      irgen->SetBasicBlock(caseBB);
+      ((SwitchLabel*)cases->Nth(i))->Emit();
+      
+    } else if(dynamic_cast<Default*>(cases->Nth(i))) {
+      if(irgen->GetBasicBlock()->getTerminator() == NULL) 
+        llvm::BranchInst::Create(defBB,irgen->GetBasicBlock());
+      irgen->SetBasicBlock(defBB);
+      ((SwitchLabel*)cases->Nth(i))->Emit();
+
+    } else {
+      cases->Nth(i)->Emit();
+    }
+  }
+
+  if(defBB->getTerminator() == NULL)
+    llvm::BranchInst::Create(footBB,defBB);
+
+  blk->pop_back();
+
+  irgen->SetBasicBlock(footBB);
+
+  return NULL;
+}

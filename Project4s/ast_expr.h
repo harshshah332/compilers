@@ -96,6 +96,7 @@ class VarExpr : public Expr
     const char *GetPrintNameForNode() { return "VarExpr"; }
     void PrintChildren(int indentLevel);
     Identifier *GetIdentifier() {return id;}
+    llvm::Value* EmitAddress(); 
     llvm::Value* Emit();    
 };
 
@@ -110,6 +111,7 @@ class Operator : public Node
     void PrintChildren(int indentLevel);
     friend ostream& operator<<(ostream& out, Operator *o) { return out << o->tokenString; }
     bool IsOp(const char *op) const;
+ string toString() { return string(tokenString); }
  };
  
 class CompoundExpr : public Expr
@@ -226,6 +228,12 @@ class FieldAccess : public LValue
     void PrintChildren(int indentLevel);
 
     llvm::Value* Emit();
+    llvm::Value* EmitAddress();
+    Identifier *GetField() { return field; }
+    Expr *GetBase() { return base; }
+    llvm::Constant* SwizzleIndex(char);
+
+
 };
 
 /* Like field access, call is used both for qualified base.field()
