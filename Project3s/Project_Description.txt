@@ -1,0 +1,9 @@
+
+
+For this project, my partner and I took a very CS fundamental view when coding and implementing the project. For previous projects in this class and others, usually we would began coding immediately, but for this project, we spent time to understand the scope of the project and what is to be expected.
+
+We started off by creating a symbol table and finalizing the design for it. We decided to go for a symbol table that had a vector. Each element in the vector was a “Scope”. The vector was a map<string, decl*> where the string was the name of the declaration. We took this approach because we thought it would make our coding and debugging as straight forward and smooth as possible. 
+
+When we coding, we implemented a check function that was a virtual function of the Node. This meant that every class could implement their own version of Check. We also had a virtual function called getType that returned the type of the declaration. We decided to separate the check and getting the type into 2 functions because it made it easier to debug and find errors later on during the testing.
+
+Throughout the entire project, many polymorphism and inheritance principles were used and was the main focus throughout the program. 

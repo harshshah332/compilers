@@ -52,45 +52,28 @@ void VarDecl::Check(){
 
 //	printf("\n");
 
-	if ( before == NULL ) {
+	if ( before != NULL ) {
+	 ReportError::DeclConflict(this, before);
+	} 
+	else{ 
+ 	   Node::symtab -> insertCurScope(this->GetIdentifier()->GetName(), this) ;	
+	}
+
+
            if(this->assignTo != NULL) {
- 
 		assignTo->Check();
                
-       //         if ( Node::symtab->searchAllScopes(assignTo->GetIdentifier()->GetName()) != NULL ) {
-                   if (this->type != assignTo->getType()) { //printf("in init\n");
-	//	puts(assignTo->getType()->getNameType());
-	//	FnDecl* fn = NULL;// dynamic_cast<FnDecl*>(Node::symtab->searchAllScopes(assignTo->GetIdentifier()->GetName()));
-	//	if(fn!=NULL){printf("fndecl type is "); }//puts(fn->GetType()->getNameType()); }
+/*	if( assignTo->getType() == Type::errorType){
+		printf("no\n");*/ 
+
+
+                  if (assignTo->getType()->IsConvertibleTo(this->type) != true) { //  this->type != assignTo->getType() && assignTo->getType() != Type::errorType) { //printf("in init\n");
 			 ReportError::InvalidInitialization(this->GetIdentifier(), this->type, assignTo->getType());  
 			//report error that type does not match assignto
-	    	   }  	
-		   else {
-			Node::symtab -> insertCurScope(this->GetIdentifier()->GetName(), this) ;	
-                   }
-	           
-         /*      }
-	         else{
-	           ReportError::IdentifierNotDeclared ((assignTo->GetIdentifier(), LookingForVariable)
-			//report error that its looking for the variable to assign it to
-	        } */
+	    	   }
+	    	
+}
 
-
-
-          }  
-	else{
-
-
-//	printf("inserting \n");
-	Node::symtab -> insertCurScope(this->GetIdentifier()->GetName(), this) ;
-//	printf("the size of the curscope map at this level is %d\n", static_cast<int>( Node::symtab->getCurrentScope().size()));
-         }
-
-	}
-	else{
-		ReportError::DeclConflict(this, before);  
-
-	}
 //https://piazza.com/class/ilg2qlo1ijg10f?cid=790
 }
 
@@ -98,6 +81,7 @@ void VarDecl::Check(){
 
 void FnDecl::Check(){
 
+Program::returnExist = 0;
 
    if(returnType != NULL){
 	Program::fnReturnType = returnType;
