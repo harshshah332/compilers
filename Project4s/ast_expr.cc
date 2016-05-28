@@ -732,12 +732,24 @@ void ConditionalExpr::PrintChildren(int indentLevel) {
 //needs to be implemented
 
 llvm::Value* ConditionalExpr::Emit() {
+
+  /*   
+    llvm::LLVMContext *irgenContext = irgen->GetContext();
+    llvm::Function *funcUse = irgen->GetFunction();
+    llvm::BasicBlock *blockThen = llvm::BasicBlock::Create(*irgenContext,"blockThen",funcUse);
+    llvm::BasicBlock *blockElse = llvm::BasicBlock::Create(*irgenContext,"blockElse",funcUse);
+    llvm::BasicBlock *blockIf = llvm::BasicBlock::Create(*irgenContext,"blockIf",funcUse);
+    llvm::BasicBlock *blockFooter = llvm::BasicBlock::Create(*irgenContext,"blockFooter",funcUse);
+    llvm::BasicBlock *blockCurrent = irgen -> GetBasicBlock(); 
+*/
+
     llvm::Value *condValue = cond->Emit();
     llvm::Value *trueValue = trueExpr->Emit();
     llvm::Value *falseValue = falseExpr->Emit();
 
-    
-    return llvm::SelectInst::Create(condValue, trueValue, falseValue, "", irgen->GetBasicBlock());
+
+
+  return llvm::SelectInst::Create(condValue, trueValue, falseValue, "", irgen->GetBasicBlock());
 }
 
 
