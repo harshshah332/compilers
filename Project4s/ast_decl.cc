@@ -81,6 +81,9 @@ void FnDecl::Emit() {
     llvm::FunctionType *funTy = llvm::FunctionType::get(typeCur,refArray,false);
     
     llvm::Function *funcTmp = llvm::cast<llvm::Function>( irgen->GetOrCreateModule("")->getOrInsertFunction( llvm::StringRef(this->id->GetName()),funTy));
+	symtab->getGScope()->insertSymbol(this->id->GetName(), funcTmp);
+
+
     
     irgen->SetFunction(funcTmp);
     
