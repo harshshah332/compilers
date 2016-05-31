@@ -16,7 +16,7 @@
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Constants.h"
-
+#include <stack>
 
 #include "list.h"
 
@@ -49,7 +49,9 @@ class IRGenerator {
     llvm::Type *GetMat4Type() const;
 
     llvm::Type *GetType(Type *t) const;
-
+    
+    std::stack<llvm::BasicBlock*> clk;
+    std::stack<llvm::BasicBlock*> blk;
   private:
     llvm::LLVMContext *context;
     llvm::Module      *module;
