@@ -266,13 +266,13 @@ llvm::Value *IfStmt::Emit() {
 
 
 llvm::Value *BreakStmt::Emit() {
-  llvm::BranchInst::Create(blk->back(),irgen->GetBasicBlock());  
+  llvm::BranchInst::Create(irgen->blk.top(),irgen->GetBasicBlock());  
 
   return NULL;
 }
 
 llvm::Value *ContinueStmt::Emit() {
-  llvm::BranchInst::Create(clk->back(),irgen->GetBasicBlock());
+  llvm::BranchInst::Create(irgen->clk.top(),irgen->GetBasicBlock());
 
   return NULL;
 }
