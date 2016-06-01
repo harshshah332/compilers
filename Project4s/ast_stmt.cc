@@ -144,8 +144,8 @@ llvm::Value *ForStmt::Emit() {
     
     symtab->insertScope();
     irgen->SetBasicBlock(blockBody);
-    blk->push_back(blockFooter);
-    clk->push_back(blockStep);
+    irgen->blk.push(blockFooter);
+    irgen->clk.push(blockStep);
     body->Emit();
     if(irgen->GetBasicBlock()->getTerminator() == NULL) {
         llvm::BranchInst::Create(blockStep,irgen->GetBasicBlock());
@@ -163,8 +163,8 @@ llvm::Value *ForStmt::Emit() {
     }
     
     irgen->SetBasicBlock(blockFooter);
-    blk->pop_back();
-    clk->pop_back();
+    irgen->blk.pop();
+    irgen->clk.pop();
     
     return NULL;
 }
@@ -192,8 +192,8 @@ llvm::Value *WhileStmt::Emit() {
     llvm::BranchInst::Create(blockBody,blockFooter,testVal,blockHead);
     
     symtab->insertScope();
-    blk->push_back(blockFooter);
-    clk->push_back(blockHead);
+    irgen->blk.push(blockFooter);
+    irgen->clk.push(blockHead);
     irgen->SetBasicBlock(blockBody);
     body->Emit();
     if(blockBody->getTerminator() == NULL) {
@@ -202,8 +202,8 @@ llvm::Value *WhileStmt::Emit() {
     symtab->deleteScope();
     
     irgen->SetBasicBlock(blockFooter);
-    blk->pop_back();
-    clk->pop_back();
+    irgen->blk.pop();
+    irgen->clk.pop();
     
     return NULL;
 }
@@ -355,7 +355,7 @@ llvm::Value *SwitchStmt::Emit() {
     
     
     
-    blk->push_back(blockFooter);
+    irgen->blk.push(blockFooter);
     
     // here we create the instance of the switch
     llvm::SwitchInst *switchInstance = llvm::SwitchInst::Create(expr->Emit(),blockDefault,numCases,
@@ -386,7 +386,7 @@ llvm::Value *SwitchStmt::Emit() {
     if(blockDefault->getTerminator() == NULL)
         llvm::BranchInst::Create(blockFooter,blockDefault);
     
-    blk->pop_back();
+    irgen->blk.pop();
     
     irgen->SetBasicBlock(blockFooter);
     
