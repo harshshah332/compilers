@@ -390,6 +390,7 @@ llvm::Value *SwitchStmt::Emit() {
     
     if(blockFooter->getTerminator()!= NULL){
     irgen->SetBasicBlock(blockFooter);
-    }
+    
     return NULL;
+    }
 }

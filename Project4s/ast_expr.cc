@@ -813,12 +813,21 @@ llvm::Value* AssignExpr::Emit() {
     llvm::Type *tl = NULL;  
     llvm::Value *left_valAddr;
      if(f_left != NULL) {
+
         left_valAddr = f_left->EmitAddress(); //emit it
         swizzle = f_left->GetField()->GetName(); //get the name of the left
         lengthSwizzle = strlen(swizzle); //get the length of the swizzlw
         
-    }else { //if its not a swizzle, then cast it to a varexpr
-        leftVarExpr = dynamic_cast<VarExpr*>(left);
+    }
+    else if(dynamic_cast<ArrayAccess*>(left) != NULL) {
+      llvm::Value *rhs = right->Emit();
+      ArrayAccess *arr = dynamic_cast<ArrayAccess*>(left);
+      llvm::Value* ePtr = arr->Emit();
+      new llvm::StoreInst(rhs, ePtr, "", irgen->GetBasicBlock());
+      return rhs;
+    }
+    else { //if its not a swizzle, then cast it to a varexpr
+      leftVarExpr = dynamic_cast<VarExpr*>(left);
         left_valAddr = leftVarExpr->EmitAddress();
     }
    
