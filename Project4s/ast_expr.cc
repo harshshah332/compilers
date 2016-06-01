@@ -686,87 +686,119 @@ if ( (tl->isVectorTy()) && ty->isFloatTy() ) {
     
     return ret;
 }
-
-
-
 //needs to be implemented
 llvm::Value* PostfixExpr::Emit() {
-  FieldAccess *l_fa = dynamic_cast<FieldAccess*>(left);
-  VarExpr* l_var; // = dynamic_cast<VarExpr*>(left);
-  llvm::Value *l_addr = NULL;
-  //llvm::Value *i = llvm::ConstantInt::get(irgen->GetIntType(), 1);
-  llvm::Value *l = left->Emit();
-  llvm::Type *ty = l->getType();
-  bool FTy = (ty != (llvm::Type*)irgen->GetIntType());
-  llvm::Value *ival = (FTy) ? llvm::ConstantFP::get(irgen->GetFloatType(), 1.f) :
-                              llvm::ConstantInt::get(irgen->GetIntType(), 1);
+    FieldAccess *f_left = dynamic_cast<FieldAccess*>(left);
+    VarExpr* l_var;
+    llvm::Value *l_addr = NULL;
 
-  llvm::Value *stor = NULL;
-  char *swizzle = NULL;
-  int swizzle_len = 0;
+    llvm::Value *l = left->Emit();
+    llvm::Type *typeLeft = l->getType();
+    bool leftFloat;
+    
 
-  if(l_fa) {
-    swizzle = l_fa->GetField()->GetName();
-    swizzle_len = strlen(swizzle);
-    l_addr = l_fa->EmitAddress();
-  } else {
-    l_var = dynamic_cast<VarExpr*>(left);
-    l_addr = l_var->EmitAddress();
-  }
+    if(typeLeft == (llvm::Type*)irgen->GetIntType()){
+        leftFloat = false;
+    }
+    else{
+        leftFloat = true;
+    }
+    
+    
+    llvm::Value *valueInt = NULL;
+    if(leftFloat == true ) {
+        
+        valueInt = llvm::ConstantFP::get(irgen->GetFloatType(), 1.f);
+    }
+    else{
+        valueInt =  llvm::ConstantInt::get(irgen->GetIntType(), 1);
+    }
+    
+    
+    
+    llvm::Value *storeVal = NULL;
+    char *swizzleName = NULL;
+    int lengthSwizzle = 0;
+    
+    if(f_left) {
+        swizzleName = f_left->GetField()->GetName();
+        lengthSwizzle = strlen(swizzleName);
+        l_addr = f_left->EmitAddress();
+    } else {
+        l_var = dynamic_cast<VarExpr*>(left);
+        l_addr = l_var->EmitAddress();
+    }
+    
+    
+    llvm::Value *tempVal = new llvm::LoadInst(l_addr, "", irgen->GetBasicBlock());
+    
+    llvm::Value *returnValue = new llvm::LoadInst(l_addr, "", irgen->GetBasicBlock());
+    
+    string str = op->toString();
+    if(str.compare("--") == false) {
+        if(f_left != NULL) {
+            vector<llvm::Constant*> vector_ind;
+            int i;
+            for(i = 0; i < lengthSwizzle; i++) {
+                llvm::Constant *indexSwizzle = f_left->SwizzleIndex(swizzleName[i]);
+                
+                llvm::Constant *vec_ind = llvm::ConstantInt::get(irgen->GetIntType(), i);
+                llvm::Value *leftValue = llvm::ExtractElementInst::Create(l, vec_ind, "", irgen->GetBasicBlock());
+                llvm::Value *resultValue = llvm::BinaryOperator::CreateFAdd(leftValue, valueInt, "", irgen->GetBasicBlock());
+                
+                tempVal = llvm::InsertElementInst::Create(tempVal, resultValue, indexSwizzle, "", irgen->GetBasicBlock());
+                vector_ind.push_back(indexSwizzle);
+            }
+            llvm::Constant *mask = llvm::ConstantVector::get(vector_ind);
+            storeVal = new llvm::ShuffleVectorInst(tempVal, llvm::UndefValue::get(tempVal->getType()), mask, "", irgen->GetBasicBlock());
+            
+        } else{
+            
+            
+            if(leftFloat == true){
+                storeVal = llvm::BinaryOperator::CreateFSub(l, valueInt, "", irgen->GetBasicBlock());
+            }
+            else{
+                storeVal = llvm::BinaryOperator::CreateSub(l, valueInt, "", irgen->GetBasicBlock());
+            }
+            
+            
+        }
+        
+    } else if(str.compare("++") == false) {
+        if(f_left != NULL) {
+            vector<llvm::Constant*> vector_ind;
+            int i;
+            for(i = 0; i < lengthSwizzle; i++) {
+                llvm::Constant *indexSwizzle = f_left->SwizzleIndex(swizzleName[i]);
+                
+                llvm::Constant *vec_ind = llvm::ConstantInt::get(irgen->GetIntType(), i);
+                llvm::Value *leftValue = llvm::ExtractElementInst::Create(l, vec_ind, "", irgen->GetBasicBlock());
+                llvm::Value *resultValue = llvm::BinaryOperator::CreateFAdd(leftValue, valueInt, "", irgen->GetBasicBlock());
+                
+                tempVal = llvm::InsertElementInst::Create(tempVal, resultValue, indexSwizzle, "", irgen->GetBasicBlock());
+                vector_ind.push_back(indexSwizzle);
+            }
+            llvm::Constant *mask = llvm::ConstantVector::get(vector_ind);
+            storeVal = new llvm::ShuffleVectorInst(tempVal, llvm::UndefValue::get(tempVal->getType()), mask, "", irgen->GetBasicBlock());
+            
+        } else {
+            
+            if(leftFloat == true){
+                storeVal = llvm::BinaryOperator::CreateFAdd(l, valueInt, "", irgen->GetBasicBlock());
+            }
+            else{
+                storeVal = llvm::BinaryOperator::CreateAdd(l, valueInt, "", irgen->GetBasicBlock());
+            }
+        }
 
-
-  llvm::Value *temp = new llvm::LoadInst(l_addr, "", irgen->GetBasicBlock());
-
-  llvm::Value *ret = new llvm::LoadInst(l_addr, "", irgen->GetBasicBlock());
-
-  string str = op->toString();
-  if(!str.compare("++")) {
-    if(l_fa) {
-      vector<llvm::Constant*> mask_ind;
-      int i;
-      for(i = 0; i < swizzle_len; i++) {
-        llvm::Constant *swizzle_ind = l_fa->SwizzleIndex(swizzle[i]);
-	llvm::Constant *vec_ind = llvm::ConstantInt::get(irgen->GetIntType(), i);
-	llvm::Value *lhs = llvm::ExtractElementInst::Create(l, vec_ind, "", irgen->GetBasicBlock());
-        llvm::Value *res = llvm::BinaryOperator::CreateFAdd(lhs, ival, "", irgen->GetBasicBlock());
-
-	llvm::InsertElementInst::Create(temp, res, swizzle_ind, "", irgen->GetBasicBlock());
-	mask_ind.push_back(swizzle_ind);
-      }
-      llvm::Constant *mask = llvm::ConstantVector::get(mask_ind);
-      stor = new llvm::ShuffleVectorInst(temp, llvm::UndefValue::get(temp->getType()), mask, "", irgen->GetBasicBlock());
-
-    } else
-      stor = (FTy) ? llvm::BinaryOperator::CreateFAdd(l, ival, "", irgen->GetBasicBlock()) :
-                     llvm::BinaryOperator::CreateAdd(l, ival, "", irgen->GetBasicBlock());
-
-  } else if(!str.compare("--")) {
-    if(l_fa) {
-      vector<llvm::Constant*> mask_ind;
-      int i;
-      for(i = 0; i < swizzle_len; i++) {
-        llvm::Constant *swizzle_ind = l_fa->SwizzleIndex(swizzle[i]);
-        llvm::Constant *vec_ind = llvm::ConstantInt::get(irgen->GetIntType(), i);
-        llvm::Value *lhs = llvm::ExtractElementInst::Create(l, vec_ind, "", irgen->GetBasicBlock());
-        llvm::Value *res = llvm::BinaryOperator::CreateFAdd(lhs, ival, "", irgen->GetBasicBlock());
-
-        llvm::InsertElementInst::Create(temp, res, swizzle_ind, "", irgen->GetBasicBlock());
-        mask_ind.push_back(swizzle_ind);
-      }
-      llvm::Constant *mask = llvm::ConstantVector::get(mask_ind);
-      stor = new llvm::ShuffleVectorInst(temp, llvm::UndefValue::get(temp->getType()), mask, "", irgen->GetBasicBlock());
-
-    } else 
-      stor = (FTy) ? llvm::BinaryOperator::CreateFSub(l, ival, "", irgen->GetBasicBlock()) : 
-                   llvm::BinaryOperator::CreateSub(l, ival, "", irgen->GetBasicBlock());
-  }
-  
-  new llvm::StoreInst(stor, l_addr, irgen->GetBasicBlock());
-
-  return ret;
+    }
+    
+    new llvm::StoreInst(storeVal, l_addr, irgen->GetBasicBlock());
+    
+    return returnValue;
 }
-//needs to be implemented
-//llvm::Value* RelationalExpr::Emit() { return NULL; }
+
 
 //needs to be implemented
 

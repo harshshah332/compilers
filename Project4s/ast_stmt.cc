@@ -40,7 +40,7 @@ void Program::Emit() {
       decls->Nth(i)->Emit();
     }
   
-    mod->dump();
+   // mod->dump();
 
     // write the BC into standard output
     llvm::WriteBitcodeToFile(mod, llvm::outs());
