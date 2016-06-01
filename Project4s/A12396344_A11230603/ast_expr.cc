@@ -844,7 +844,7 @@ llvm::Value* AssignExpr::Emit() {
     
     string str = op->toString();
     if(str.compare("=") == false) {
-        if(f_left != NULL) { //if string is an assign expr and f_left isn't NULL
+        if(f_left != NULL) { //if string isn't an assign expr and f_left isn't NULL
             llvm::Value *tempVal = new llvm::LoadInst(left_valAddr, "", irgen->GetBasicBlock());
             //if left is ex) x,y, set it to whatever is right
             if(lengthSwizzle == 1){
