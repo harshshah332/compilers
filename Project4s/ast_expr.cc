@@ -4,6 +4,8 @@
  */
 
 #include <string.h>
+#include <iostream>
+#include <sstream>
 #include "ast_expr.h"
 #include "ast_type.h"
 #include "ast_decl.h"
@@ -1379,6 +1381,37 @@ ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
 void ArrayAccess::PrintChildren(int indentLevel) {
     base->Print(indentLevel+1);
     subscript->Print(indentLevel+1, "(subscript) ");
+}
+
+llvm::Value* ArrayAccess::Emit() {
+   
+   //start creating and retrieving values to pass into GetElementPtrInst
+
+   std::vector<llvm::Value *> vecIdxList; //will be used to create ArrayRef<Value*> using its constructor 
+
+
+   llvm::Constant* zIndex = llvm::ConstantInt::get(irgen->GetIntType(), 0); //array pointer points to first element so get 0 index
+   vecIdxList.push_back(zIndex);
+   vecIdxList.push_back(subscript->Emit());
+
+   llvm::ArrayRef<llvm::Value*> indexList(vecIdxList); //create ArrayRef<Value*> to pass into getelementptrinst later
+   
+   std::stringstream varName;
+
+   varName << "array_access_" << subscript->Emit();
+
+   //create Twine ptr with the varName variable to pass into GetElementPtrInst::Create()
+   
+   llvm::Twine* eName = new llvm::Twine(varName.str());
+
+   llvm::Value* pointerOp = llvm::cast<llvm::LoadInst>(base->Emit())->getPointerOperand();
+   //call GetElementPtrInst::Create()
+
+   llvm::Value *ret = llvm::GetElementPtrInst::Create(pointerOp, indexList, *eName, irgen->GetBasicBlock());
+
+   //return the new load instruction
+
+   return new llvm::LoadInst(ret, "Array Access", irgen->GetBasicBlock());
 }
      
 FieldAccess::FieldAccess(Expr *b, Identifier *f) 
