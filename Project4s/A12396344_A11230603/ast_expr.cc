@@ -1208,25 +1208,25 @@ llvm::Value* LogicalExpr::Emit() {
     
     llvm::CmpInst::OtherOps ops;
     
-    if(typeF != NULL){ //if typeF isn't NULL
+    if(typeF){ //if typeF isn't NULL
         
-        ops = llvm::CmpInst::FCmp;
+        ops = llvm::CmpInst::ICmp; //FCmp
     }
     else{
-        ops = llvm::CmpInst::ICmp;
+        ops = llvm::CmpInst::FCmp; //ICmp
     }
     
-    
+   
     string str = op->toString();
     
     if(str.compare("!=") == false) { //call toSTring on the op and if is not equal to "!=" and typeF isn't NULL
         
-        if(typeF != NULL){
+        if(typeF ){  //check if it exists
             
-            pred =  llvm::CmpInst::FCMP_ONE;
+            pred =  llvm::CmpInst::ICMP_NE; //FCMP_ONE;
         }
         else{
-            pred = llvm::ICmpInst::ICMP_NE;
+            pred = llvm::ICmpInst::FCMP_ONE; //ICMP_NE;
         }
         
     }
@@ -1234,12 +1234,12 @@ llvm::Value* LogicalExpr::Emit() {
     
     else if(str.compare("==") == false){ //if str isn't equal to "==" and typeF isn't NULL
         
-        if(typeF != NULL){
+        if(typeF){
             
-            pred =  llvm::CmpInst::FCMP_OEQ;
+            pred =  llvm::CmpInst::ICMP_EQ; //FCMP_OEQ;
         }
         else{
-            pred = llvm::ICmpInst::ICMP_EQ;
+            pred = llvm::ICmpInst::FCMP_OEQ;  // ICMP_EQ;
         }
         
     }
