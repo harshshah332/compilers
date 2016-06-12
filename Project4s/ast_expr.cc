@@ -813,12 +813,21 @@ llvm::Value* AssignExpr::Emit() {
     llvm::Type *tl = NULL;  
     llvm::Value *left_valAddr;
      if(f_left != NULL) {
+
         left_valAddr = f_left->EmitAddress(); //emit it
         swizzle = f_left->GetField()->GetName(); //get the name of the left
         lengthSwizzle = strlen(swizzle); //get the length of the swizzlw
         
-    }else { //if its not a swizzle, then cast it to a varexpr
-        leftVarExpr = dynamic_cast<VarExpr*>(left);
+    }
+    else if(dynamic_cast<ArrayAccess*>(left) != NULL) {
+      llvm::Value *rhs = right->Emit();
+      ArrayAccess *arr = dynamic_cast<ArrayAccess*>(left);
+      llvm::Value* ePtr = arr->Emit();
+      new llvm::StoreInst(rhs, ePtr, "", irgen->GetBasicBlock());
+      return rhs;
+    }
+    else { //if its not a swizzle, then cast it to a varexpr
+      leftVarExpr = dynamic_cast<VarExpr*>(left);
         left_valAddr = leftVarExpr->EmitAddress();
     }
    
@@ -844,7 +853,7 @@ llvm::Value* AssignExpr::Emit() {
     
     string str = op->toString();
     if(str.compare("=") == false) {
-        if(f_left != NULL) { //if string isn't an assign expr and f_left isn't NULL
+        if(f_left != NULL) { //if string is an assign expr and f_left isn't NULL
             llvm::Value *tempVal = new llvm::LoadInst(left_valAddr, "", irgen->GetBasicBlock());
             //if left is ex) x,y, set it to whatever is right
             if(lengthSwizzle == 1){
